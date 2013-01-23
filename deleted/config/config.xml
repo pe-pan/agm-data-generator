@@ -1,5 +1,0 @@
-<config xmlns="demo.hp.com/ali/config">
-    <svn svn-admin="c:\\Program Files (x86)\\VisualSVN Server\\bin\\svnadmin.exe" repository-path="c:\Repositories\hp-am-demo"/>
-    <hudson home="c:\\'Users\\panuska\\.hudson" />
-    <am url="http://czvm159.devlab.ad:8080/qcbin/"/>
-</config>
