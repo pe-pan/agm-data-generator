@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<result>
+  <suites>
+    <suite>
+      <file>C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\target\surefire-reports\TEST-com.hp.demo.fedex.ShipWebServiceClientTest.xml</file>
+      <name>com.hp.demo.fedex.ShipWebServiceClientTest</name>
+      <duration>0.986</duration>
+      <cases>
+        <case>
+          <duration>0.185</duration>
+          <className>com.hp.demo.fedex.ShipWebServiceClientTest</className>
+          <testName>testCreateClientDetail</testName>
+          <skipped>false</skipped>
+          <failedSince>0</failedSince>
+        </case>
+        <case>
+          <duration>0.798</duration>
+          <className>com.hp.demo.fedex.ShipWebServiceClientTest</className>
+          <testName>testUpdateEndPoint</testName>
+          <skipped>false</skipped>
+          <failedSince>0</failedSince>
+        </case>
+        <case>
+          <duration>0.0</duration>
+          <className>com.hp.demo.fedex.ShipWebServiceClientTest</className>
+          <testName>testGetPayorAccountNumber</testName>
+          <skipped>false</skipped>
+          <failedSince>0</failedSince>
+        </case>
+        <case>
+          <duration>0.003</duration>
+          <className>com.hp.demo.fedex.ShipWebServiceClientTest</className>
+          <testName>testCreateWebAuthenticationDetail</testName>
+          <skipped>false</skipped>
+          <failedSince>0</failedSince>
+        </case>
+      </cases>
+    </suite>
+  </suites>
+  <duration>0.986</duration>
+  <keepLongStdio>false</keepLongStdio>
+</result>

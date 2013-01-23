@@ -1,0 +1,132 @@
+Started by user anonymous
+Checking out a fresh workspace because the workspace is not https://czvm64.devlab.ad:443/svn/hp-am-demo/trunk/fedex-demo
+Cleaning workspace C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace
+Checking out https://czvm64.devlab.ad:443/svn/hp-am-demo/trunk/fedex-demo revision: Oct 12, 2012 1:29:50 PM depth:infinity ignoreExternals: false
+AU        .classpath
+AU        .project
+A         src
+A         src\test
+A         src\test\java
+A         src\test\java\com
+A         src\test\java\com\hp
+A         src\test\java\com\hp\demo
+A         src\test\java\com\hp\demo\fedex
+AU        src\test\java\com\hp\demo\fedex\ShipWebServiceClientTest.java
+A         src\main
+A         src\main\java
+A         src\main\java\com
+A         src\main\java\com\hp
+A         src\main\java\com\hp\demo
+A         src\main\java\com\hp\demo\fedex
+AU        src\main\java\com\hp\demo\fedex\ShipWebServiceClient.java
+A         src\main\wsdl
+AU        src\main\wsdl\ShipService_v9.wsdl
+AU        pom.xml
+A         .settings
+AU        .settings\org.eclipse.jdt.core.prefs
+AU        .settings\org.eclipse.m2e.core.prefs
+At revision 9
+no revision recorded for https://czvm64.devlab.ad:443/svn/hp-am-demo/trunk/fedex-demo in the previous build
+[INFO] Using bundled Maven 3 installation
+[INFO] Checking Maven 3 installation environment
+[workspace] $ C:\Users\panuska\.hudson\maven\slavebundle\bundled-maven\bin\mvn.bat --help
+[INFO] Checking Maven 3 installation version
+[INFO] Detected Maven 3 installation version: 3.0.3
+[workspace] $ C:\Users\panuska\.hudson\maven\slavebundle\bundled-maven\bin\mvn.bat clean cobertura:cobertura -V -B -Dmaven.ext.class.path=C:\Users\panuska\.hudson\maven\slavebundle\resources;C:\Users\panuska\.hudson\maven\slavebundle\lib\maven3-eventspy-3.0.jar;C:\Users\panuska\.hudson\war\WEB-INF\lib\hudson-remoting-2.2.1.jar -Dhudson.eventspy.port=19832 -f pom.xml
+[DEBUG] Waiting for connection on port: 19832
+Apache Maven 3.0.3 (r1075438; 2011-02-28 18:31:09+0100)
+Maven home: C:\Users\panuska\.hudson\maven\slavebundle\bundled-maven
+Java version: 1.7.0_03, vendor: Oracle Corporation
+Java home: c:\Program Files\Java\jdk1.7.0_03\jre
+Default locale: en_US, platform encoding: Cp1252
+OS name: "windows server 2008", version: "6.0", arch: "amd64", family: "windows"
+[DEBUG] Connected to remote
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building fedex-demo 1.0
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ fedex-demo ---
+[INFO] 
+[INFO] >>> cobertura-maven-plugin:2.5.1:cobertura (default-cli) @ fedex-demo >>>
+[INFO] 
+[INFO] --- axistools-maven-plugin:1.4:wsdl2java (default) @ fedex-demo ---
+[INFO] about to add compile source root
+[INFO] Processing wsdl: C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\src\main\wsdl\ShipService_v9.wsdl
+Oct 12, 2012 1:30:14 PM org.apache.axis.utils.JavaUtils isAttachmentSupported
+WARNING: Unable to find required classes (javax.activation.DataHandler and javax.mail.internet.MimeMultipart). Attachment support is disabled.
+[INFO] 
+[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ fedex-demo ---
+[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\src\main\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ fedex-demo ---
+[WARNING] File encoding has not been set, using platform encoding Cp1252, i.e. build is platform dependent!
+[INFO] Compiling 251 source files to C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\target\classes
+[INFO] 
+[INFO] --- cobertura-maven-plugin:2.5.1:instrument (default-cli) @ fedex-demo ---
+[INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
+Instrumenting 1 file to C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\target\generated-classes\cobertura
+Cobertura: Saved information on 1 classes.
+Instrument time: 410ms
+
+[INFO] Instrumentation was successful.
+[INFO] NOT adding cobertura ser file to attached artifacts list.
+[INFO] 
+[INFO] --- maven-resources-plugin:2.4.3:testResources (default-testResources) @ fedex-demo ---
+[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\src\test\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ fedex-demo ---
+[WARNING] File encoding has not been set, using platform encoding Cp1252, i.e. build is platform dependent!
+[INFO] Compiling 1 source file to C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\target\test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.7.2:test (default-test) @ fedex-demo ---
+[INFO] Surefire report directory: C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\target\surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running com.hp.demo.fedex.ShipWebServiceClientTest
+Oct 12, 2012 1:30:56 PM org.apache.axis.utils.JavaUtils isAttachmentSupported
+WARNING: Unable to find required classes (javax.activation.DataHandler and javax.mail.internet.MimeMultipart). Attachment support is disabled.
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.115 sec
+
+Results :
+
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+
+Flushing results...
+Flushing results done
+Cobertura: Loaded information on 1 classes.
+Cobertura: Saved information on 1 classes.
+[INFO] 
+[INFO] <<< cobertura-maven-plugin:2.5.1:cobertura (default-cli) @ fedex-demo <<<
+[INFO] 
+[INFO] --- cobertura-maven-plugin:2.5.1:cobertura (default-cli) @ fedex-demo ---
+[INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
+Cobertura: Loaded information on 1 classes.
+Report time: 1078ms
+
+[INFO] Cobertura Report generation was successful.
+[INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
+Cobertura: Loaded information on 1 classes.
+Report time: 312ms
+
+[INFO] Cobertura Report generation was successful.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 50.756s
+[INFO] Finished at: Fri Oct 12 13:30:59 CEST 2012
+[INFO] Final Memory: 21M/61M
+[INFO] ------------------------------------------------------------------------
+[DEBUG] Closing connection to remote
+[DEBUG] Waiting for process to finish
+[DEBUG] Result: 0
+Recording test results
+Publishing Cobertura coverage report...
+Publishing Cobertura coverage results...
+[DEBUG] Skipping watched dependency update; build not configured with trigger: FedEx Ship Service #17
+Finished: SUCCESS

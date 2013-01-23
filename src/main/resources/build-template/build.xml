@@ -1,0 +1,217 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<build>
+  <actions>
+    <hudson.model.CauseAction>
+      <causes>
+        <hudson.model.Cause_-UserCause>
+          <authenticationName>anonymous</authenticationName>
+        </hudson.model.Cause_-UserCause>
+      </causes>
+    </hudson.model.CauseAction>
+    <hudson.scm.SubversionTagAction>
+      <build class="build" reference="../../.."/>
+      <tags class="hudson.util.CopyOnWriteMap$Tree">
+        <entry>
+          <hudson.scm.SubversionSCM_-SvnInfo>
+            <url>https://czvm64.devlab.ad/svn/hp-am-demo/trunk/fedex-demo</url>
+            <revision>9</revision>
+          </hudson.scm.SubversionSCM_-SvnInfo>
+          <list/>
+        </entry>
+      </tags>
+    </hudson.scm.SubversionTagAction>
+    <hudson.scm.SVNRevisionState>
+      <revisions>
+        <entry>
+          <string>https://czvm64.devlab.ad/svn/hp-am-demo/trunk/fedex-demo</string>
+          <long>9</long>
+        </entry>
+      </revisions>
+    </hudson.scm.SVNRevisionState>
+    <maven-build-record>
+      <id>2d336461-0013-4fc1-808e-18bd3cbba5d7</id>
+      <build class="build" reference="../../.."/>
+      <state>
+        <outer-class reference="../.."/>
+      </state>
+    </maven-build-record>
+    <maven-build-action>
+      <build class="build" reference="../../.."/>
+    </maven-build-action>
+    <hudson.tasks.junit.TestResultAction>
+      <owner class="build" reference="../../.."/>
+      <descriptions class="java.util.concurrent.ConcurrentHashMap"/>
+      <failCount>0</failCount>
+      <skipCount>0</skipCount>
+      <totalCount>4</totalCount>
+      <testData/>
+    </hudson.tasks.junit.TestResultAction>
+    <hudson.plugins.cobertura.CoberturaBuildAction>
+      <owner class="build" reference="../../.."/>
+      <healthyTarget>
+        <targets class="enum-map" enum-type="hudson.plugins.cobertura.targets.CoverageMetric">
+          <entry>
+            <hudson.plugins.cobertura.targets.CoverageMetric>CONDITIONAL</hudson.plugins.cobertura.targets.CoverageMetric>
+            <int>70</int>
+          </entry>
+          <entry>
+            <hudson.plugins.cobertura.targets.CoverageMetric>LINE</hudson.plugins.cobertura.targets.CoverageMetric>
+            <int>80</int>
+          </entry>
+          <entry>
+            <hudson.plugins.cobertura.targets.CoverageMetric>METHOD</hudson.plugins.cobertura.targets.CoverageMetric>
+            <int>80</int>
+          </entry>
+        </targets>
+      </healthyTarget>
+      <unhealthyTarget>
+        <targets class="enum-map" enum-type="hudson.plugins.cobertura.targets.CoverageMetric">
+          <entry>
+            <hudson.plugins.cobertura.targets.CoverageMetric>CONDITIONAL</hudson.plugins.cobertura.targets.CoverageMetric>
+            <int>0</int>
+          </entry>
+          <entry>
+            <hudson.plugins.cobertura.targets.CoverageMetric>LINE</hudson.plugins.cobertura.targets.CoverageMetric>
+            <int>0</int>
+          </entry>
+          <entry>
+            <hudson.plugins.cobertura.targets.CoverageMetric>METHOD</hudson.plugins.cobertura.targets.CoverageMetric>
+            <int>0</int>
+          </entry>
+        </targets>
+      </unhealthyTarget>
+      <result class="enum-map" enum-type="hudson.plugins.cobertura.targets.CoverageMetric">
+        <entry>
+          <hudson.plugins.cobertura.targets.CoverageMetric>CLASSES</hudson.plugins.cobertura.targets.CoverageMetric>
+          <hudson.plugins.cobertura.Ratio>
+            <numerator>1.0</numerator>
+            <denominator>1.0</denominator>
+          </hudson.plugins.cobertura.Ratio>
+        </entry>
+        <entry>
+          <hudson.plugins.cobertura.targets.CoverageMetric>CONDITIONAL</hudson.plugins.cobertura.targets.CoverageMetric>
+          <hudson.plugins.cobertura.Ratio>
+            <numerator>12.0</numerator>
+            <denominator>68.0</denominator>
+          </hudson.plugins.cobertura.Ratio>
+        </entry>
+        <entry>
+          <hudson.plugins.cobertura.targets.CoverageMetric>FILES</hudson.plugins.cobertura.targets.CoverageMetric>
+          <hudson.plugins.cobertura.Ratio reference="../../entry/hudson.plugins.cobertura.Ratio"/>
+        </entry>
+        <entry>
+          <hudson.plugins.cobertura.targets.CoverageMetric>LINE</hudson.plugins.cobertura.targets.CoverageMetric>
+          <hudson.plugins.cobertura.Ratio>
+            <numerator>31.0</numerator>
+            <denominator>221.0</denominator>
+          </hudson.plugins.cobertura.Ratio>
+        </entry>
+        <entry>
+          <hudson.plugins.cobertura.targets.CoverageMetric>METHOD</hudson.plugins.cobertura.targets.CoverageMetric>
+          <hudson.plugins.cobertura.Ratio>
+            <numerator>5.0</numerator>
+            <denominator>13.0</denominator>
+          </hudson.plugins.cobertura.Ratio>
+        </entry>
+        <entry>
+          <hudson.plugins.cobertura.targets.CoverageMetric>PACKAGES</hudson.plugins.cobertura.targets.CoverageMetric>
+          <hudson.plugins.cobertura.Ratio reference="../../entry/hudson.plugins.cobertura.Ratio"/>
+        </entry>
+      </result>
+      <health>
+        <score>17</score>
+        <iconUrl>health-00to19.gif</iconUrl>
+        <localizibleDescription>
+          <holder>
+            <owner>hudson.plugins.cobertura.Messages</owner>
+          </holder>
+          <key>CoberturaBuildAction.description</key>
+          <args>
+            <int>14</int>
+            <string>31/221</string>
+            <string>Lines</string>
+          </args>
+        </localizibleDescription>
+      </health>
+      <onlyStable>false</onlyStable>
+    </hudson.plugins.cobertura.CoberturaBuildAction>
+    <com.hp.alm.ali.hudson.BuildAction>
+      <owner class="build" reference="../../.."/>
+      <codeCoverage>
+        <content serialization="custom">
+          <hudson.FilePath>
+            <default>
+              <remote>C:\Users\panuska\.hudson\jobs\FedEx Ship Service\builds\2012-10-12_14-29-50\aliCoverage.xml</remote>
+            </default>
+            <boolean>true</boolean>
+          </hudson.FilePath>
+        </content>
+        <result>
+          <total>221</total>
+          <covered>31</covered>
+        </result>
+      </codeCoverage>
+        <codeChanges>
+          <changes>
+            <repositoryChanges class="java.util.Collections$SingletonList">
+              <element class="com.hp.alm.scm.build.RepositoryChanges">
+                <id>https://alm-server:8443/svn/hp-alm-demo</id>
+                <location>https://alm-server:8443/svn/hp-alm-demo</location>
+                <revisionChanges class="linked-list">
+                  <com.hp.alm.scm.build.RevisionChange>
+                    <revFrom>9</revFrom>
+                    <revTo>9</revTo>
+                  </com.hp.alm.scm.build.RevisionChange>
+                </revisionChanges>
+              </element>
+            </repositoryChanges>
+          </changes>
+          <revision>9</revision>
+        </codeChanges>
+        <testResults>
+        <build class="build" reference="../../../.."/>
+        <content serialization="custom">
+          <hudson.FilePath>
+            <default>
+              <remote>C:\Users\panuska\.hudson\jobs\FedEx Ship Service\builds\2012-10-12_13-29-50\aliTests.xml</remote>
+            </default>
+            <boolean>true</boolean>
+          </hudson.FilePath>
+        </content>
+        <result>
+          <total>4</total>
+          <failed>0</failed>
+          <skipped>0</skipped>
+        </result>
+      </testResults>
+      <context/>
+      <settings>
+        <entry>
+          <string>salesforce_config</string>
+          <com.hp.alm.ali.hudson.coverage.salesforce.AliSalesforceCoverageExtension_-SalesforceConfig>
+            <reportDir></reportDir>
+            <projectRoot>src</projectRoot>
+          </com.hp.alm.ali.hudson.coverage.salesforce.AliSalesforceCoverageExtension_-SalesforceConfig>
+        </entry>
+        <entry>
+          <string>ncover_config</string>
+          <string></string>
+        </entry>
+      </settings>
+      <log>
+        <build class="build" reference="../../../.."/>
+        <status>OK</status>
+      </log>
+    </com.hp.alm.ali.hudson.BuildAction>
+  </actions>
+  <number>19</number>
+  <result>SUCCESS</result>
+  <duration>83687</duration>
+  <charset>windows-1252</charset>
+  <keepLog>false</keepLog>
+  <builtOn></builtOn>
+  <workspace>C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace</workspace>
+  <hudsonVersion>2.2.1</hudsonVersion>
+  <scm class="hudson.scm.SubversionChangeLogParser"/>
+  <culprits/>
+</build>

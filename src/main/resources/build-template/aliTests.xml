@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<tests>
+ <repository id="https://czvm64.devlab.ad:443/svn/hp-am-demo" location="https://czvm64.devlab.ad:443/svn/hp-am-demo">
+  <branch path="/trunk/fedex-demo">
+   <file path="src/test/java/com/hp/demo/fedex/ShipWebServiceClientTest.java" total="4" skipped="0" failed="0" href="testReport/com.hp.demo.fedex/ShipWebServiceClientTest">
+    <test name="testCreateClientDetail" status="PASSED" />
+    <test name="testUpdateEndPoint" status="PASSED" />
+    <test name="testGetPayorAccountNumber" status="PASSED" />
+    <test name="testCreateWebAuthenticationDetail" status="PASSED" />
+   </file>
+  </branch>
+ </repository>
+</tests>

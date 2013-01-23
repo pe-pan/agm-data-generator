@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<coverage>
+ <repository id="https://czvm64.devlab.ad:443/svn/hp-am-demo" location="https://czvm64.devlab.ad:443/svn/hp-am-demo">
+  <branch path="/trunk/fedex-demo">
+   <file path="src/main/java/com/hp/demo/fedex/ShipWebServiceClient.java" covered="31" lines="221" href="cobertura/com_hp_demo_fedex/ShipWebServiceClient_java" />
+  </branch>
+ </repository>
+</coverage>
