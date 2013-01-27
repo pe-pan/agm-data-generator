@@ -61,7 +61,7 @@ public class DataGenerator {
     }
 
     private static void generateProject(ExcelReader reader) {
-        log.debug("Generating project data...");
+        log.info("Generating project data...");
         User adminUser = User.getUser(settings.getAdmin());
         if ("on-premise".equals(settings.getEnvironment())) {
             RestHelper.Login(adminUser.getLogin(), adminUser.getPassword(), settings.getLoginUrl());
@@ -84,7 +84,7 @@ public class DataGenerator {
     }
 
     private static Sheet readUsers(ExcelReader reader) {
-        log.debug("Reading list of users...");
+        log.info("Reading list of users...");
         Sheet users = reader.getSheet("Users");
         EntityIterator iterator = new EntityIterator(users);
         while (iterator.hasNext()) {
@@ -112,7 +112,7 @@ public class DataGenerator {
     private static Map<String, String> idTranslationTable = new HashMap<String, String>();
 
     private static void generateEntity(ExcelReader reader, String sheetName, String agmAddress) {
-        log.debug("Generating entity: "+sheetName);
+        log.info("Generating entity: "+sheetName);
         Sheet sheet = reader.getSheet(sheetName);
         EntityIterator iterator = new EntityIterator(sheet);
         List<String> referenceColumns = iterator.getReferenceColumns();
@@ -156,7 +156,7 @@ public class DataGenerator {
                 }
             idTranslationTable.put(sheetName+"#"+excelId, agmId);
         }
-    }
+   }
 
     public static void resolveTenantUrl() {
         HashMap<String, String> data = new HashMap<String, String>();

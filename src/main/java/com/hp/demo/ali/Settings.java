@@ -34,7 +34,7 @@ public class Settings {
     private int firstRequirementNumber;
 
     public Settings(Sheet settings) {
-        log.debug("Reading settings...");
+        log.info("Reading settings...");
         generateProject = "yes".equals(SheetTools.getStringValue(settings, 2, 2));
         environment = SheetTools.getStringValue(settings, 3, 2);
         loginUrl = SheetTools.getStringValue(settings, 4, 2);
