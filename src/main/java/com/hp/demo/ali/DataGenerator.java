@@ -21,6 +21,8 @@ public class DataGenerator {
     private static Logger log = Logger.getLogger(RestHelper.class.getName());
 
     private static Settings settings;
+    private static String restUrl;
+    private static String tenantId;
 
     public static void main(String[] args) throws JAXBException, FileNotFoundException {
         if (args.length != 1) {
@@ -33,6 +35,15 @@ public class DataGenerator {
         settings = new Settings(reader.getSheet("Settings"));
 
         if (settings.isGenerateProject()) {
+            if (settings.getRestUrl().length() == 0 || settings.getTenantId().length() == 0) {
+                resolveTenantUrl();
+            } else {
+                restUrl = settings.getRestUrl();
+                tenantId = settings.getTenantId();
+                log.info("");
+            }
+            log.info("REST URL: "+restUrl);
+            log.info("Tenant ID:"+tenantId);
             generateProject(reader);
         }
         if (settings.isMeldRepository()) {
@@ -63,9 +74,9 @@ public class DataGenerator {
         for (Sheet sheet : entitySheets) {
             String entityName = sheet.getSheetName();
             if ("apmuiservice".equals(entityName)) { //todo remove the string constant
-                generateEntity(reader, entityName, settings.getRestUrl()+entityName+"s/assignmentservice/planning");
+                generateEntity(reader, entityName, restUrl+entityName+"s/assignmentservice/planning");
             } else {
-                generateEntity(reader, entityName, settings.getRestUrl()+entityName+"s?TENANTID="+settings.getTenantId());
+                generateEntity(reader, entityName, restUrl+entityName+"s?TENANTID="+tenantId);
             }
         }
         log.debug(idTranslationTable.toString());
@@ -141,8 +152,26 @@ public class DataGenerator {
             } else {
                 Entity agmEntity = RestHelper.postEntity(excelEntity, agmAddress);
                 agmId = EntityTools.getFieldValue(agmEntity, "id");
-            }
+                }
             idTranslationTable.put(sheetName+"#"+excelId, agmId);
         }
     }
+
+    public static void resolveTenantUrl() {
+        HashMap<String, String> data = new HashMap<String, String>();
+        User admin = User.getUser(settings.getAdmin());
+        data.put("username", admin.getLogin());
+        data.put("password", admin.getPassword());
+
+        RestHelper.HttpResponse response = RestHelper.postData("https://gateway.saas.hp.com/msg/actions/doLogin.action", data, null);
+        String url = RestHelper.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
+
+        response = RestHelper.postData(url, null, response.getCookie());
+        url = RestHelper.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
+        String[] tokens = url.split("[/=&]");
+
+        restUrl = "https://agilemanager-int.saas.hp.com/qcbin/rest/domains/"+tokens[4]+"/projects/"+tokens[5]+"/";
+        tenantId = tokens[9];
+    }
+
 }

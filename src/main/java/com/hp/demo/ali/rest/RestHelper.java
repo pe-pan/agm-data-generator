@@ -3,17 +3,26 @@ package com.hp.demo.ali.rest;
 import com.hp.demo.ali.entity.Entity;
 import com.hp.demo.ali.entity.Field;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.tidy.Tidy;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by panuska on 10/26/12.
@@ -120,17 +129,17 @@ public class RestHelper {
         }
     }
 
-    public static String moveEntity (Entity entity, String qcAddress) {
+    public static String moveEntity(Entity entity, String qcAddress) {
         HttpURLConnection conn = null;
         try {
             // write the parameters
             StringBuilder urlParameters = new StringBuilder(qcAddress).append('?');
 
             List<Field> fields = entity.getFields().getField();
-            for(Field field : fields) {
+            for (Field field : fields) {
                 urlParameters.append(field.getName()).append('=').append(/*URLEncoder.encode(*/field.getValue().getValue()/*, "UTF-8")*/).append('&');
             }
-            urlParameters.deleteCharAt(urlParameters.length()-1);
+            urlParameters.deleteCharAt(urlParameters.length() - 1);
             log.debug("Posting: " + urlParameters.toString());
 
             URL url = new URL(urlParameters.toString());
@@ -210,8 +219,132 @@ public class RestHelper {
             log.debug(xmlEntity);
             return xmlEntity.substring("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>".length());
         } catch (Exception e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("When posting: \n"+xmlToPost+"\n at address: "+restAddress, e);
         }
     }
 
+    public static class HttpResponse {
+        private final String response;
+        private final String cookie;
+        private final int responseCode;
+
+        public HttpResponse(String response, String cookie, int responseCode) {
+            this.response = response;
+            this.cookie = cookie;
+            this.responseCode = responseCode;
+        }
+
+        public String getResponse() {
+            return response;
+        }
+
+        public String getCookie() {
+            return cookie;
+        }
+
+        public int getResponseCode() {
+            return responseCode;
+        }
+    }
+
+    /**
+     * Posts given data to the given address and sets the given cookie.
+     * Also handles redirects; only first time it does POST, then it does GET.
+     * @param urlAddress
+     * @param formData if null, GET method is used; POST otherwise
+     * @param cookie this is being returned, unless Set-Cookie header was in the communication
+     * @return
+     */
+    public static HttpResponse postData(String urlAddress, HashMap<String, String> formData, String cookie) {
+        //todo refactor this class to remove code duplicates
+        HttpURLConnection conn = null;
+        try {
+            boolean redirect = false;
+            String data = null;
+            String newCookie = null;
+            do {
+                URL url = new URL(urlAddress);
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(formData != null);
+                conn.setDoInput(true);
+                conn.setAllowUserInteraction(false);
+                conn.setRequestMethod(redirect | formData == null ? "GET" : "POST");
+                if (cookie != null) {
+                    log.debug("Setting cookie: " + cookie);
+                    conn.setRequestProperty("Cookie", cookie);
+                }
+
+                // write the data
+                if (!redirect && formData != null) {
+                    Set<String> keys = formData.keySet();
+                    StringBuilder urlParameters = new StringBuilder();
+                    for (String key : keys) {
+                        String value = formData.get(key);
+                        urlParameters.
+                                append('&').                    // even the very first parameter starts with '&'
+                                append(key).append('=').
+                                append(URLEncoder.encode(value, "UTF-8"));
+                    }
+                    data = urlParameters.substring(1);  // remove the very first '&'
+                    log.debug("Data size: " + data.length());
+                    conn.setRequestProperty("Content-Length", Integer.toString(data.length()));
+                    log.debug("Posting: " + data);
+                    DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+                    wr.writeBytes(data);
+                    wr.flush();
+                    wr.close();
+                }
+
+                if (conn.getResponseCode() == 301 || conn.getResponseCode() == 302) {
+                    urlAddress = conn.getHeaderField("Location");
+                    log.debug("Redirect to: " + urlAddress);
+                    redirect = true;
+                    conn.disconnect();
+                } else {
+                    redirect = false;
+                }
+                newCookie = conn.getHeaderField("Set-Cookie");
+                if (newCookie != null) {
+                    cookie = newCookie;
+                    log.debug("New cookie: " + cookie);
+                }
+            } while (redirect);
+
+            // Get the response
+
+            log.debug("Receiving:");
+            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String line;
+            StringBuilder response = new StringBuilder();
+            while ((line = rd.readLine()) != null) {
+                log.debug(line);
+                response.append(line);
+            }
+            rd.close();
+
+            return  new HttpResponse(response.toString(), cookie, conn.getResponseCode());
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+    }
+
+    public static String extractString(String html, String xpathString) {
+        Tidy tidy = new Tidy();
+        tidy.setShowErrors(0);        //todo redirect Tidy logging to log4j; (see http://ideas-and-code.blogspot.cz/2009/10/jtidy-errors-to-log4j.html)
+        tidy.setShowWarnings(false);
+        tidy.setQuiet(true);
+        Document document = tidy.parseDOM(new StringReader(html), null);
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        Node a = null;
+        try {
+            a = (Node) xpath.compile(xpathString).evaluate(document, XPathConstants.NODE);
+        } catch (XPathExpressionException e) {
+            throw new IllegalStateException("Cannot parse this xpath:"+xpathString, e);
+        }
+        return a.getNodeValue();
+    }
 }
