@@ -50,8 +50,8 @@ public class DataGenerator {
                 tenantId = settings.getTenantId();
                 log.info("");
             }
-            log.info("REST URL: "+restUrl);
-            log.info("Tenant ID:"+tenantId);
+            log.debug("REST URL: " + restUrl);
+            log.debug("Tenant ID:" + tenantId);
             generateProject(reader);
         }
         if (settings.isMeldRepository()) {
