@@ -117,6 +117,9 @@ public class DataGenerator {
         EntityIterator iterator = new EntityIterator(sheet);
         List<String> referenceColumns = iterator.getReferenceColumns();
 
+        int firstReqId = 0;
+        int firstDefId = 0;
+
         /**
          * Translates the IDs from excel to the ones used in AGM.
          */
@@ -153,7 +156,16 @@ public class DataGenerator {
             } else {
                 Entity agmEntity = RestHelper.postEntity(excelEntity, agmAddress);
                 agmId = EntityTools.getFieldValue(agmEntity, "id");
+                // todo an evil hack ; remove it -> handlers can resolve it
+                if (sheetName.equals("requirement") && firstReqId == 0) {   // remember req IDs
+                    firstReqId = Integer.parseInt(agmId);
+                    settings.setFirstRequirementNumber(firstReqId);
                 }
+                if (sheetName.equals("defect") && firstDefId == 0) {        // remember def IDs
+                    firstDefId = Integer.parseInt(agmId);
+                    settings.setFirstDefectNumber(firstDefId);
+                }
+            }
             idTranslationTable.put(sheetName+"#"+excelId, agmId);
         }
    }
