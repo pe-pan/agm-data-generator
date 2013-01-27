@@ -280,6 +280,9 @@ public class RestHelper {
                     StringBuilder urlParameters = new StringBuilder();
                     for (String key : keys) {
                         String value = formData.get(key);
+                        if (value == null) {
+                            value = "";
+                        }
                         urlParameters.
                                 append('&').                    // even the very first parameter starts with '&'
                                 append(key).append('=').
@@ -345,6 +348,10 @@ public class RestHelper {
         } catch (XPathExpressionException e) {
             throw new IllegalStateException("Cannot parse this xpath:"+xpathString, e);
         }
-        return a.getNodeValue();
+        try {
+            return a.getNodeValue();
+        } catch (NullPointerException e) {
+            throw new IllegalStateException("Entity not found!\nEntity: "+xpathString+"\nDocument: "+html);
+        }
     }
 }

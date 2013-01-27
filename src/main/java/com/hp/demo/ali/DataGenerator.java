@@ -25,14 +25,22 @@ public class DataGenerator {
     private static String tenantId;
 
     public static void main(String[] args) throws JAXBException, FileNotFoundException {
-        if (args.length != 1) {
-            System.out.println("Usage: java -jar data-generator.jar excel-configuration-file.xlsx\n");
+        if (args.length != 1 && args.length != 3) {
+            System.out.println("Usage: java -jar data-generator.jar excel-configuration-file.xlsx [admin_user_name admin_password]");
+            System.out.println("       admin_user_name and admin_password are optional");
+            System.out.println("       they overwrite the settings from excel configuration file");
+            System.out.println();
             System.exit(-1);
         }
 
         ExcelReader reader = new ExcelReader(args[0]);
         readUsers(reader);
         settings = new Settings(reader.getSheet("Settings"));
+        if (args.length == 3) {
+            User admin = User.getUser(settings.getAdmin());
+            admin.setLogin(args[1]);
+            admin.setPassword(args[2]);
+        }
 
         if (settings.isGenerateProject()) {
             if (settings.getRestUrl().length() == 0 || settings.getTenantId().length() == 0) {
@@ -177,7 +185,14 @@ public class DataGenerator {
         data.put("password", admin.getPassword());
 
         RestHelper.HttpResponse response = RestHelper.postData("https://gateway.saas.hp.com/msg/actions/doLogin.action", data, null);
-        String url = RestHelper.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
+        String url = null;
+        try {
+            url = RestHelper.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
+        } catch (IllegalStateException e) {
+            log.debug(e);
+            log.error("Incorrect credentials: " + admin.getLogin() + " / " + admin.getPassword());
+            System.exit(-1);
+        }
 
         response = RestHelper.postData(url, null, response.getCookie());
         url = RestHelper.extractString(response.getResponse(), "/html/body/p[2]/a/@href");

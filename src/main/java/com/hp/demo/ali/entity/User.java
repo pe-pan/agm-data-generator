@@ -31,6 +31,14 @@ public class User {
         return password;
     }
 
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     static private Map<String, User> users = new HashMap<String, User>();
 
     public static void addUser(User user) {
