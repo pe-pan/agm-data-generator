@@ -2,6 +2,7 @@ package com.hp.demo.ali;
 
 import com.hp.demo.ali.entity.Entity;
 import com.hp.demo.ali.excel.EntityIterator;
+import com.hp.demo.ali.rest.RestHelper;
 import com.hp.demo.ali.svn.RepositoryMender;
 import com.hp.demo.ali.tools.EntityTools;
 import org.apache.commons.io.FileUtils;
@@ -25,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -40,16 +42,21 @@ public class BuildGenerator {
     private int firstBuildNumber;
     private long startingRevision;
     private String svnUrl;
-    private static String buildTemplateFolder = "C:\\System\\SVN\\ALI Data Generator\\src\\main\\resources\\build-template";
+    private String hudsonUrl;
+    private String jobName;
+    private String buildTemplateFolder;
 
     private RepositoryMender mender;
 
     public BuildGenerator(Settings settings) {
         this.buildsFolder = settings.getBuildFolder();
+        buildTemplateFolder = settings.getBuildTemplateFolder();
         this.firstBuildDate = settings.getFirstBuildDate();
         this.firstBuildNumber = settings.getFirstBuildNumber();
         this.startingRevision = settings.getFirstSvnRevision();
         this.svnUrl = settings.getSvnUrl();
+        hudsonUrl = settings.getHudsonUrl();
+        jobName = settings.getJobName();
         mender = new RepositoryMender(settings);
         log.debug("Build template folder is: " + buildTemplateFolder);
     }
@@ -75,7 +82,7 @@ public class BuildGenerator {
             int teamMembers = EntityTools.getFieldIntValue(entity, "team members");
 
             firstBuildDate = new Date(firstBuildDate.getTime() + nextBuild);     //nextBuild is in milliseconds
-            String outputFolder = buildsFolder + File.separator + sdf.format(firstBuildDate);
+            String outputFolder = buildsFolder + File.separator + jobName + File.separator + "builds" + File.separator + sdf.format(firstBuildDate);
             try {
                 log.debug("Copying template folder to " + outputFolder);
                 FileUtils.copyDirectory(new File(buildTemplateFolder), new File(outputFolder));
@@ -216,5 +223,16 @@ public class BuildGenerator {
 
     private String setNodeValue(Document document, String xpathString, long value) {
         return setNodeValue(document, xpathString, Long.toString(value));
+    }
+
+    public void createJob() {
+        HashMap<String, String> data = new HashMap<String, String>();
+        data.put("name", jobName);
+        data.put("mode", "copy");
+        data.put("from", "uimafit");   //todo uimafit - should not be encoded here
+        data.put("json", "{\"name\": \"BookStore2\", \"mode\": \"copy\", \"from\": \"uimafit\", \"Submit\": \"OK\"}");
+        data.put("Submit", "OK");
+        RestHelper.postData(hudsonUrl + "view/All/createItem", data, null);
+        //todo verify status code -> fail or log error
     }
 }

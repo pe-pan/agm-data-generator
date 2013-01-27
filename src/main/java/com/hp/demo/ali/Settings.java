@@ -23,7 +23,10 @@ public class Settings {
     private String svnUrl;
     private String svnUser;
     private boolean generateBuilds;
+    private String hudsonUrl;
+    private String jobName;
     private String buildFolder;
+    private String buildTemplateFolder;
     private Date firstBuildDate;
     private int firstBuildNumber;
     private long firstSvnRevision;
@@ -42,12 +45,15 @@ public class Settings {
         svnUrl = SheetTools.getStringValue(settings, 9, 2);
         svnUser = SheetTools.getStringValue(settings, 10, 2);
         generateBuilds = "yes".equals(SheetTools.getStringValue(settings, 11, 2));
-        buildFolder = SheetTools.getStringValue(settings, 12, 2);
-        firstBuildDate = SheetTools.getDateValue(settings, 13, 2, new SimpleDateFormat("dd/MM/yyyy HH:mm"));
-        firstBuildNumber = SheetTools.getIntValue(settings, 14, 2);
-        firstSvnRevision = SheetTools.getLongValue(settings, 15, 2);
-        firstDefectNumber = SheetTools.getIntValue(settings, 16, 2);
-        firstRequirementNumber = SheetTools.getIntValue(settings, 17, 2);
+        hudsonUrl = SheetTools.getStringValue(settings, 12, 2);
+        jobName = SheetTools.getStringValue(settings, 13, 2);
+        buildFolder = SheetTools.getStringValue(settings, 14, 2);
+        buildTemplateFolder = SheetTools.getStringValue(settings, 15, 2);
+        firstBuildDate = SheetTools.getDateValue(settings, 16, 2, new SimpleDateFormat("dd/MM/yyyy HH:mm"));
+        firstBuildNumber = SheetTools.getIntValue(settings, 17, 2);
+        firstSvnRevision = SheetTools.getLongValue(settings, 18, 2);
+        firstDefectNumber = SheetTools.getIntValue(settings, 19, 2);
+        firstRequirementNumber = SheetTools.getIntValue(settings, 20, 2);
     }
 
     public boolean isGenerateProject() {
@@ -90,8 +96,20 @@ public class Settings {
         return generateBuilds;
     }
 
+    public String getHudsonUrl() {
+        return hudsonUrl;
+    }
+
+    public String getJobName() {
+        return jobName;
+    }
+
     public String getBuildFolder() {
         return buildFolder;
+    }
+
+    public String getBuildTemplateFolder() {
+        return buildTemplateFolder;
     }
 
     public Date getFirstBuildDate() {
@@ -113,4 +131,13 @@ public class Settings {
     public int getFirstRequirementNumber() {
         return firstRequirementNumber;
     }
+
+    public void setFirstDefectNumber(int firstDefectNumber) {
+        this.firstDefectNumber = firstDefectNumber;
+    }
+
+    public void setFirstRequirementNumber(int firstRequirementNumber) {
+        this.firstRequirementNumber = firstRequirementNumber;
+    }
+
 }

@@ -56,6 +56,7 @@ public class DataGenerator {
             List<Long>skippedRevisions = readSkippedRevisions(reader.getSheet("Skip-Revisions"));
             BuildGenerator generator = new BuildGenerator(settings);
             generator.generate(reader.getSheet("Builds"), skippedRevisions);
+            generator.createJob();
         }
     }
 
