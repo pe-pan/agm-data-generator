@@ -83,7 +83,7 @@ public class DataGenerator {
         for (Sheet sheet : entitySheets) {
             String entityName = sheet.getSheetName();
             if ("apmuiservice".equals(entityName)) { //todo remove the string constant
-                log.info("Moving back log items to the created release...");
+                log.info("Moving backlog items to the created release...");
                 generateEntity(reader, entityName, restUrl+entityName+"s/assignmentservice/planning");
             } else {
                 log.info("Generating entity: "+entityName);
@@ -169,10 +169,12 @@ public class DataGenerator {
                 if (sheetName.equals("requirement") && firstReqId == 0) {   // remember req IDs
                     firstReqId = Integer.parseInt(agmId);
                     settings.setFirstRequirementNumber(firstReqId);
+                    log.info("First requirement ID: "+firstReqId);
                 }
                 if (sheetName.equals("defect") && firstDefId == 0) {        // remember def IDs
                     firstDefId = Integer.parseInt(agmId);
                     settings.setFirstDefectNumber(firstDefId);
+                    log.info("First defect ID: "+firstDefId);
                 }
             }
             idTranslationTable.put(sheetName+"#"+excelId, agmId);

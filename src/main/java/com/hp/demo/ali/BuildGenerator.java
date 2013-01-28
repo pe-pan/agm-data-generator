@@ -62,7 +62,7 @@ public class BuildGenerator {
     }
 
     public void generate(Sheet sheet, List<Long> skipRevisions) {
-        log.debug("Generating builds...");
+        log.info("Generating builds...");
         EntityIterator iterator = new EntityIterator(sheet);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-'00'");
         while (iterator.hasNext()) {
@@ -84,7 +84,7 @@ public class BuildGenerator {
             firstBuildDate = new Date(firstBuildDate.getTime() + nextBuild);     //nextBuild is in milliseconds
             String outputFolder = buildsFolder + File.separator + jobName + File.separator + "builds" + File.separator + sdf.format(firstBuildDate);
             try {
-                log.info("Copying template folder to " + outputFolder);
+                log.info("Generating build " + sdf.format(firstBuildDate));
                 FileUtils.copyDirectory(new File(buildTemplateFolder), new File(outputFolder));
                 File buildXmlFile = new File(outputFolder + File.separator + BUILD_XML);
                 UUID buildId = UUID.randomUUID();
