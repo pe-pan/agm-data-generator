@@ -54,12 +54,6 @@ public class DataGenerator {
             log.debug("Tenant ID:" + tenantId);
             generateProject(reader);
         }
-        if (settings.isMeldRepository()) {
-            RepositoryMender mender = new RepositoryMender(settings);
-    ////        mender.mendRepository(reader.getSheet("Revisions"));
-    //        release starts on 01/Aug/2012
-            mender.mendRepository(new Date(112, 7, 1), 2, 218, 1034, 1142);
-        }
         if (settings.isGenerateBuilds()) {
             List<Long>skippedRevisions = readSkippedRevisions(reader.getSheet("Skip-Revisions"));
             BuildGenerator generator = new BuildGenerator(settings);

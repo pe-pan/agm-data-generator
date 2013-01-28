@@ -47,6 +47,7 @@ public class BuildGenerator {
     private String buildTemplateFolder;
 
     private RepositoryMender mender;
+    private boolean alterRepository;
 
     public BuildGenerator(Settings settings) {
         this.buildsFolder = settings.getBuildFolder();
@@ -58,6 +59,7 @@ public class BuildGenerator {
         hudsonUrl = settings.getHudsonUrl();
         jobName = settings.getJobName();
         mender = new RepositoryMender(settings);
+        alterRepository = settings.isMeldRepository();
         log.debug("Build template folder is: " + buildTemplateFolder);
     }
 
@@ -97,7 +99,9 @@ public class BuildGenerator {
                 File newMavenBuildFile = new File(outputFolder + File.separator + MAVEN_XML_PREF + buildId.toString() + ".xml");
                 mavenBuildFile.renameTo(newMavenBuildFile);
 
-//                mender.alterRepository(fromRevision, toRevision, firstBuildDate.getTime() - nextBuild, firstBuildDate.getTime(), requirements, defects, unassigned, teamMembers);
+                if (alterRepository) {
+                    mender.alterRepository(fromRevision, toRevision, firstBuildDate.getTime() - nextBuild, firstBuildDate.getTime(), requirements, defects, unassigned, teamMembers);
+                }
 
             } catch (IOException e) {
                 throw new IllegalStateException(e);
