@@ -84,7 +84,7 @@ public class BuildGenerator {
             firstBuildDate = new Date(firstBuildDate.getTime() + nextBuild);     //nextBuild is in milliseconds
             String outputFolder = buildsFolder + File.separator + jobName + File.separator + "builds" + File.separator + sdf.format(firstBuildDate);
             try {
-                log.debug("Copying template folder to " + outputFolder);
+                log.info("Copying template folder to " + outputFolder);
                 FileUtils.copyDirectory(new File(buildTemplateFolder), new File(outputFolder));
                 File buildXmlFile = new File(outputFolder + File.separator + BUILD_XML);
                 UUID buildId = UUID.randomUUID();

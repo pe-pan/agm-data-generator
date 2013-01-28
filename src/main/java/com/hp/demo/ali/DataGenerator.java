@@ -83,8 +83,10 @@ public class DataGenerator {
         for (Sheet sheet : entitySheets) {
             String entityName = sheet.getSheetName();
             if ("apmuiservice".equals(entityName)) { //todo remove the string constant
+                log.info("Moving back log items to the created release...");
                 generateEntity(reader, entityName, restUrl+entityName+"s/assignmentservice/planning");
             } else {
+                log.info("Generating entity: "+entityName);
                 generateEntity(reader, entityName, restUrl+entityName+"s?TENANTID="+tenantId);
             }
         }
@@ -120,7 +122,6 @@ public class DataGenerator {
     private static Map<String, String> idTranslationTable = new HashMap<String, String>();
 
     private static void generateEntity(ExcelReader reader, String sheetName, String agmAddress) {
-        log.info("Generating entity: "+sheetName);
         Sheet sheet = reader.getSheet(sheetName);
         EntityIterator iterator = new EntityIterator(sheet);
         List<String> referenceColumns = iterator.getReferenceColumns();
@@ -176,7 +177,7 @@ public class DataGenerator {
             }
             idTranslationTable.put(sheetName+"#"+excelId, agmId);
         }
-   }
+    }
 
     public static void resolveTenantUrl() {
         HashMap<String, String> data = new HashMap<String, String>();
