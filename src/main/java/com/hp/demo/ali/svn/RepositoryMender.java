@@ -193,7 +193,7 @@ public class RepositoryMender {
         int defectMax = defectNumber;
 
         // team members
-        int userBlock = (int) numOfRevisions / teamMembers;
+        int userBlock = (int)Math.ceil((float)numOfRevisions / (float)teamMembers);
 
         for (long i = startRevision; i < endRevision; i++) {
             //time
