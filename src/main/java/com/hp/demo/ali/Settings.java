@@ -25,6 +25,7 @@ public class Settings {
     private boolean generateBuilds;
     private String hudsonUrl;
     private String jobName;
+    private String templateJobName;
     private String buildFolder;
     private String buildTemplateFolder;
     private Date firstBuildDate;
@@ -47,13 +48,14 @@ public class Settings {
         generateBuilds = "yes".equals(SheetTools.getStringValue(settings, 11, 2));
         hudsonUrl = SheetTools.getStringValue(settings, 12, 2);
         jobName = SheetTools.getStringValue(settings, 13, 2);
-        buildFolder = SheetTools.getStringValue(settings, 14, 2);
-        buildTemplateFolder = SheetTools.getStringValue(settings, 15, 2);
-        firstBuildDate = SheetTools.getDateValue(settings, 16, 2, new SimpleDateFormat("dd/MM/yyyy HH:mm"));
-        firstBuildNumber = SheetTools.getIntValue(settings, 17, 2);
-        firstSvnRevision = SheetTools.getLongValue(settings, 18, 2);
-        firstDefectNumber = SheetTools.getIntValue(settings, 19, 2);
-        firstRequirementNumber = SheetTools.getIntValue(settings, 20, 2);
+        templateJobName = SheetTools.getStringValue(settings, 14, 2);
+        buildFolder = SheetTools.getStringValue(settings, 15, 2);
+        buildTemplateFolder = SheetTools.getStringValue(settings, 16, 2);
+        firstBuildDate = SheetTools.getDateValue(settings, 17, 2, new SimpleDateFormat("dd/MM/yyyy HH:mm"));
+        firstBuildNumber = SheetTools.getIntValue(settings, 18, 2);
+        firstSvnRevision = SheetTools.getLongValue(settings, 19, 2);
+        firstDefectNumber = SheetTools.getIntValue(settings, 20, 2);
+        firstRequirementNumber = SheetTools.getIntValue(settings, 21, 2);
     }
 
     public boolean isGenerateProject() {
@@ -102,6 +104,10 @@ public class Settings {
 
     public String getJobName() {
         return jobName;
+    }
+
+    public String getTemplateJobName() {
+        return templateJobName;
     }
 
     public String getBuildFolder() {

@@ -44,6 +44,7 @@ public class BuildGenerator {
     private String svnUrl;
     private String hudsonUrl;
     private String jobName;
+    private String templateJobName;
     private String buildTemplateFolder;
 
     private RepositoryMender mender;
@@ -58,6 +59,7 @@ public class BuildGenerator {
         this.svnUrl = settings.getSvnUrl();
         hudsonUrl = settings.getHudsonUrl();
         jobName = settings.getJobName();
+        templateJobName = settings.getTemplateJobName();
         mender = new RepositoryMender(settings);
         alterRepository = settings.isMeldRepository();
         log.debug("Build template folder is: " + buildTemplateFolder);
@@ -233,8 +235,8 @@ public class BuildGenerator {
         HashMap<String, String> data = new HashMap<String, String>();
         data.put("name", jobName);
         data.put("mode", "copy");
-        data.put("from", "uimafit");   //todo uimafit - should not be encoded here
-        data.put("json", "{\"name\": \"BookStore2\", \"mode\": \"copy\", \"from\": \"uimafit\", \"Submit\": \"OK\"}");
+        data.put("from", templateJobName);
+        data.put("json", "{\"name\": \""+jobName+"\", \"mode\": \"copy\", \"from\": \""+jobName+"\", \"Submit\": \"OK\"}");
         data.put("Submit", "OK");
         RestHelper.postData(hudsonUrl + "view/All/createItem", data, null);
         //todo verify status code -> fail or log error
