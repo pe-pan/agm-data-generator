@@ -214,12 +214,22 @@ public class RepositoryMender {
 
             if (requirementCount >= defectCount && requirementCount >= unassignedCount) {
                 // requirements
-                setProperty(i, "svn:log", "implementing user story #"+requirementNumber+": "+originalMessage);
+                String prefix = "implementing user story #"+requirementNumber+": ";
+                if (!originalMessage.startsWith(prefix)) {
+                    setProperty(i, "svn:log", prefix+originalMessage);
+                } else {
+                    log.debug("Skipping, log already set into: "+originalMessage);
+                }
                 requirementCount--;
                 requirementNumber++;
             } else if (defectCount >= unassignedCount) {
                 // defects
-                setProperty(i, "svn:log", "fixing defect #"+defectNumber+": "+originalMessage);
+                String prefix = "fixing defect #"+defectNumber+": ";
+                if (!originalMessage.startsWith(prefix)) {
+                    setProperty(i, "svn:log", prefix+originalMessage);
+                } else {
+                    log.debug("Skipping, log already set into: "+originalMessage);
+                }
                 defectCount--;
                 defectNumber++;
             } else {
