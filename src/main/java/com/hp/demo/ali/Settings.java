@@ -51,7 +51,12 @@ public class Settings {
         templateJobName = SheetTools.getStringValue(settings, 14, 2);
         buildFolder = SheetTools.getStringValue(settings, 15, 2);
         buildTemplateFolder = SheetTools.getStringValue(settings, 16, 2);
-        firstBuildDate = SheetTools.getDateValue(settings, 17, 2, new SimpleDateFormat("dd/MM/yyyy HH:mm"));
+        try {
+            long days = SheetTools.getLongValue(settings, 17, 2);
+            firstBuildDate = new Date(new Date().getTime() + days*24*60*60*1000);
+        } catch (NumberFormatException e) {
+            firstBuildDate = SheetTools.getDateValue(settings, 17, 2, new SimpleDateFormat("dd/MM/yyyy HH:mm"));
+        }
         firstBuildNumber = SheetTools.getIntValue(settings, 18, 2);
         firstSvnRevision = SheetTools.getLongValue(settings, 19, 2);
         firstDefectNumber = SheetTools.getIntValue(settings, 20, 2);
