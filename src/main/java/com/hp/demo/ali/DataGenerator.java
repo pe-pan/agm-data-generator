@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 
 import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -32,33 +33,43 @@ public class DataGenerator {
             System.out.println();
             System.exit(-1);
         }
-
-        ExcelReader reader = new ExcelReader(args[0]);
-        readUsers(reader);
-        settings = new Settings(reader.getSheet("Settings"));
-        if (args.length == 3) {
-            User admin = User.getUser(settings.getAdmin());
-            admin.setLogin(args[1]);
-            admin.setPassword(args[2]);
-        }
-
-        if (settings.isGenerateProject()) {
-            if (settings.getRestUrl().length() == 0 || settings.getTenantId().length() == 0) {
-                resolveTenantUrl();
-            } else {
-                restUrl = settings.getRestUrl();
-                tenantId = settings.getTenantId();
-                log.info("");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        long startTime = new Date().getTime();
+        log.info("Starting at: "+sdf.format(new Date(startTime)));
+        try {
+            ExcelReader reader = new ExcelReader(args[0]);
+            readUsers(reader);
+            settings = new Settings(reader.getSheet("Settings"));
+            if (args.length == 3) {
+                User admin = User.getUser(settings.getAdmin());
+                admin.setLogin(args[1]);
+                admin.setPassword(args[2]);
             }
-            log.debug("REST URL: " + restUrl);
-            log.debug("Tenant ID:" + tenantId);
-            generateProject(reader);
-        }
-        if (settings.isGenerateBuilds()) {
-            List<Long>skippedRevisions = readSkippedRevisions(reader.getSheet("Skip-Revisions"));
-            BuildGenerator generator = new BuildGenerator(settings);
-            generator.generate(reader.getSheet("Builds"), skippedRevisions);
-            generator.createJob();
+
+            if (settings.isGenerateProject()) {
+                if (settings.getRestUrl().length() == 0 || settings.getTenantId().length() == 0) {
+                    resolveTenantUrl();
+                } else {
+                    restUrl = settings.getRestUrl();
+                    tenantId = settings.getTenantId();
+                    log.info("");
+                }
+                log.debug("REST URL: " + restUrl);
+                log.debug("Tenant ID:" + tenantId);
+                generateProject(reader);
+            }
+            if (settings.isGenerateBuilds()) {
+                List<Long>skippedRevisions = readSkippedRevisions(reader.getSheet("Skip-Revisions"));
+                BuildGenerator generator = new BuildGenerator(settings);
+                generator.generate(reader.getSheet("Builds"), skippedRevisions);
+                generator.createJob();
+            }
+        } finally {
+            long endTime = new Date().getTime();
+            log.info("Finished at: "+sdf.format(new Date(endTime)));
+            long total = endTime - startTime;
+
+            log.info(String.format("The generator ran for: %02d:%02d.%03d", total / 60000, (total%60000)/1000, total%100));
         }
     }
 
