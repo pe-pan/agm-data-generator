@@ -22,8 +22,6 @@ public class DataGenerator {
     private static Logger log = Logger.getLogger(RestHelper.class.getName());
 
     private static Settings settings;
-    private static String restUrl;
-    private static String tenantId;
 
     public static void main(String[] args) throws JAXBException, FileNotFoundException {
         if (args.length != 1 && args.length != 3) {
@@ -49,13 +47,9 @@ public class DataGenerator {
             if (settings.isGenerateProject()) {
                 if (settings.getRestUrl().length() == 0 || settings.getTenantId().length() == 0) {
                     resolveTenantUrl();
-                } else {
-                    restUrl = settings.getRestUrl();
-                    tenantId = settings.getTenantId();
-                    log.info("");
                 }
-                log.debug("REST URL: " + restUrl);
-                log.debug("Tenant ID:" + tenantId);
+                log.debug("REST URL: " + settings.getRestUrl());
+                log.debug("Tenant ID:" + settings.getTenantId());
                 generateProject(reader);
             }
             if (settings.isGenerateBuilds()) {
@@ -89,13 +83,14 @@ public class DataGenerator {
             String entityName = sheet.getSheetName();
             if ("apmuiservice".equals(entityName)) { //todo remove the string constant
                 log.info("Moving backlog items to the created release...");
-                generateEntity(reader, entityName, restUrl+entityName+"s/assignmentservice/planning");
+                generateEntity(reader, entityName, settings.getRestUrl()+entityName+"s/assignmentservice/planning");
             } else {
                 log.info("Generating entity: "+entityName);
-                generateEntity(reader, entityName, restUrl+entityName+"s?TENANTID="+tenantId);
+                generateEntity(reader, entityName, settings.getRestUrl()+entityName+"s?TENANTID="+settings.getTenantId());
             }
         }
         log.debug(idTranslationTable.toString());
+
     }
 
     private static Sheet readUsers(ExcelReader reader) {
@@ -219,8 +214,8 @@ public class DataGenerator {
         url = RestHelper.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
         String[] tokens = url.split("[/=&]");
 
-        restUrl = "https://agilemanager-int.saas.hp.com/qcbin/rest/domains/"+tokens[4]+"/projects/"+tokens[5]+"/";
-        tenantId = tokens[9];
+        settings.setRestUrl("https://agilemanager-int.saas.hp.com/qcbin/rest/domains/"+tokens[4]+"/projects/"+tokens[5]+"/");
+        settings.setTenantId(tokens[9]);
     }
 
 }

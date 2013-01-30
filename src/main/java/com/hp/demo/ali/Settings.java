@@ -82,8 +82,16 @@ public class Settings {
         return restUrl;
     }
 
+    public void setRestUrl(String restUrl) {
+        this.restUrl = restUrl;
+    }
+
     public String getTenantId() {
         return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     public String getAdmin() {
