@@ -195,6 +195,7 @@ public class DataGenerator {
     }
 
     public static void resolveTenantUrl() {
+        log.info("Resolving Tenant ID, domain and project name...");
         HashMap<String, String> data = new HashMap<String, String>();
         User admin = User.getUser(settings.getAdmin());
         data.put("username", admin.getLogin());

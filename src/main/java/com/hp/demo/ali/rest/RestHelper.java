@@ -297,6 +297,7 @@ public class RestHelper {
                     wr.flush();
                     wr.close();
                 }
+                log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
 
                 if (conn.getResponseCode() == 301 || conn.getResponseCode() == 302) {
                     urlAddress = conn.getHeaderField("Location");
@@ -327,6 +328,7 @@ public class RestHelper {
 
             return  new HttpResponse(response.toString(), cookie, conn.getResponseCode());
         } catch (IOException e) {
+            log.debug("Exception caught", e);
             throw new IllegalStateException(e);
         } finally {
             if (conn != null) {
