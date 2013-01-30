@@ -168,6 +168,19 @@ public class DataGenerator {
             if ("apmuiservice".equals(sheetName)) {
                 agmId = RestHelper.moveEntity(excelEntity, agmAddress);
             } else {
+                if (sheetName.equals("release")) {
+                // todo an evil hack ; remove it -> handlers can resolve it
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    Field startDateField = EntityTools.getField(excelEntity, "start-date");
+                    Field endDateField = EntityTools.getField(excelEntity, "end-date");
+                    Date startDate = new Date(settings.getFirstBuildDate().getTime() + (Long.parseLong(startDateField.getValue().getValue()) * 24*60*60*1000));
+                    Date endDate = new Date(startDate.getTime() + (Long.parseLong(endDateField.getValue().getValue()) * 24*60*60*1000));
+
+                    startDateField.getValue().setValue(sdf.format(startDate));
+                    log.debug("Setting start of the release to: "+sdf.format(startDate));
+                    endDateField.getValue().setValue(sdf.format(endDate));
+                    log.debug("Setting end of the release to: "+sdf.format(endDate));
+                }
                 Entity agmEntity = RestHelper.postEntity(excelEntity, agmAddress);
                 agmId = EntityTools.getFieldValue(agmEntity, "id");
                 // todo an evil hack ; remove it -> handlers can resolve it
