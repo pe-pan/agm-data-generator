@@ -232,6 +232,7 @@ public class BuildGenerator {
     }
 
     public void createJob() {
+        log.info("Creating job "+jobName+" at Hudson...");
         HashMap<String, String> data = new HashMap<String, String>();
         data.put("name", jobName);
         data.put("mode", "copy");

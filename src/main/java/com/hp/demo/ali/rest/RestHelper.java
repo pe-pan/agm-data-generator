@@ -263,6 +263,7 @@ public class RestHelper {
             String data = null;
             String newCookie = null;
             do {
+                log.debug("At: "+urlAddress);
                 URL url = new URL(urlAddress);
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setDoOutput(formData != null);
