@@ -19,6 +19,7 @@ public class Settings {
     private String restUrl;
     private String tenantId;
     private String admin;
+    private String aliDevBridgeUrl;
     private boolean meldRepository;
     private String svnUrl;
     private String svnUser;
@@ -42,28 +43,29 @@ public class Settings {
         restUrl = SheetTools.getStringValue(settings, 5, 2);
         tenantId = SheetTools.getStringValue(settings, 6, 2);
         admin = SheetTools.getStringValue(settings, 7, 2);
-        meldRepository = "yes".equals(SheetTools.getStringValue(settings, 9, 2));
-        svnUrl = SheetTools.getStringValue(settings, 10, 2);
-        svnUser = SheetTools.getStringValue(settings, 11, 2);
-        generateBuilds = "yes".equals(SheetTools.getStringValue(settings, 12, 2));
-        hudsonUrl = SheetTools.getStringValue(settings, 13, 2);
-        jobName = SheetTools.getStringValue(settings, 14, 2);
-        templateJobName = SheetTools.getStringValue(settings, 15, 2);
-        buildFolder = SheetTools.getStringValue(settings, 16, 2);
-        buildTemplateFolder = SheetTools.getStringValue(settings, 17, 2);
+        meldRepository = "yes".equals(SheetTools.getStringValue(settings, 8, 2));
+        svnUrl = SheetTools.getStringValue(settings, 9, 2);
+        svnUser = SheetTools.getStringValue(settings, 10, 2);
+        generateBuilds = "yes".equals(SheetTools.getStringValue(settings, 11, 2));
+        hudsonUrl = SheetTools.getStringValue(settings, 12, 2);
+        jobName = SheetTools.getStringValue(settings, 13, 2);
+        templateJobName = SheetTools.getStringValue(settings, 14, 2);
+        buildFolder = SheetTools.getStringValue(settings, 15, 2);
+        buildTemplateFolder = SheetTools.getStringValue(settings, 16, 2);
         try {
-            long days = SheetTools.getLongValue(settings, 18, 2);
+            long days = SheetTools.getLongValue(settings, 17, 2);
             firstBuildDate = new Date(new Date().getTime() + days*24*60*60*1000);
             log.debug("Setting first build date to: "+firstBuildDate.toString());
         } catch (NumberFormatException e) {
             log.debug("First build date is not a relative number to todays'; trying if it's absolute date");
-            firstBuildDate = SheetTools.getDateValue(settings, 18, 2, new SimpleDateFormat("dd/MM/yyyy HH:mm"));
+            firstBuildDate = SheetTools.getDateValue(settings, 17, 2, new SimpleDateFormat("dd/MM/yyyy HH:mm"));
             log.debug("First build date is absolute: "+firstBuildDate.toString());
         }
-        firstBuildNumber = SheetTools.getIntValue(settings, 19, 2);
-        firstSvnRevision = SheetTools.getLongValue(settings, 20, 2);
-        firstDefectNumber = SheetTools.getIntValue(settings, 21, 2);
-        firstRequirementNumber = SheetTools.getIntValue(settings, 22, 2);
+        firstBuildNumber = SheetTools.getIntValue(settings, 18, 2);
+        firstSvnRevision = SheetTools.getLongValue(settings, 19, 2);
+        firstDefectNumber = SheetTools.getIntValue(settings, 20, 2);
+        firstRequirementNumber = SheetTools.getIntValue(settings, 21, 2);
+        aliDevBridgeUrl = SheetTools.getStringValue(settings, 22    , 2);
     }
 
     public boolean isGenerateProject() {
@@ -96,6 +98,10 @@ public class Settings {
 
     public String getAdmin() {
         return admin;
+    }
+
+    public String getAliDevBridgeUrl() {
+        return aliDevBridgeUrl;
     }
 
     public boolean isMeldRepository() {

@@ -57,6 +57,7 @@ public class DataGenerator {
                 BuildGenerator generator = new BuildGenerator(settings);
                 generator.generate(reader.getSheet("Builds"), skippedRevisions);
                 generator.createJob();
+                synchronizeAliDevBridge();
             }
         } finally {
             long endTime = new Date().getTime();
@@ -217,6 +218,35 @@ public class DataGenerator {
 
         settings.setRestUrl("https://agilemanager-int.saas.hp.com/qcbin/rest/domains/"+tokens[4]+"/projects/"+tokens[5]+"/");
         settings.setTenantId(tokens[9]);
+    }
+
+    public static void synchronizeAliDevBridge() {
+        log.debug("Synchronizing builds and source code changes");
+
+        HashMap<String, String> data = new HashMap<String, String>(2);
+        User admin = User.getUser(settings.getAdmin());
+        data.put("j_username", admin.getLogin());
+        data.put("j_password", admin.getPassword());
+        data.put("a", "");
+
+        RestHelper.HttpResponse response = RestHelper.postData(settings.getAliDevBridgeUrl()+"/j_spring_security_check", data, null);
+
+        String script = RestHelper.extractString(response.getResponse(), "/html/head/script[2]/text()");
+
+        String cookie = response.getCookie();
+
+        String token = "\"fid\""; // after this token is the value in " " characters
+        String scriptEnd = script.substring(script.indexOf(token)+token.length());
+        int first = scriptEnd.indexOf('"')+1;
+        int last = scriptEnd.indexOf('"', first);
+        String fid = scriptEnd.substring(first, last);
+
+        data = new HashMap<String, String>(1);
+        data.put("fid", fid);
+        RestHelper.postData(settings.getAliDevBridgeUrl()+"/rest/task/start/BuildSyncTask", data, cookie);
+        log.info("Build synchronization started!");
+        RestHelper.postData(settings.getAliDevBridgeUrl()+"/rest/task/start/SourceSyncTask", data, cookie);
+        log.info("Source code synchronization started!");
     }
 
 }
