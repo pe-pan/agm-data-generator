@@ -80,6 +80,7 @@ public class RestHelper {
             wr.writeBytes(urlParameters);
             wr.flush();
             wr.close();
+            log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
             // Get the response
 
             BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -151,6 +152,7 @@ public class RestHelper {
             conn.setRequestProperty("Accept", "application/json");
 
             conn.setRequestProperty("Cookie", getCookieList(url.getHost()));
+            log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
 
 //            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
 //            wr.writeBytes(urlParameters.toString());
@@ -233,6 +235,7 @@ public class RestHelper {
             wr.write(xmlToPost);
             wr.flush();
             wr.close();
+            log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
             // Get the response
             BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             String line;
