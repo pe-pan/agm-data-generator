@@ -42,8 +42,6 @@ public class RestHelper {
             conn.setDoOutput(true);
             conn.setDoInput(true);
             conn.setAllowUserInteraction(false);
-//             conn.setRequestProperty("Authorization", "Basic "
-//                     + Base64.encode((username + ":" + password).getBytes()));
 
             // Get the response
             BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -63,8 +61,6 @@ public class RestHelper {
     public static void LoginSaaS(String username, String password, String qcAddress) {
         HttpURLConnection conn = null;
         try {
-
-//             qcAddress = qcAddress+"?j_username="+username+"&j_password="+password;
             URL url = new URL(qcAddress);
             conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
@@ -93,7 +89,6 @@ public class RestHelper {
 
             List<String> cookieList = conn.getHeaderFields().get("Set-Cookie");
             addCookieList(url.getHost(), cookieList);
-            return;
 
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -148,16 +143,10 @@ public class RestHelper {
             conn.setRequestMethod("POST");
             conn.setAllowUserInteraction(false);
             conn.setRequestProperty("Content-type", "application/xml; charset=UTF-8");
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1");
             conn.setRequestProperty("Accept", "application/json");
 
             conn.setRequestProperty("Cookie", getCookieList(url.getHost()));
             log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
-
-//            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-//            wr.writeBytes(urlParameters.toString());
-//            wr.flush();
-//            wr.close();
             // Get the response
 
             BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -229,7 +218,6 @@ public class RestHelper {
             }
             conn.setRequestProperty("Cookie", getCookieList(url.getHost()));
             conn.setRequestProperty("Content-type", "application/xml; charset=UTF-8");
-            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1");
             conn.setRequestProperty("Accept", "application/xml");
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
             wr.write(xmlToPost);
