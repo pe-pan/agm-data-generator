@@ -204,7 +204,7 @@ public class DataGenerator {
         data.put("username", admin.getLogin());
         data.put("password", admin.getPassword());
 
-        RestHelper.HttpResponse response = RestHelper.postData("https://gateway.saas.hp.com/msg/actions/doLogin.action", data);
+        RestHelper.HttpResponse response = RestHelper.postData(settings.getLoginUrl(), data);
         String url = null;
         try {
             url = RestHelper.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
@@ -213,13 +213,14 @@ public class DataGenerator {
             log.error("Incorrect credentials: " + admin.getLogin() + " / " + admin.getPassword());
             System.exit(-1);
         }
+        String[] tokens1 = url.split("/");
 
         response = RestHelper.postData(url, null);
-        url = RestHelper.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
-        String[] tokens = url.split("[/=&]");
+        String relativeUrl = RestHelper.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
+        String[] tokens2 = relativeUrl.split("[/=&]");
 
-        settings.setRestUrl("https://agilemanager-int.saas.hp.com/qcbin/rest/domains/"+tokens[4]+"/projects/"+tokens[5]+"/");
-        settings.setTenantId(tokens[9]);
+        settings.setRestUrl("https://"+tokens1[2]+"/qcbin/rest/domains/"+tokens2[4]+"/projects/"+tokens2[5]+"/");
+        settings.setTenantId(tokens2[9]);
     }
 
     public static void synchronizeAliDevBridge() {
@@ -231,7 +232,7 @@ public class DataGenerator {
         data.put("j_password", admin.getPassword());
         data.put("a", "");
 
-        RestHelper.HttpResponse response = RestHelper.postData(settings.getAliDevBridgeUrl()+"/j_spring_security_check", data);
+        RestHelper.HttpResponse response = RestHelper.postData(settings.getAliDevBridgeUrl() + "/j_spring_security_check", data);
 
         String script = RestHelper.extractString(response.getResponse(), "/html/head/script[2]/text()");
 
