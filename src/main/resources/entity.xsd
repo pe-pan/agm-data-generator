@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="Entities">
+        <xs:annotation>
+            <xs:documentation>A collection of entities</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="Entity" minOccurs="1" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attribute name="TotalResults" type="xs:int" use="required"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="Entity">
         <xs:annotation>
             <xs:documentation>An entity in ALM</xs:documentation>

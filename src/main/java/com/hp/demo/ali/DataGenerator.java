@@ -8,7 +8,10 @@ import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -140,6 +143,10 @@ public class DataGenerator {
             // remember ID
             Field idField = EntityTools.removeIdField(excelEntity);
             String excelId = idField.getValue().getValue();
+            String originalEntityId = null;
+            if ("apmuiservice".equals(sheetName)) {
+                originalEntityId = EntityTools.getFieldValue(excelEntity, "id");
+            }
 
             // replace with references
             for (String referenceId : referenceColumns) {
@@ -163,8 +170,29 @@ public class DataGenerator {
                 }
             }
             String agmId;
-            if ("apmuiservice".equals(sheetName)) {
+            if ("release-backlog-item".equals(sheetName)) {
+                StringBuilder data = new StringBuilder();
+                List<Field> fields = excelEntity.getFields().getField();
+                String backlogId = fields.get(0).getValue().getValue();
+                String sprintId = fields.get(1).getValue().getValue();
+                String teamId = fields.get(2).getValue().getValue();
+                data.
+                        append("{\"entities\":[{\"Fields\":[{\"Name\":\"id\", \"values\":[{\"value\":\"").
+                        append(backlogId).
+                        append("\"}]},{\"Name\":\"sprint-id\", \"values\":[{\"value\":\"").
+                        append(sprintId).
+                        append("\"}]},{\"Name\":\"team-id\", \"values\":[{\"value\":\"").
+                        append(teamId).
+                        append("\"}]}], \"Type\":\"release-backlog-item\"}], \"TotalResults\":1}");
+                RestHelper.postData(settings.getRestUrl()+"release-backlog-items", data.toString(), true);
+            } else if ("apmuiservice".equals(sheetName)) {
                 agmId = RestHelper.moveEntity(excelEntity, agmAddress);
+                String entityType = EntityTools.getFieldValue(excelEntity, "entityType");
+//                String entityId = EntityTools.getFieldValue(excelEntity, "id");
+                String key= sheetName+"#"+originalEntityId;
+                String value = agmId;
+                log.debug("Storing: "+key+"="+value);
+                idTranslationTable.put(key, value);
             } else {
                 if (sheetName.equals("release")) {
                 // todo an evil hack ; remove it -> handlers can resolve it
@@ -192,8 +220,11 @@ public class DataGenerator {
                     settings.setFirstDefectNumber(firstDefId);
                     log.info("First defect ID: "+firstDefId);
                 }
+                idTranslationTable.put(sheetName+"#"+excelId, agmId);
+                if (sheetName.equals("release")) {
+                    learnSprints(agmId);
+                }
             }
-            idTranslationTable.put(sheetName+"#"+excelId, agmId);
         }
     }
 
@@ -215,7 +246,7 @@ public class DataGenerator {
         }
         String[] tokens1 = url.split("/");
 
-        response = RestHelper.postData(url, null);
+        response = RestHelper.postData(url, null, false);
         String relativeUrl = RestHelper.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
         String[] tokens2 = relativeUrl.split("[/=&]");
 
@@ -257,5 +288,27 @@ public class DataGenerator {
 
         RestHelper.HttpResponse response = RestHelper.postData(settings.getRestUrl() + "scm/dev-bridge/deployment-url", data);
         //todo check response code
+    }
+
+    public static void learnSprints(String releaseId) {
+        log.info("Learning created sprints...");
+        RestHelper.HttpResponse response = RestHelper.postData(settings.getRestUrl()+"release-cycles?query={parent-id["+releaseId+"]}&order-by={start-date[ASC]}&page-size=2000&start-index=1", null, false);
+        String xmlEntities = response.getResponse().substring("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>".length());
+        Entities sprintEntities;
+        try {
+            final JAXBContext context = JAXBContext.newInstance(Entities.class);
+            ByteArrayInputStream input = new ByteArrayInputStream(xmlEntities.getBytes());
+            Unmarshaller u = context.createUnmarshaller();
+            sprintEntities = (Entities) u.unmarshal(input);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+        List<Entity> sprintList = sprintEntities.getEntity();
+        int i = 1;
+        for (Entity sprint : sprintList) {
+            String id = EntityTools.getFieldValue(sprint, "id");
+            idTranslationTable.put("sprint#"+i++, id);
+            log.debug("Learning sprint id: "+id);
+        }
     }
 }

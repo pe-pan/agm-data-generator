@@ -157,7 +157,7 @@ public class RestHelper {
                 returnValue.append(line);
             }
             rd.close();
-            int startIndex = "[\"release-backlog-item_".length();
+            int startIndex = returnValue.indexOf("release-backlog-item_")+"release-backlog-item_".length();
             int lastIndex = returnValue.indexOf("\"", startIndex);
 
             String xmlEntity = returnValue.substring(startIndex, lastIndex);
@@ -208,7 +208,7 @@ public class RestHelper {
             URL url = new URL(restAddress);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setDoOutput(true);
-            if ("release-backlog-item".equals(entity.getType())) {
+            if (restAddress.contains("release-backlog-item")) {
                 //todo an evil hack
                 log.debug("Putting at: " + restAddress);
                 conn.setRequestMethod("PUT");
@@ -259,6 +259,26 @@ public class RestHelper {
         }
     }
 
+    public static HttpResponse postData(String urlAddress, HashMap<String, String> formData) {
+        Set<String> keys = formData.keySet();
+        StringBuilder urlParameters = new StringBuilder();
+        for (String key : keys) {
+            String value = formData.get(key);
+            if (value == null) {
+                value = "";
+            }
+            try {
+                urlParameters.
+                        append('&').                    // even the very first parameter starts with '&'
+                        append(key).append('=').
+                        append(URLEncoder.encode(value, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return postData(urlAddress, urlParameters.substring(1), false);
+    }
+
     /**
      * Posts given data to the given address and sets the given cookie.
      * Also handles redirects; only first time it does POST, then it does GET.
@@ -267,12 +287,11 @@ public class RestHelper {
      * @param formData if null, GET method is used; POST otherwise
      * @return
      */
-    public static HttpResponse postData(String urlAddress, HashMap<String, String> formData) {
+    public static HttpResponse postData(String urlAddress, String formData, boolean isPut) {
         //todo refactor this class to remove code duplicates
         HttpURLConnection conn = null;
         try {
             boolean redirect = false;
-            String data = null;
             do {
                 log.debug("At: "+urlAddress);
                 URL url = new URL(urlAddress);
@@ -280,7 +299,11 @@ public class RestHelper {
                 conn.setDoOutput(formData != null);
                 conn.setDoInput(true);
                 conn.setAllowUserInteraction(false);
-                conn.setRequestMethod(redirect | formData == null ? "GET" : "POST");
+                conn.setRequestMethod(redirect | formData == null ? "GET" : isPut ? "PUT" : "POST");
+                if (isPut) {
+                    conn.setRequestProperty("Content-type", "application/json;type=collection");
+                    conn.setRequestProperty("Accept", "application/json");
+                }
                 if (urlAddress.endsWith("/scm/dev-bridge/deployment-url")) { //todo an evil hack; set INTERNAL_DATA header when setting ALI DEV Bridge URL
                     String state = cookies.get("LWSSO_COOKIE_KEY");
                     cookies.put("STATE", state);
@@ -291,24 +314,11 @@ public class RestHelper {
 
                 // write the data
                 if (!redirect && formData != null) {
-                    Set<String> keys = formData.keySet();
-                    StringBuilder urlParameters = new StringBuilder();
-                    for (String key : keys) {
-                        String value = formData.get(key);
-                        if (value == null) {
-                            value = "";
-                        }
-                        urlParameters.
-                                append('&').                    // even the very first parameter starts with '&'
-                                append(key).append('=').
-                                append(URLEncoder.encode(value, "UTF-8"));
-                    }
-                    data = urlParameters.substring(1);  // remove the very first '&'
-                    log.debug("Data size: " + data.length());
-                    conn.setRequestProperty("Content-Length", Integer.toString(data.length()));
-                    log.debug("Posting: " + data);
+                    log.debug("Data size: " + formData.length());
+                    conn.setRequestProperty("Content-Length", Integer.toString(formData.length()));
+                    log.debug("Posting: " + formData);
                     DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-                    wr.writeBytes(data);
+                    wr.writeBytes(formData);
                     wr.flush();
                     wr.close();
                 }
