@@ -4,7 +4,6 @@ import com.hp.demo.ali.entity.*;
 import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.RestHelper;
-import com.hp.demo.ali.svn.RepositoryMender;
 import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -202,7 +201,7 @@ public class DataGenerator {
         data.put("username", admin.getLogin());
         data.put("password", admin.getPassword());
 
-        RestHelper.HttpResponse response = RestHelper.postData("https://gateway.saas.hp.com/msg/actions/doLogin.action", data, null);
+        RestHelper.HttpResponse response = RestHelper.postData("https://gateway.saas.hp.com/msg/actions/doLogin.action", data);
         String url = null;
         try {
             url = RestHelper.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
@@ -212,7 +211,7 @@ public class DataGenerator {
             System.exit(-1);
         }
 
-        response = RestHelper.postData(url, null, response.getCookie());
+        response = RestHelper.postData(url, null);
         url = RestHelper.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
         String[] tokens = url.split("[/=&]");
 
@@ -229,11 +228,9 @@ public class DataGenerator {
         data.put("j_password", admin.getPassword());
         data.put("a", "");
 
-        RestHelper.HttpResponse response = RestHelper.postData(settings.getAliDevBridgeUrl()+"/j_spring_security_check", data, null);
+        RestHelper.HttpResponse response = RestHelper.postData(settings.getAliDevBridgeUrl()+"/j_spring_security_check", data);
 
         String script = RestHelper.extractString(response.getResponse(), "/html/head/script[2]/text()");
-
-        String cookie = response.getCookie();
 
         String token = "\"fid\""; // after this token is the value in " " characters
         String scriptEnd = script.substring(script.indexOf(token)+token.length());
@@ -243,9 +240,9 @@ public class DataGenerator {
 
         data = new HashMap<String, String>(1);
         data.put("fid", fid);
-        RestHelper.postData(settings.getAliDevBridgeUrl()+"/rest/task/start/BuildSyncTask", data, cookie);
+        RestHelper.postData(settings.getAliDevBridgeUrl()+"/rest/task/start/BuildSyncTask", data);
         log.info("Build synchronization started!");
-        RestHelper.postData(settings.getAliDevBridgeUrl()+"/rest/task/start/SourceSyncTask", data, cookie);
+        RestHelper.postData(settings.getAliDevBridgeUrl()+"/rest/task/start/SourceSyncTask", data);
         log.info("Source code synchronization started!");
     }
 

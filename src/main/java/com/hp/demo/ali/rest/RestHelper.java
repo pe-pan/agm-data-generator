@@ -29,7 +29,6 @@ import java.util.Set;
  */
 public class RestHelper {
 
-    static String lwssoCookieKey;
     private static Logger log = Logger.getLogger(RestHelper.class.getName());
 
     public static void Login(String username, String password, String qcAddress) {
@@ -55,8 +54,7 @@ public class RestHelper {
             rd.close();
             log.debug("Logged in");
 
-            lwssoCookieKey = conn.getHeaderField("Set-Cookie");
-            log.debug("Cookie value:" + lwssoCookieKey);
+            addCookieList(url.getHost(), conn.getHeaderFields().get("Set-Cookie"));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -92,8 +90,8 @@ public class RestHelper {
             rd.close();
             log.debug("Logged in");
 
-            lwssoCookieKey = conn.getHeaderField("Set-Cookie");
-            log.debug("Cookie value:" + lwssoCookieKey);
+            List<String> cookieList = conn.getHeaderFields().get("Set-Cookie");
+            addCookieList(url.getHost(), cookieList);
             return;
 
         } catch (IOException e) {
@@ -148,10 +146,11 @@ public class RestHelper {
             conn.setDoInput(true);
             conn.setRequestMethod("POST");
             conn.setAllowUserInteraction(false);
-            conn.setRequestProperty("Cookie", lwssoCookieKey.substring(0, lwssoCookieKey.length() - ";Path=/".length()) + "; TENANT_ID_COOKIE=0");
             conn.setRequestProperty("Content-type", "application/xml; charset=UTF-8");
             conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1");
             conn.setRequestProperty("Accept", "application/json");
+
+            conn.setRequestProperty("Cookie", getCookieList(url.getHost()));
 
 //            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
 //            wr.writeBytes(urlParameters.toString());
@@ -183,6 +182,34 @@ public class RestHelper {
         }
     }
 
+    private static HashMap<String, String> cookies = new HashMap<String, String>();
+
+    //todo every host should have its own set of cookies
+    private static void addCookieList(String host, List<String> cookieList) {
+        if (cookieList == null) {
+            return;
+        }
+        for (String cookie : cookieList) {
+            String key = cookie.substring(0, cookie.indexOf('='));
+            String value = cookie.substring(key.length()+1, cookie.indexOf(";", key.length()));
+            cookies.put(key, value);
+        }
+        log.debug("Cookies: "+cookies.toString());
+    }
+
+    private static String getCookieList(String url) {
+        if (cookies.size() == 0) {
+            return "";
+        }
+        Set<String> keys = cookies.keySet();
+        StringBuilder cookieList = new StringBuilder();
+        for (String key : keys) {
+            String value = cookies.get(key);
+            cookieList.append(key).append('=').append(value).append(';');
+        }
+        return cookieList.substring(0, cookieList.length() - 1); // remove the last ';'
+    }
+
     public static String post(String xmlToPost, String restAddress, Entity entity) {
         try {
 
@@ -198,7 +225,7 @@ public class RestHelper {
                 log.debug("Posting at: " + restAddress);
                 conn.setRequestMethod("POST");
             }
-            conn.setRequestProperty("Cookie", lwssoCookieKey.substring(0, lwssoCookieKey.length() - ";Path=/".length()) + "; TENANT_ID_COOKIE=0");
+            conn.setRequestProperty("Cookie", getCookieList(url.getHost()));
             conn.setRequestProperty("Content-type", "application/xml; charset=UTF-8");
             conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:7.0.1) Gecko/20100101 Firefox/7.0.1");
             conn.setRequestProperty("Accept", "application/xml");
@@ -225,21 +252,15 @@ public class RestHelper {
 
     public static class HttpResponse {
         private final String response;
-        private final String cookie;
         private final int responseCode;
 
-        public HttpResponse(String response, String cookie, int responseCode) {
+        public HttpResponse(String response, int responseCode) {
             this.response = response;
-            this.cookie = cookie;
             this.responseCode = responseCode;
         }
 
         public String getResponse() {
             return response;
-        }
-
-        public String getCookie() {
-            return cookie;
         }
 
         public int getResponseCode() {
@@ -250,18 +271,17 @@ public class RestHelper {
     /**
      * Posts given data to the given address and sets the given cookie.
      * Also handles redirects; only first time it does POST, then it does GET.
+     *
      * @param urlAddress
      * @param formData if null, GET method is used; POST otherwise
-     * @param cookie this is being returned, unless Set-Cookie header was in the communication
      * @return
      */
-    public static HttpResponse postData(String urlAddress, HashMap<String, String> formData, String cookie) {
+    public static HttpResponse postData(String urlAddress, HashMap<String, String> formData) {
         //todo refactor this class to remove code duplicates
         HttpURLConnection conn = null;
         try {
             boolean redirect = false;
             String data = null;
-            String newCookie = null;
             do {
                 log.debug("At: "+urlAddress);
                 URL url = new URL(urlAddress);
@@ -270,10 +290,7 @@ public class RestHelper {
                 conn.setDoInput(true);
                 conn.setAllowUserInteraction(false);
                 conn.setRequestMethod(redirect | formData == null ? "GET" : "POST");
-                if (cookie != null) {
-                    log.debug("Setting cookie: " + cookie);
-                    conn.setRequestProperty("Cookie", cookie);
-                }
+                conn.setRequestProperty("Cookie", getCookieList(url.getHost()));
 
                 // write the data
                 if (!redirect && formData != null) {
@@ -308,11 +325,7 @@ public class RestHelper {
                 } else {
                     redirect = false;
                 }
-                newCookie = conn.getHeaderField("Set-Cookie");
-                if (newCookie != null) {
-                    cookie = newCookie;
-                    log.debug("New cookie: " + cookie);
-                }
+                addCookieList(url.getHost(), conn.getHeaderFields().get("Set-Cookie"));
             } while (redirect);
 
             // Get the response
@@ -327,7 +340,7 @@ public class RestHelper {
             }
             rd.close();
 
-            return  new HttpResponse(response.toString(), cookie, conn.getResponseCode());
+            return  new HttpResponse(response.toString(), conn.getResponseCode());
         } catch (IOException e) {
             log.debug("Exception caught", e);
             throw new IllegalStateException(e);

@@ -239,7 +239,7 @@ public class BuildGenerator {
         data.put("from", templateJobName);
         data.put("json", "{\"name\": \""+jobName+"\", \"mode\": \"copy\", \"from\": \""+jobName+"\", \"Submit\": \"OK\"}");
         data.put("Submit", "OK");
-        RestHelper.postData(hudsonUrl + "createItem", data, null);
+        RestHelper.postData(hudsonUrl + "createItem", data);
         //todo verify status code -> fail or log error
     }
 }
