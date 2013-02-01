@@ -290,6 +290,12 @@ public class RestHelper {
                 conn.setDoInput(true);
                 conn.setAllowUserInteraction(false);
                 conn.setRequestMethod(redirect | formData == null ? "GET" : "POST");
+                if (urlAddress.endsWith("/scm/dev-bridge/deployment-url")) { //todo an evil hack; set INTERNAL_DATA header when setting ALI DEV Bridge URL
+                    String state = cookies.get("LWSSO_COOKIE_KEY");
+                    cookies.put("STATE", state);
+                    log.debug("Setting INTERNAL_DATA header: "+ state);
+                    conn.setRequestProperty("INTERNAL_DATA", state);
+                }
                 conn.setRequestProperty("Cookie", getCookieList(url.getHost()));
 
                 // write the data

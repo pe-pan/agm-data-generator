@@ -56,6 +56,9 @@ public class DataGenerator {
                 BuildGenerator generator = new BuildGenerator(settings);
                 generator.generate(reader.getSheet("Builds"), skippedRevisions);
                 generator.createJob();
+            }
+            if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
+                configureAliDevBridge();
                 synchronizeAliDevBridge();
             }
         } finally {
@@ -246,4 +249,12 @@ public class DataGenerator {
         log.info("Source code synchronization started!");
     }
 
+    public static void configureAliDevBridge() {
+        log.info("Configuring ALI Dev Bridge...");
+        HashMap<String, String> data = new HashMap<String, String>();
+        data.put("bridge_url", settings.getAliDevBridgeUrl());
+
+        RestHelper.HttpResponse response = RestHelper.postData(settings.getRestUrl() + "scm/dev-bridge/deployment-url", data);
+        //todo check response code
+    }
 }
