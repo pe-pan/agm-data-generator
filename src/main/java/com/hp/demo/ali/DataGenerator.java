@@ -176,6 +176,7 @@ public class DataGenerator {
                 String backlogId = fields.get(0).getValue().getValue();
                 String sprintId = fields.get(1).getValue().getValue();
                 String teamId = fields.get(2).getValue().getValue();
+                String owner = fields.get(3).getValue().getValue();
                 data.
                         append("{\"entities\":[{\"Fields\":[{\"Name\":\"id\", \"values\":[{\"value\":\"").
                         append(backlogId).
@@ -183,6 +184,8 @@ public class DataGenerator {
                         append(sprintId).
                         append("\"}]},{\"Name\":\"team-id\", \"values\":[{\"value\":\"").
                         append(teamId).
+                        append("\"}]},{\"Name\":\"owner\", \"values\":[{\"value\":\"").
+                        append(owner).
                         append("\"}]}], \"Type\":\"release-backlog-item\"}], \"TotalResults\":1}");
                 RestHelper.postData(settings.getRestUrl()+"release-backlog-items", data.toString(), true);
             } else if ("apmuiservice".equals(sheetName)) {
