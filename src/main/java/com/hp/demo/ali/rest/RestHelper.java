@@ -299,6 +299,7 @@ public class RestHelper {
                 conn.setDoOutput(formData != null);
                 conn.setDoInput(true);
                 conn.setAllowUserInteraction(false);
+                conn.setInstanceFollowRedirects(false);
                 conn.setRequestMethod(redirect | formData == null ? "GET" : isPut ? "PUT" : "POST");
                 if (isPut) {
                     conn.setRequestProperty("Content-type", "application/json;type=collection");
