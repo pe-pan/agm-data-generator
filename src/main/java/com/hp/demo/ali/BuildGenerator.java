@@ -2,7 +2,7 @@ package com.hp.demo.ali;
 
 import com.hp.demo.ali.entity.Entity;
 import com.hp.demo.ali.excel.EntityIterator;
-import com.hp.demo.ali.rest.RestHelper;
+import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.svn.RepositoryMender;
 import com.hp.demo.ali.tools.EntityTools;
 import org.apache.commons.io.FileUtils;
@@ -26,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -95,8 +94,8 @@ public class BuildGenerator {
                 long fromRevision = startingRevision;
                 startingRevision += increaseRevision;
                 long toRevision = startingRevision;
-                long[] subset = getRevisionSubSet(skipRevisions, fromRevision, toRevision-1);
-                String oldBuildId = correctBuildFile(buildXmlFile, buildId, firstBuildNumber++, totalLines, coveredLines, totalTests, skippedTests, failedTests, status, duration, fromRevision, toRevision-1, subset, svnUrl);
+                long[] subset = getRevisionSubSet(skipRevisions, fromRevision, toRevision - 1);
+                String oldBuildId = correctBuildFile(buildXmlFile, buildId, firstBuildNumber++, totalLines, coveredLines, totalTests, skippedTests, failedTests, status, duration, fromRevision, toRevision - 1, subset, svnUrl);
                 File mavenBuildFile = new File(outputFolder + File.separator + MAVEN_XML_PREF + oldBuildId + ".xml");
                 File newMavenBuildFile = new File(outputFolder + File.separator + MAVEN_XML_PREF + buildId.toString() + ".xml");
                 mavenBuildFile.renameTo(newMavenBuildFile);
@@ -117,7 +116,7 @@ public class BuildGenerator {
         if (skipRevisions == null || skipRevisions.size() == 0) {
             return null;
         }
-        assert(skipRevisions.get(0) >= fromRevision);
+        assert (skipRevisions.get(0) >= fromRevision);
         List<Long> subset = new LinkedList<Long>();
         while (skipRevisions.size() > 0 && skipRevisions.get(0) <= toRevision) {
             subset.add(skipRevisions.remove(0));
@@ -136,7 +135,7 @@ public class BuildGenerator {
 
     private String correctBuildFile(File buildXmlFile, UUID buildId, int buildNumber, int totalLines, int coveredLines,
                                     int totalTests, int skippedTests, int failedTests, String status, int duration, long revisionFrom, long revisionTo, long[] skip, String svnUrl) {
-        log.debug("Setting the build id into: "+buildId+" and build number into: "+buildNumber);
+        log.debug("Setting the build id into: " + buildId + " and build number into: " + buildNumber);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document document = null;
         try {
@@ -184,15 +183,15 @@ public class BuildGenerator {
                 setRevisions(revisionChangeNode, revisionFrom, revisionTo);
             } else {
                 Node parent = revisionChangeNode.getParentNode();
-                setRevisions(revisionChangeNode, revisionFrom, skip[0]-1);
+                setRevisions(revisionChangeNode, revisionFrom, skip[0] - 1);
                 for (int i = 1; i < skip.length; i++) {
                     Node brother = revisionChangeNode.cloneNode(true);
-                    if (setRevisions(brother, skip[i-1]+1, skip[i]-1)) {
+                    if (setRevisions(brother, skip[i - 1] + 1, skip[i] - 1)) {
                         parent.appendChild(brother);
                     }
                 }
                 Node brother = revisionChangeNode.cloneNode(true);
-                if (setRevisions(revisionChangeNode, skip[skip.length-1]+1, revisionTo)) {
+                if (setRevisions(revisionChangeNode, skip[skip.length - 1] + 1, revisionTo)) {
                     parent.appendChild(brother);
                 }
             }
@@ -205,7 +204,7 @@ public class BuildGenerator {
         if (revisionFrom > revisionTo) {    // skip two or more subsequent revisions
             return false;
         }
-        log.debug("Setting revisions from "+revisionFrom+" to "+revisionTo);
+        log.debug("Setting revisions from " + revisionFrom + " to " + revisionTo);
         XPathExpression expression = xpath.compile("revFrom/text()");
         Node revFromNode = (Node) expression.evaluate(revisionChangeNode, XPathConstants.NODE);
         revFromNode.setTextContent(Long.toString(revisionFrom));
@@ -223,7 +222,7 @@ public class BuildGenerator {
             node.setTextContent(value);
             return oldValue;
         } catch (XPathExpressionException e) {
-            throw new IllegalStateException("Exception when compiling xpath "+xpathString+" in document "+document.getDocumentURI(), e);
+            throw new IllegalStateException("Exception when compiling xpath " + xpathString + " in document " + document.getDocumentURI(), e);
         }
     }
 
@@ -232,14 +231,18 @@ public class BuildGenerator {
     }
 
     public void createJob() {
-        log.info("Creating job "+jobName+" at Hudson...");
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put("name", jobName);
-        data.put("mode", "copy");
-        data.put("from", templateJobName);
-        data.put("json", "{\"name\": \""+jobName+"\", \"mode\": \"copy\", \"from\": \""+jobName+"\", \"Submit\": \"OK\"}");
-        data.put("Submit", "OK");
-        RestHelper.postData(hudsonUrl + "createItem", data);
+        log.info("Creating job " + jobName + " at Hudson...");
+        final String data[][] = {
+                {"name", jobName},
+                {"mode", "copy"},
+                {"from", templateJobName},
+                {"json", "{\"name\": \"" + jobName + "\", \"mode\": \"copy\", \"from\": \"" + jobName + "\", \"Submit\": \"OK\"}"},
+                {"Submit", "OK"}
+        };
+
+        RestClient client = new RestClient();
+
+        client.postData(hudsonUrl + "createItem", data);
         //todo verify status code -> fail or log error
     }
 }

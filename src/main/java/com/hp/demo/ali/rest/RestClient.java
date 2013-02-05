@@ -27,11 +27,11 @@ import java.util.Set;
 /**
  * Created by panuska on 10/26/12.
  */
-public class RestHelper {
+public class RestClient {
 
-    private static Logger log = Logger.getLogger(RestHelper.class.getName());
+    private static Logger log = Logger.getLogger(RestClient.class.getName());
 
-    public static void Login(String username, String password, String qcAddress) {
+    public void Login(String username, String password, String qcAddress) {
         try {
 
             qcAddress = qcAddress + "?j_username=" + username + "&j_password=" + password;
@@ -58,7 +58,7 @@ public class RestHelper {
         }
     }
 
-    public static void LoginSaaS(String username, String password, String qcAddress) {
+    public void LoginSaaS(String username, String password, String qcAddress) {
         HttpURLConnection conn = null;
         try {
             URL url = new URL(qcAddress);
@@ -99,7 +99,7 @@ public class RestHelper {
         }
     }
 
-    public static Entity postEntity(Entity entity, String restAddress) {
+    public Entity postEntity(Entity entity, String restAddress) {
         try {
             final JAXBContext context = JAXBContext.newInstance(Entity.class);
             final Marshaller marshaller = context.createMarshaller();
@@ -123,7 +123,7 @@ public class RestHelper {
         }
     }
 
-    public static String moveEntity(Entity entity, String qcAddress) {
+    public String moveEntity(Entity entity, String qcAddress) {
         HttpURLConnection conn = null;
         try {
             // write the parameters
@@ -173,10 +173,10 @@ public class RestHelper {
         }
     }
 
-    private static HashMap<String, String> cookies = new HashMap<String, String>();
+    private HashMap<String, String> cookies = new HashMap<String, String>();
 
     //todo every host should have its own set of cookies
-    private static void addCookieList(String host, List<String> cookieList) {
+    private void addCookieList(String host, List<String> cookieList) {
         if (cookieList == null) {
             return;
         }
@@ -188,7 +188,7 @@ public class RestHelper {
         log.debug("Cookies: "+cookies.toString());
     }
 
-    private static String getCookieList(String url) {
+    private String getCookieList(String url) {
         if (cookies.size() == 0) {
             return "";
         }
@@ -201,7 +201,7 @@ public class RestHelper {
         return cookieList.substring(0, cookieList.length() - 1); // remove the last ';'
     }
 
-    public static String post(String xmlToPost, String restAddress, Entity entity) {
+    public String post(String xmlToPost, String restAddress, Entity entity) {
         try {
 
             // Send data
@@ -259,11 +259,12 @@ public class RestHelper {
         }
     }
 
-    public static HttpResponse postData(String urlAddress, HashMap<String, String> formData) {
-        Set<String> keys = formData.keySet();
+    public HttpResponse postData(String urlAddress, String[][] formData) {
         StringBuilder urlParameters = new StringBuilder();
-        for (String key : keys) {
-            String value = formData.get(key);
+        for (String[] parameter : formData) {
+            assert parameter.length == 2;
+            String key = parameter[0];
+            String value  = parameter[1];
             if (value == null) {
                 value = "";
             }
@@ -276,18 +277,20 @@ public class RestHelper {
                 throw new IllegalStateException(e);
             }
         }
-        return postData(urlAddress, urlParameters.substring(1), false);
+        return postData(urlAddress, urlParameters.substring(1), Method.POST);   // remove the starting '&' character
     }
 
     /**
      * Posts given data to the given address and sets the given cookie.
      * Also handles redirects; only first time it does POST, then it does GET.
      *
+     *
      * @param urlAddress
      * @param formData if null, GET method is used; POST otherwise
+     * @param method
      * @return
      */
-    public static HttpResponse postData(String urlAddress, String formData, boolean isPut) {
+    public HttpResponse postData(String urlAddress, String formData, Method method) {
         //todo refactor this class to remove code duplicates
         HttpURLConnection conn = null;
         try {
@@ -300,8 +303,8 @@ public class RestHelper {
                 conn.setDoInput(true);
                 conn.setAllowUserInteraction(false);
                 conn.setInstanceFollowRedirects(false);
-                conn.setRequestMethod(redirect | formData == null ? "GET" : isPut ? "PUT" : "POST");
-                if (isPut) {
+                conn.setRequestMethod(redirect ? "GET" : method.toString());
+                if (method == Method.PUT) {
                     conn.setRequestProperty("Content-type", "application/json;type=collection");
                     conn.setRequestProperty("Accept", "application/json");
                 }
@@ -359,7 +362,7 @@ public class RestHelper {
         }
     }
 
-    public static String extractString(String html, String xpathString) {
+    public String extractString(String html, String xpathString) {
         Tidy tidy = new Tidy();
         tidy.setShowErrors(0);        //todo redirect Tidy logging to log4j; (see http://ideas-and-code.blogspot.cz/2009/10/jtidy-errors-to-log4j.html)
         tidy.setShowWarnings(false);

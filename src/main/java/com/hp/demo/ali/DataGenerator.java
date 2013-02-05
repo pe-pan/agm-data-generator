@@ -3,7 +3,8 @@ package com.hp.demo.ali;
 import com.hp.demo.ali.entity.*;
 import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
-import com.hp.demo.ali.rest.RestHelper;
+import com.hp.demo.ali.rest.Method;
+import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -21,9 +22,10 @@ import java.util.*;
  */
 public class DataGenerator {
 
-    private static Logger log = Logger.getLogger(RestHelper.class.getName());
+    private static Logger log = Logger.getLogger(RestClient.class.getName());
 
     private static Settings settings;
+    private static RestClient client = new RestClient();
 
     public static void main(String[] args) throws JAXBException, FileNotFoundException {
         if (args.length != 1 && args.length != 3) {
@@ -77,9 +79,9 @@ public class DataGenerator {
         log.info("Generating project data...");
         User adminUser = User.getUser(settings.getAdmin());
         if ("on-premise".equals(settings.getEnvironment())) {
-            RestHelper.Login(adminUser.getLogin(), adminUser.getPassword(), settings.getLoginUrl());
+            client.Login(adminUser.getLogin(), adminUser.getPassword(), settings.getLoginUrl());
         } else if ("SaaS".equals(settings.getEnvironment())) {
-            RestHelper.LoginSaaS(adminUser.getLogin(), adminUser.getPassword(), settings.getLoginUrl());
+            client.LoginSaaS(adminUser.getLogin(), adminUser.getPassword(), settings.getLoginUrl());
         } else {
             throw new IllegalStateException("Unknown environment type: "+settings.getEnvironment());
         }
@@ -187,11 +189,9 @@ public class DataGenerator {
                         append("\"}]},{\"Name\":\"owner\", \"values\":[{\"value\":\"").
                         append(owner).
                         append("\"}]}], \"Type\":\"release-backlog-item\"}], \"TotalResults\":1}");
-                RestHelper.postData(settings.getRestUrl()+"release-backlog-items", data.toString(), true);
+                client.postData(settings.getRestUrl() + "release-backlog-items", data.toString(), Method.PUT);
             } else if ("apmuiservice".equals(sheetName)) {
-                agmId = RestHelper.moveEntity(excelEntity, agmAddress);
-                String entityType = EntityTools.getFieldValue(excelEntity, "entityType");
-//                String entityId = EntityTools.getFieldValue(excelEntity, "id");
+                agmId = client.moveEntity(excelEntity, agmAddress);
                 String key= sheetName+"#"+originalEntityId;
                 String value = agmId;
                 log.debug("Storing: "+key+"="+value);
@@ -210,7 +210,7 @@ public class DataGenerator {
                     endDateField.getValue().setValue(sdf.format(endDate));
                     log.debug("Setting end of the release to: "+sdf.format(endDate));
                 }
-                Entity agmEntity = RestHelper.postEntity(excelEntity, agmAddress);
+                Entity agmEntity = client.postEntity(excelEntity, agmAddress);
                 agmId = EntityTools.getFieldValue(agmEntity, "id");
                 // todo an evil hack ; remove it -> handlers can resolve it
                 if (sheetName.equals("requirement") && firstReqId == 0) {   // remember req IDs
@@ -233,15 +233,16 @@ public class DataGenerator {
 
     public static void resolveTenantUrl() {
         log.info("Resolving Tenant ID, domain and project name...");
-        HashMap<String, String> data = new HashMap<String, String>();
         User admin = User.getUser(settings.getAdmin());
-        data.put("username", admin.getLogin());
-        data.put("password", admin.getPassword());
 
-        RestHelper.HttpResponse response = RestHelper.postData(settings.getLoginUrl(), data);
+        final String[][] data = {
+                { "username", admin.getLogin() },
+                { "password", admin.getPassword() }
+        };
+        RestClient.HttpResponse response = client.postData(settings.getLoginUrl(), data);
         String url = null;
         try {
-            url = RestHelper.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
+            url = client.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
         } catch (IllegalStateException e) {
             log.debug(e);
             log.error("Incorrect credentials: " + admin.getLogin() + " / " + admin.getPassword());
@@ -249,53 +250,52 @@ public class DataGenerator {
         }
         String[] tokens1 = url.split("/");
 
-        response = RestHelper.postData(url, null, false);
-        String relativeUrl = RestHelper.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
+        response = client.postData(url, null, Method.GET);
+        String relativeUrl = client.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
         String[] tokens2 = relativeUrl.split("[/=&]");
 
-        settings.setRestUrl("https://"+tokens1[2]+"/qcbin/rest/domains/"+tokens2[4]+"/projects/"+tokens2[5]+"/");
+        settings.setRestUrl("https://" + tokens1[2] + "/qcbin/rest/domains/" + tokens2[4] + "/projects/" + tokens2[5] + "/");
         settings.setTenantId(tokens2[9]);
     }
 
     public static void synchronizeAliDevBridge() {
         log.debug("Synchronizing builds and source code changes");
 
-        HashMap<String, String> data = new HashMap<String, String>(2);
         User admin = User.getUser(settings.getAdmin());
-        data.put("j_username", admin.getLogin());
-        data.put("j_password", admin.getPassword());
-        data.put("a", "");
+        String [][] data = {
+                { "j_username", admin.getLogin() },
+                { "j_password", admin.getPassword() },
+                { "a", "" }
+        };
+        RestClient devBridgeClient = new RestClient();
+        RestClient.HttpResponse response = devBridgeClient.postData(settings.getAliDevBridgeUrl() + "/j_spring_security_check", data);
 
-        RestHelper.HttpResponse response = RestHelper.postData(settings.getAliDevBridgeUrl() + "/j_spring_security_check", data);
-
-        String script = RestHelper.extractString(response.getResponse(), "/html/head/script[2]/text()");
+        String script = devBridgeClient.extractString(response.getResponse(), "/html/head/script[2]/text()");
 
         String token = "\"fid\""; // after this token is the value in " " characters
-        String scriptEnd = script.substring(script.indexOf(token)+token.length());
+        String scriptEnd = script.substring(script.indexOf(token) + token.length());
         int first = scriptEnd.indexOf('"')+1;
         int last = scriptEnd.indexOf('"', first);
         String fid = scriptEnd.substring(first, last);
 
-        data = new HashMap<String, String>(1);
-        data.put("fid", fid);
-        RestHelper.postData(settings.getAliDevBridgeUrl()+"/rest/task/start/BuildSyncTask", data);
+        data = new String[][] { { "fid", fid } };
+        devBridgeClient.postData(settings.getAliDevBridgeUrl() + "/rest/task/start/BuildSyncTask", data);
         log.info("Build synchronization started!");
-        RestHelper.postData(settings.getAliDevBridgeUrl()+"/rest/task/start/SourceSyncTask", data);
+        devBridgeClient.postData(settings.getAliDevBridgeUrl() + "/rest/task/start/SourceSyncTask", data);
         log.info("Source code synchronization started!");
     }
 
     public static void configureAliDevBridge() {
         log.info("Configuring ALI Dev Bridge...");
-        HashMap<String, String> data = new HashMap<String, String>();
-        data.put("bridge_url", settings.getAliDevBridgeUrl());
+        final String[][] data = { { "bridge_url", settings.getAliDevBridgeUrl() } };
 
-        RestHelper.HttpResponse response = RestHelper.postData(settings.getRestUrl() + "scm/dev-bridge/deployment-url", data);
+        RestClient.HttpResponse response = client.postData(settings.getRestUrl() + "scm/dev-bridge/deployment-url", data);
         //todo check response code
     }
 
     public static void learnSprints(String releaseId) {
         log.info("Learning created sprints...");
-        RestHelper.HttpResponse response = RestHelper.postData(settings.getRestUrl()+"release-cycles?query={parent-id["+releaseId+"]}&order-by={start-date[ASC]}&page-size=2000&start-index=1", null, false);
+        RestClient.HttpResponse response = client.postData(settings.getRestUrl() + "release-cycles?query={parent-id[" + releaseId + "]}&order-by={start-date[ASC]}&page-size=2000&start-index=1", null, Method.GET);
         String xmlEntities = response.getResponse().substring("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>".length());
         Entities sprintEntities;
         try {
