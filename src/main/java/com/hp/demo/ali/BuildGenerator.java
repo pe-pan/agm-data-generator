@@ -242,7 +242,7 @@ public class BuildGenerator {
 
         RestClient client = new RestClient();
 
-        client.postData(hudsonUrl + "createItem", data);
+        client.doPost(hudsonUrl + "createItem", data);
         //todo verify status code -> fail or log error
     }
 }

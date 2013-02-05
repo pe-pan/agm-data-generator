@@ -1,16 +1,10 @@
 package com.hp.demo.ali.rest;
 
-import com.hp.demo.ali.entity.Entity;
-import com.hp.demo.ali.entity.Field;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.tidy.Tidy;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -18,7 +12,6 @@ import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
@@ -30,148 +23,6 @@ import java.util.Set;
 public class RestClient {
 
     private static Logger log = Logger.getLogger(RestClient.class.getName());
-
-    public void Login(String username, String password, String qcAddress) {
-        try {
-
-            qcAddress = qcAddress + "?j_username=" + username + "&j_password=" + password;
-            log.debug("Login to: " + qcAddress);
-
-            URL url = new URL(qcAddress);
-            URLConnection conn = url.openConnection();
-            conn.setDoOutput(true);
-            conn.setDoInput(true);
-            conn.setAllowUserInteraction(false);
-
-            // Get the response
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line;
-            while ((line = rd.readLine()) != null) {
-                log.debug(line);
-            }
-            rd.close();
-            log.debug("Logged in");
-
-            addCookieList(conn.getHeaderFields().get("Set-Cookie"));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    public void LoginSaaS(String username, String password, String qcAddress) {
-        HttpURLConnection conn = null;
-        try {
-            URL url = new URL(qcAddress);
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            conn.setDoInput(true);
-            conn.setAllowUserInteraction(false);
-            conn.setRequestMethod("POST");
-
-            // write the credentials
-            String urlParameters =
-                    "username=" + URLEncoder.encode(username, "UTF-8") +
-                    "&password=" + URLEncoder.encode(password, "UTF-8");
-            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
-            // Get the response
-
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line;
-            while ((line = rd.readLine()) != null) {
-                log.debug(line);
-            }
-            rd.close();
-            log.debug("Logged in");
-
-            List<String> cookieList = conn.getHeaderFields().get("Set-Cookie");
-            addCookieList(cookieList);
-
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-    }
-
-    public Entity postEntity(Entity entity, String restAddress) {
-        try {
-            final JAXBContext context = JAXBContext.newInstance(Entity.class);
-            final Marshaller marshaller = context.createMarshaller();
-
-            final StringWriter stringWriter = new StringWriter();
-
-            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            // Marshal the javaObject and write the XML to the stringWriter
-            marshaller.marshal(entity, stringWriter);
-
-            log.debug(stringWriter.toString());
-            String xmlEntity = post(stringWriter.toString(), restAddress, entity);
-
-            ByteArrayInputStream input = new ByteArrayInputStream(xmlEntity.getBytes());
-
-            Unmarshaller u = context.createUnmarshaller();
-            return (Entity) u.unmarshal(input);
-
-        } catch (JAXBException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    public String moveEntity(Entity entity, String qcAddress) {
-        HttpURLConnection conn = null;
-        try {
-            // write the parameters
-            StringBuilder urlParameters = new StringBuilder(qcAddress).append('?');
-
-            List<Field> fields = entity.getFields().getField();
-            for (Field field : fields) {
-                urlParameters.append(field.getName()).append('=').append(/*URLEncoder.encode(*/field.getValue().getValue()/*, "UTF-8")*/).append('&');
-            }
-            urlParameters.deleteCharAt(urlParameters.length() - 1);
-            log.debug("Posting: " + urlParameters.toString());
-
-            URL url = new URL(urlParameters.toString());
-            conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(false);
-            conn.setDoInput(true);
-            conn.setRequestMethod("POST");
-            conn.setAllowUserInteraction(false);
-            conn.setRequestProperty("Content-type", "application/xml; charset=UTF-8");
-            conn.setRequestProperty("Accept", "application/json");
-
-            conn.setRequestProperty("Cookie", getCookieList());
-            log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
-            // Get the response
-
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line;
-            StringBuilder returnValue = new StringBuilder();
-            while ((line = rd.readLine()) != null) {
-                log.debug(line);
-                returnValue.append(line);
-            }
-            rd.close();
-            int startIndex = returnValue.indexOf("release-backlog-item_")+"release-backlog-item_".length();
-            int lastIndex = returnValue.indexOf("\"", startIndex);
-
-            String xmlEntity = returnValue.substring(startIndex, lastIndex);
-            log.debug("Receive:");
-            log.debug(xmlEntity);
-            return xmlEntity;
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
-            }
-        }
-    }
 
     private HashMap<String, String> cookies = new HashMap<String, String>();
 
@@ -200,46 +51,6 @@ public class RestClient {
         return cookieList.substring(0, cookieList.length() - 1); // remove the last ';'
     }
 
-    public String post(String xmlToPost, String restAddress, Entity entity) {
-        try {
-
-            // Send data
-            URL url = new URL(restAddress);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setDoOutput(true);
-            if (restAddress.contains("release-backlog-item")) {
-                //todo an evil hack
-                log.debug("Putting at: " + restAddress);
-                conn.setRequestMethod("PUT");
-            } else {
-                log.debug("Posting at: " + restAddress);
-                conn.setRequestMethod("POST");
-            }
-            conn.setRequestProperty("Cookie", getCookieList());
-            conn.setRequestProperty("Content-type", "application/xml; charset=UTF-8");
-            conn.setRequestProperty("Accept", "application/xml");
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
-            wr.write(xmlToPost);
-            wr.flush();
-            wr.close();
-            log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
-            // Get the response
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line;
-            StringBuilder xmlEntity = new StringBuilder();
-            while ((line = rd.readLine()) != null) {
-                xmlEntity.append(line);
-            }
-            rd.close();
-            conn.disconnect();
-            log.debug("Receive:");
-            log.debug(xmlEntity);
-            return xmlEntity.substring("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>".length());
-        } catch (Exception e) {
-            throw new IllegalStateException("When posting: \n"+xmlToPost+"\n at address: "+restAddress, e);
-        }
-    }
-
     public static class HttpResponse {
         private final String response;
         private final int responseCode;
@@ -258,39 +69,16 @@ public class RestClient {
         }
     }
 
-    public HttpResponse postData(String urlAddress, String[][] formData) {
-        StringBuilder urlParameters = new StringBuilder();
-        for (String[] parameter : formData) {
-            assert parameter.length == 2;
-            String key = parameter[0];
-            String value  = parameter[1];
-            if (value == null) {
-                value = "";
-            }
-            try {
-                urlParameters.
-                        append('&').                    // even the very first parameter starts with '&'
-                        append(key).append('=').
-                        append(URLEncoder.encode(value, "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-        return postData(urlAddress, urlParameters.substring(1), Method.POST);   // remove the starting '&' character
-    }
-
     /**
-     * Posts given data to the given address and sets the given cookie.
+     * Posts given data to the given address and collects (re-send) cookies.
      * Also handles redirects; only first time it does POST, then it does GET.
      *
-     *
-     * @param urlAddress
+     * @param urlAddress where the request is being sent
      * @param formData if null, GET method is used; POST otherwise
-     * @param method
-     * @return
+     * @param method which method will be used
+     * @return response of the request
      */
-    public HttpResponse postData(String urlAddress, String formData, Method method) {
-        //todo refactor this class to remove code duplicates
+    public HttpResponse doRequest(String urlAddress, String formData, Method method, ContentType contentType) {
         HttpURLConnection conn = null;
         try {
             boolean redirect = false;
@@ -303,9 +91,17 @@ public class RestClient {
                 conn.setAllowUserInteraction(false);
                 conn.setInstanceFollowRedirects(false);
                 conn.setRequestMethod(redirect ? "GET" : method.toString());
-                if (method == Method.PUT) {
-                    conn.setRequestProperty("Content-type", "application/json;type=collection");
-                    conn.setRequestProperty("Accept", "application/json");
+                switch (contentType) {
+                    case JSON : {
+                        conn.setRequestProperty("Content-type", "application/json;type=collection");
+                        conn.setRequestProperty("Accept", "application/json");
+                        break;
+                    }
+                    case XML : {
+                        conn.setRequestProperty("Content-type", "application/xml; charset=UTF-8");
+                        conn.setRequestProperty("Accept", "application/xml");
+                        break;
+                    }
                 }
                 if (urlAddress.endsWith("/scm/dev-bridge/deployment-url")) { //todo an evil hack; set INTERNAL_DATA header when setting ALI DEV Bridge URL
                     String state = cookies.get("LWSSO_COOKIE_KEY");
@@ -361,7 +157,57 @@ public class RestClient {
         }
     }
 
+    private String serializeParameters(String [][]data) {
+        StringBuilder returnValue = new StringBuilder();
+        for (String[] parameter : data) {
+            assert parameter.length == 2;
+            String key = parameter[0];
+            String value  = parameter[1];
+            if (value == null) {
+                value = "";
+            }
+            try {
+                returnValue.
+                        append('&').                    // even the very first parameter starts with '&'
+                        append(key).append('=').
+                        append(URLEncoder.encode(value, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new IllegalStateException(e);     // remove the starting '&' character
+            }
+        }
+        return returnValue.substring(1);
+    }
+
+    public HttpResponse doRequest(String urlAddress, String[][] formData, Method method, ContentType contentType) {
+        return doRequest(urlAddress, serializeParameters(formData), method, contentType);
+    }
+
+    public HttpResponse doGet(String url) {
+        return doRequest(url, (String) null, Method.GET, ContentType.NONE);
+    }
+
+    public HttpResponse doPost(String url, String data) {
+        return doRequest(url, data, Method.POST, ContentType.XML);
+    }
+
+    public HttpResponse doPost(String url, String[][] data) {
+        return doRequest(url, serializeParameters(data), Method.POST, ContentType.NONE);
+    }
+
+    public HttpResponse doPut(String url, String data) {
+        return doRequest(url, data, Method.PUT, ContentType.JSON);
+    }
+
+    public HttpResponse doPut(String url, String[][] data) {
+        return doRequest(url, serializeParameters(data), Method.PUT, ContentType.JSON);
+    }
+
+    public HttpResponse doDelete(String url) {
+        return doRequest(url, (String) null, Method.DELETE, ContentType.NONE);
+    }
+
     public String extractString(String html, String xpathString) {
+        //todo this method should not be here
         Tidy tidy = new Tidy();
         tidy.setShowErrors(0);        //todo redirect Tidy logging to log4j; (see http://ideas-and-code.blogspot.cz/2009/10/jtidy-errors-to-log4j.html)
         tidy.setShowWarnings(false);

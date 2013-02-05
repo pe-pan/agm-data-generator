@@ -2,15 +2,22 @@ package com.hp.demo.ali.tools;
 
 import com.hp.demo.ali.entity.Entity;
 import com.hp.demo.ali.entity.Field;
-import com.hp.demo.ali.entity.Fields;
+import org.apache.log4j.Logger;
 
-import java.util.Iterator;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import java.io.ByteArrayInputStream;
+import java.io.StringWriter;
 import java.util.List;
 
 /**
  * Created by panuska on 10/30/12.
  */
 public class EntityTools {
+
+    private static Logger log = Logger.getLogger(EntityTools.class.getName());
 
     public static Field removeIdField(Entity entity) {
         //todo currently, only simplified implementation; it should look for a field with name "id" and remove this one
@@ -41,5 +48,48 @@ public class EntityTools {
             }
         }
         return null;
+    }
+
+    private final static JAXBContext context;
+    static {
+        try {
+            context = JAXBContext.newInstance(Entity.class);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static String toXml(Entity entity) {
+        try {
+            final Marshaller marshaller = context.createMarshaller();
+            final StringWriter stringWriter = new StringWriter();
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+            // Marshal the javaObject and write the XML to the stringWriter
+            marshaller.marshal(entity, stringWriter);
+            String returnValue = stringWriter.toString();
+            log.debug(returnValue);
+            return returnValue;
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static Entity fromXml(String xmlEntity) {
+        try {
+            ByteArrayInputStream input = new ByteArrayInputStream(xmlEntity.getBytes());
+            Unmarshaller u = context.createUnmarshaller();
+            return (Entity) u.unmarshal(input);
+        } catch (JAXBException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static String toUrlParameters(Entity entity) {
+        StringBuilder urlParameters = new StringBuilder("?");
+        List<Field> fields = entity.getFields().getField();
+        for (Field field : fields) {
+            urlParameters.append(field.getName()).append('=').append(/*URLEncoder.encode(*/field.getValue().getValue()/*, "UTF-8")*/).append('&');
+        }
+        return urlParameters.substring(urlParameters.length()-1);
     }
 }

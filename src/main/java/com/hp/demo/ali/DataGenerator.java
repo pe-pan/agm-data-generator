@@ -3,6 +3,7 @@ package com.hp.demo.ali;
 import com.hp.demo.ali.entity.*;
 import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
+import com.hp.demo.ali.rest.ContentType;
 import com.hp.demo.ali.rest.Method;
 import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.tools.EntityTools;
@@ -79,12 +80,17 @@ public class DataGenerator {
         log.info("Generating project data...");
         User adminUser = User.getUser(settings.getAdmin());
         if ("on-premise".equals(settings.getEnvironment())) {
-            client.Login(adminUser.getLogin(), adminUser.getPassword(), settings.getLoginUrl());
+            client.doGet(settings.getLoginUrl() + "?j_username=" + adminUser.getLogin() + "&j_password=" + adminUser.getPassword());
         } else if ("SaaS".equals(settings.getEnvironment())) {
-            client.LoginSaaS(adminUser.getLogin(), adminUser.getPassword(), settings.getLoginUrl());
+            final String[][] data = {
+                    { "username", adminUser.getLogin() },
+                    { "password", adminUser.getPassword() }
+            };
+            client.doPost(settings.getLoginUrl(), data);
         } else {
             throw new IllegalStateException("Unknown environment type: "+settings.getEnvironment());
         }
+        log.debug("Logged in to: " + settings.getLoginUrl());
 
         List<Sheet> entitySheets = reader.getAllEntitySheets();
         for (Sheet sheet : entitySheets) {
@@ -189,9 +195,13 @@ public class DataGenerator {
                         append("\"}]},{\"Name\":\"owner\", \"values\":[{\"value\":\"").
                         append(owner).
                         append("\"}]}], \"Type\":\"release-backlog-item\"}], \"TotalResults\":1}");
-                client.postData(settings.getRestUrl() + "release-backlog-items", data.toString(), Method.PUT);
+                client.doPut(settings.getRestUrl() + "release-backlog-items", data.toString());
             } else if ("apmuiservice".equals(sheetName)) {
-                agmId = client.moveEntity(excelEntity, agmAddress);
+                RestClient.HttpResponse response = client.doRequest(agmAddress + EntityTools.toUrlParameters(excelEntity), (String) null, Method.POST, ContentType.JSON);
+                String returnValue = response.getResponse();
+                int startIndex = returnValue.indexOf("release-backlog-item_")+"release-backlog-item_".length();
+                int lastIndex = returnValue.indexOf("\"", startIndex);
+                agmId = returnValue.substring(startIndex, lastIndex);
                 String key= sheetName+"#"+originalEntityId;
                 String value = agmId;
                 log.debug("Storing: "+key+"="+value);
@@ -210,22 +220,28 @@ public class DataGenerator {
                     endDateField.getValue().setValue(sdf.format(endDate));
                     log.debug("Setting end of the release to: "+sdf.format(endDate));
                 }
-                Entity agmEntity = client.postEntity(excelEntity, agmAddress);
-                agmId = EntityTools.getFieldValue(agmEntity, "id");
-                // todo an evil hack ; remove it -> handlers can resolve it
-                if (sheetName.equals("requirement") && firstReqId == 0) {   // remember req IDs
-                    firstReqId = Integer.parseInt(agmId);
-                    settings.setFirstRequirementNumber(firstReqId);
-                    log.info("First requirement ID: "+firstReqId);
-                }
-                if (sheetName.equals("defect") && firstDefId == 0) {        // remember def IDs
-                    firstDefId = Integer.parseInt(agmId);
-                    settings.setFirstDefectNumber(firstDefId);
-                    log.info("First defect ID: "+firstDefId);
-                }
-                idTranslationTable.put(sheetName+"#"+excelId, agmId);
-                if (sheetName.equals("release")) {
-                    learnSprints(agmId);
+                String data = EntityTools.toXml(excelEntity);
+                if (sheetName.equals("release-backlog-item")) {
+                    client.doPut(agmAddress, data);
+                } else {
+                    RestClient.HttpResponse response = client.doPost(agmAddress, data);
+                    Entity agmEntity = EntityTools.fromXml(response.getResponse());
+                    agmId = EntityTools.getFieldValue(agmEntity, "id");
+                    // todo an evil hack ; remove it -> handlers can resolve it
+                    if (sheetName.equals("requirement") && firstReqId == 0) {   // remember req IDs
+                        firstReqId = Integer.parseInt(agmId);
+                        settings.setFirstRequirementNumber(firstReqId);
+                        log.info("First requirement ID: "+firstReqId);
+                    }
+                    if (sheetName.equals("defect") && firstDefId == 0) {        // remember def IDs
+                        firstDefId = Integer.parseInt(agmId);
+                        settings.setFirstDefectNumber(firstDefId);
+                        log.info("First defect ID: "+firstDefId);
+                    }
+                    idTranslationTable.put(sheetName+"#"+excelId, agmId);
+                    if (sheetName.equals("release")) {
+                        learnSprints(agmId);
+                    }
                 }
             }
         }
@@ -239,7 +255,7 @@ public class DataGenerator {
                 { "username", admin.getLogin() },
                 { "password", admin.getPassword() }
         };
-        RestClient.HttpResponse response = client.postData(settings.getLoginUrl(), data);
+        RestClient.HttpResponse response = client.doPost(settings.getLoginUrl(), data);
         String url = null;
         try {
             url = client.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
@@ -250,7 +266,7 @@ public class DataGenerator {
         }
         String[] tokens1 = url.split("/");
 
-        response = client.postData(url, null, Method.GET);
+        response = client.doGet(url);
         String relativeUrl = client.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
         String[] tokens2 = relativeUrl.split("[/=&]");
 
@@ -268,7 +284,7 @@ public class DataGenerator {
                 { "a", "" }
         };
         RestClient devBridgeClient = new RestClient();
-        RestClient.HttpResponse response = devBridgeClient.postData(settings.getAliDevBridgeUrl() + "/j_spring_security_check", data);
+        RestClient.HttpResponse response = devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/j_spring_security_check", data);
 
         String script = devBridgeClient.extractString(response.getResponse(), "/html/head/script[2]/text()");
 
@@ -279,9 +295,9 @@ public class DataGenerator {
         String fid = scriptEnd.substring(first, last);
 
         data = new String[][] { { "fid", fid } };
-        devBridgeClient.postData(settings.getAliDevBridgeUrl() + "/rest/task/start/BuildSyncTask", data);
+        devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/rest/task/start/BuildSyncTask", data);
         log.info("Build synchronization started!");
-        devBridgeClient.postData(settings.getAliDevBridgeUrl() + "/rest/task/start/SourceSyncTask", data);
+        devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/rest/task/start/SourceSyncTask", data);
         log.info("Source code synchronization started!");
     }
 
@@ -289,13 +305,13 @@ public class DataGenerator {
         log.info("Configuring ALI Dev Bridge...");
         final String[][] data = { { "bridge_url", settings.getAliDevBridgeUrl() } };
 
-        RestClient.HttpResponse response = client.postData(settings.getRestUrl() + "scm/dev-bridge/deployment-url", data);
+        RestClient.HttpResponse response = client.doRequest(settings.getRestUrl() + "scm/dev-bridge/deployment-url", data, Method.POST, ContentType.NONE);
         //todo check response code
     }
 
     public static void learnSprints(String releaseId) {
         log.info("Learning created sprints...");
-        RestClient.HttpResponse response = client.postData(settings.getRestUrl() + "release-cycles?query={parent-id[" + releaseId + "]}&order-by={start-date[ASC]}&page-size=2000&start-index=1", null, Method.GET);
+        RestClient.HttpResponse response = client.doGet(settings.getRestUrl() + "release-cycles?query={parent-id[" + releaseId + "]}&order-by={start-date[ASC]}&page-size=2000&start-index=1");
         String xmlEntities = response.getResponse().substring("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>".length());
         Entities sprintEntities;
         try {
