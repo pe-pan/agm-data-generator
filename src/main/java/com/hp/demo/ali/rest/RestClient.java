@@ -52,7 +52,7 @@ public class RestClient {
             rd.close();
             log.debug("Logged in");
 
-            addCookieList(url.getHost(), conn.getHeaderFields().get("Set-Cookie"));
+            addCookieList(conn.getHeaderFields().get("Set-Cookie"));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
@@ -88,7 +88,7 @@ public class RestClient {
             log.debug("Logged in");
 
             List<String> cookieList = conn.getHeaderFields().get("Set-Cookie");
-            addCookieList(url.getHost(), cookieList);
+            addCookieList(cookieList);
 
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -145,7 +145,7 @@ public class RestClient {
             conn.setRequestProperty("Content-type", "application/xml; charset=UTF-8");
             conn.setRequestProperty("Accept", "application/json");
 
-            conn.setRequestProperty("Cookie", getCookieList(url.getHost()));
+            conn.setRequestProperty("Cookie", getCookieList());
             log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
             // Get the response
 
@@ -175,8 +175,7 @@ public class RestClient {
 
     private HashMap<String, String> cookies = new HashMap<String, String>();
 
-    //todo every host should have its own set of cookies
-    private void addCookieList(String host, List<String> cookieList) {
+    private void addCookieList(List<String> cookieList) {
         if (cookieList == null) {
             return;
         }
@@ -188,7 +187,7 @@ public class RestClient {
         log.debug("Cookies: "+cookies.toString());
     }
 
-    private String getCookieList(String url) {
+    private String getCookieList() {
         if (cookies.size() == 0) {
             return "";
         }
@@ -216,7 +215,7 @@ public class RestClient {
                 log.debug("Posting at: " + restAddress);
                 conn.setRequestMethod("POST");
             }
-            conn.setRequestProperty("Cookie", getCookieList(url.getHost()));
+            conn.setRequestProperty("Cookie", getCookieList());
             conn.setRequestProperty("Content-type", "application/xml; charset=UTF-8");
             conn.setRequestProperty("Accept", "application/xml");
             OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
@@ -314,7 +313,7 @@ public class RestClient {
                     log.debug("Setting INTERNAL_DATA header: "+ state);
                     conn.setRequestProperty("INTERNAL_DATA", state);
                 }
-                conn.setRequestProperty("Cookie", getCookieList(url.getHost()));
+                conn.setRequestProperty("Cookie", getCookieList());
 
                 // write the data
                 if (!redirect && formData != null) {
@@ -336,7 +335,7 @@ public class RestClient {
                 } else {
                     redirect = false;
                 }
-                addCookieList(url.getHost(), conn.getHeaderFields().get("Set-Cookie"));
+                addCookieList(conn.getHeaderFields().get("Set-Cookie"));
             } while (redirect);
 
             // Get the response
