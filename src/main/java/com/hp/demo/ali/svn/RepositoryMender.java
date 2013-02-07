@@ -182,7 +182,6 @@ public class RepositoryMender {
         long timeIncrease = (endDate - time) / numOfRevisions;
 
         // reqs/defs/unassigned
-//        int linksBlock = (int)numOfRevisions / (requirements + defects + unassigned);
         int requirementCount = requirements;
         int defectCount = defects;
         int unassignedCount = unassigned;
@@ -200,16 +199,6 @@ public class RepositoryMender {
             setProperty(i, "svn:date", svnDateFormat.format(new Date(time)));
             time += timeIncrease;
 
-            //reqs/defs/unassigned
-//            if (i % linksBlock == 0) {
-//                if (requirements > 0) {
-//                    requirements--;
-//                    requirementNumber++;
-//                } else if (defects > 0) {
-//                    defects--;
-//                    defectNumber++;
-//                }
-//            }
             String originalMessage = getProperty(i, "svn:log");
 
             if (requirementCount >= defectCount && requirementCount >= unassignedCount) {
@@ -246,12 +235,6 @@ public class RepositoryMender {
                     defectNumber = defectStart;
                 }
             }
-
-//            if (requirements > 0) {
-//                setProperty(i, "svn:log", "implementing user story #"+requirementNumber+": "+originalMessage);
-//            } else if (defects > 0) {
-//                setProperty(i, "svn:log", "fixing defect #"+defectNumber+": "+originalMessage);
-//            }
 
             //team members
             if (i%userBlock == 0) {
