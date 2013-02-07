@@ -200,25 +200,23 @@ public class RepositoryMender {
             time += timeIncrease;
 
             String originalMessage = getProperty(i, "svn:log");
+            if (originalMessage.startsWith("implementing user story #") ||
+                    originalMessage.startsWith("fixing defect #")) {
+                int index = originalMessage.indexOf(": ");
+                if (index > 0) {
+                    log.debug("Shortening the original message for "+originalMessage.substring(0, index+2));
+                    originalMessage = originalMessage.substring(index+2);
+                }
+            }
 
             if (requirementCount >= defectCount && requirementCount >= unassignedCount) {
                 // requirements
-                String prefix = "implementing user story #"+requirementNumber+": ";
-                if (!originalMessage.startsWith(prefix)) {
-                    setProperty(i, "svn:log", prefix+originalMessage);
-                } else {
-                    log.debug("Skipping, log already set into: "+originalMessage);
-                }
+                setProperty(i, "svn:log", "implementing user story #"+requirementNumber+": "+originalMessage);
                 requirementCount--;
                 requirementNumber++;
             } else if (defectCount >= unassignedCount) {
                 // defects
-                String prefix = "fixing defect #"+defectNumber+": ";
-                if (!originalMessage.startsWith(prefix)) {
-                    setProperty(i, "svn:log", prefix+originalMessage);
-                } else {
-                    log.debug("Skipping, log already set into: "+originalMessage);
-                }
+                setProperty(i, "svn:log", "fixing defect #"+defectNumber+": "+originalMessage);
                 defectCount--;
                 defectNumber++;
             } else {
