@@ -35,6 +35,8 @@ import java.util.UUID;
  */
 public class BuildGenerator {
 
+    public static final String HUDSON_JOB = "hudson-job";
+
     private static Logger log = Logger.getLogger(BuildGenerator.class.getName());
     private String buildsFolder;
     private Date firstBuildDate;
@@ -244,5 +246,6 @@ public class BuildGenerator {
 
         client.doPost(hudsonUrl + "createItem", data);
         //todo verify status code -> fail or log error
+        DataGenerator.writeLogLine(HUDSON_JOB, jobName);
     }
 }

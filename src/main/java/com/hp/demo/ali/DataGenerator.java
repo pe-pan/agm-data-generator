@@ -13,10 +13,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by panuska on 10/12/12.
@@ -28,7 +29,7 @@ public class DataGenerator {
     private static Settings settings;
     private static RestClient client = new RestClient();
 
-    public static void main(String[] args) throws JAXBException, FileNotFoundException {
+    public static void main(String[] args) throws JAXBException, IOException {
         if (args.length != 1 && args.length != 3) {
             System.out.println("Usage: java -jar data-generator.jar excel-configuration-file.xlsx [admin_user_name admin_password]");
             System.out.println("       admin_user_name and admin_password are optional");
@@ -55,6 +56,45 @@ public class DataGenerator {
                 }
                 log.debug("REST URL: " + settings.getRestUrl());
                 log.debug("Tenant ID:" + settings.getTenantId());
+
+                Pattern p = Pattern.compile("^https?://[^/]+/qcbin/rest/domains/([^/]+)/projects/([^/]+)/$");
+                Matcher m = p.matcher(settings.getRestUrl());
+                m.matches();
+                jobLog = new File("job-"+settings.getTenantId()+"-"+m.group(1)+"-"+m.group(2)+".log");
+                if (jobLog.exists()) {
+                    log.info("Log from previous run found ("+jobLog.getName()+"), previously created data are going to be deleted...\n"+
+                    "Type 'yes' and press <ENTER> if you wish to continue..."
+                    );
+                    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+                    String input = in.readLine();
+                    if (!input.equals("yes")) {
+                        System.exit(-1);
+                    }
+                    openLog();
+                    String previousEntity = "";
+                    for (String line = readLogLine(); line != null; line = readLogLine()) {
+                        int columnIndex = line.indexOf(':');
+                        String entityName = line.substring(0, columnIndex);
+                        String agmId = line.substring(columnIndex+2);
+                        log.debug("Deleting "+entityName+" with ID: "+agmId);
+                        if (!entityName.equals(previousEntity)) {
+                            log.info("Deleting entity: "+entityName);
+                            previousEntity = entityName;
+                        }
+                        try {
+                            if (BuildGenerator.HUDSON_JOB.equals(entityName)) {
+                                RestClient hudsonClient = new RestClient();
+                                hudsonClient.doPost(settings.getHudsonUrl()+"job/"+agmId+"/doDelete", (String) null);
+                            } else {
+                                client.doDelete(settings.getRestUrl() + entityName + "s/" + agmId);
+                            }
+                        } catch (IllegalStateException e) {
+                            log.error("Cannot delete "+entityName+" with ID: "+agmId);
+                        }
+                    }
+                } else {
+                    log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
+                }
                 generateProject(reader);
             }
             if (settings.isGenerateBuilds()) {
@@ -134,6 +174,47 @@ public class DataGenerator {
     }
 
     private static Map<String, String> idTranslationTable = new HashMap<String, String>();
+    static File jobLog = null;
+
+    public static void writeLogLine(String entityName, String entityId) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(jobLog, true));
+            writer.write(entityName+": "+entityId+"\n");
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static List<String> logItems = new LinkedList<String>();
+    private static void openLog() {
+        log.debug("Reading all the job log...");
+        try {
+            BufferedReader logReader = new BufferedReader(new FileReader(jobLog));
+            for (String line = logReader.readLine(); line != null; line = logReader.readLine()) {
+                logItems.add(line);
+            }
+            logReader.close();
+            log.debug("Renaming job log file...");
+            String bakFileName = jobLog.getName()+".bak";
+            File bakFile = new File(bakFileName);
+            bakFile.delete();
+            jobLog.renameTo(bakFile);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static String readLogLine() {
+        if (logItems.size() > 0) {
+            log.debug("Processing job log line #"+logItems.size());
+            return logItems.remove(logItems.size()-1);
+        } else {
+            log.debug("Job log processed.");
+            return null;
+        }
+    }
 
     private static void generateEntity(ExcelReader reader, String sheetName, String agmAddress) {
         Sheet sheet = reader.getSheet(sheetName);
@@ -239,6 +320,7 @@ public class DataGenerator {
                         log.info("First defect ID: "+firstDefId);
                     }
                     idTranslationTable.put(sheetName+"#"+excelId, agmId);
+                    writeLogLine(sheetName, agmId);
                     if (sheetName.equals("release")) {
                         learnSprints(agmId);
                     }
