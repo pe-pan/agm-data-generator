@@ -90,14 +90,18 @@ public class RestClient {
                 conn.setDoInput(true);
                 conn.setAllowUserInteraction(false);
                 conn.setInstanceFollowRedirects(false);
-                conn.setRequestMethod(redirect ? "GET" : method.toString());
+                String methodName = redirect ? "GET" : method.toString();
+                log.debug("Doing "+methodName);
+                conn.setRequestMethod(methodName);
                 switch (contentType) {
                     case JSON : {
+                        log.debug("JSON documents");
                         conn.setRequestProperty("Content-type", "application/json;type=collection");
                         conn.setRequestProperty("Accept", "application/json");
                         break;
                     }
                     case XML : {
+                        log.debug("XML documents");
                         conn.setRequestProperty("Content-type", "application/xml; charset=UTF-8");
                         conn.setRequestProperty("Accept", "application/xml");
                         break;
