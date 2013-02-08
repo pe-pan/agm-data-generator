@@ -90,6 +90,6 @@ public class EntityTools {
         for (Field field : fields) {
             urlParameters.append(field.getName()).append('=').append(/*URLEncoder.encode(*/field.getValue().getValue()/*, "UTF-8")*/).append('&');
         }
-        return urlParameters.substring(urlParameters.length()-1);
+        return urlParameters.substring(0, urlParameters.length()-1);
     }
 }
