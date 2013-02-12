@@ -1,5 +1,6 @@
 package com.hp.demo.ali.rest;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -30,12 +31,14 @@ public class RestClient {
         if (cookieList == null) {
             return;
         }
+        log.debug("Adding cookies:");
         for (String cookie : cookieList) {
+            log.debug(cookie);
             String key = cookie.substring(0, cookie.indexOf('='));
             String value = cookie.substring(key.length()+1, cookie.indexOf(";", key.length()));
             cookies.put(key, value);
         }
-        log.debug("Cookies: "+cookies.toString());
+        log.debug("New cookies: "+cookies.toString());
     }
 
     private String getCookieList() {
@@ -113,7 +116,9 @@ public class RestClient {
                     log.debug("Setting INTERNAL_DATA header: "+ state);
                     conn.setRequestProperty("INTERNAL_DATA", state);
                 }
-                conn.setRequestProperty("Cookie", getCookieList());
+                String cookieList = getCookieList();
+                log.debug("Sending cookies: "+cookieList);
+                conn.setRequestProperty("Cookie", cookieList);
 
                 // write the data
                 if (!redirect && formData != null) {
@@ -153,6 +158,13 @@ public class RestClient {
             return  new HttpResponse(response.toString(), conn.getResponseCode());
         } catch (IOException e) {
             log.debug("Exception caught", e);
+            try {
+                if (conn != null) {
+                    log.debug("Error stream: "+ IOUtils.toString(conn.getErrorStream()));
+                }
+            } catch (IOException e1) {
+                log.debug("Cannot convert error stream to string");
+            }
             throw new IllegalStateException(e);
         } finally {
             if (conn != null) {
