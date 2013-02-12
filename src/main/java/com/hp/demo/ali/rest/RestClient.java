@@ -125,10 +125,7 @@ public class RestClient {
                     log.debug("Data size: " + formData.length());
                     conn.setRequestProperty("Content-Length", Integer.toString(formData.length()));
                     log.debug("Posting: " + formData);
-                    DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-                    wr.writeBytes(formData);
-                    wr.flush();
-                    wr.close();
+                    IOUtils.write(formData, conn.getOutputStream());
                 }
                 log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
 
@@ -146,16 +143,10 @@ public class RestClient {
             // Get the response
 
             log.debug("Receiving:");
-            BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String line;
-            StringBuilder response = new StringBuilder();
-            while ((line = rd.readLine()) != null) {
-                log.debug(line);
-                response.append(line);
-            }
-            rd.close();
+            String response = IOUtils.toString(conn.getInputStream());
+            log.debug(response);
 
-            return  new HttpResponse(response.toString(), conn.getResponseCode());
+            return  new HttpResponse(response, conn.getResponseCode());
         } catch (IOException e) {
             log.debug("Exception caught", e);
             try {
