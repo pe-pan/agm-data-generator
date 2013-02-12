@@ -346,8 +346,8 @@ public class DataGenerator {
         String agmUrl = null;
         String portalUrl = null;
         try {
-            agmUrl = client.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
-            portalUrl = client.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[2]/@href");
+            agmUrl = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
+            portalUrl = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[2]/@href");
         } catch (IllegalStateException e) {
             log.debug(e);
             log.error("Incorrect credentials: " + admin.getLogin() + " / " + admin.getPassword());
@@ -357,7 +357,7 @@ public class DataGenerator {
         String[] tokens1 = agmUrl.split("/");
 
         response = client.doGet(agmUrl);
-        String relativeUrl = client.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
+        String relativeUrl = RestTools.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
         String[] tokens2 = relativeUrl.split("[/=&]");
 
         settings.setRestUrl("https://" + tokens1[2] + "/qcbin/rest/domains/" + tokens2[4] + "/projects/" + tokens2[5] + "/");
@@ -378,7 +378,7 @@ public class DataGenerator {
         RestClient devBridgeClient = new RestClient();
         RestClient.HttpResponse response = devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/j_spring_security_check", data);
 
-        String script = devBridgeClient.extractString(response.getResponse(), "/html/head/script[2]/text()");
+        String script = RestTools.extractString(response.getResponse(), "/html/head/script[2]/text()");
 
         String token = "\"fid\""; // after this token is the value in " " characters
         String scriptEnd = script.substring(script.indexOf(token) + token.length());
@@ -434,7 +434,7 @@ public class DataGenerator {
         portalClient.doPost(settings.getLoginUrl(), data);
         portalClient.doGet(settings.getPortalUrl()+"/portal/pages/Dashboard?TENANTID=0");
         RestClient.HttpResponse response = portalClient.doGet(settings.getPortalUrl()+"/portal/pages/ListUsers2");
-        String token = portalClient.extractString(response.getResponse(), "//div[@id='newUserDialog']/form[@id='createUserForm']/input[@name='struts.token']/@value");
+        String token = RestTools.extractString(response.getResponse(), "//div[@id='newUserDialog']/form[@id='createUserForm']/input[@name='struts.token']/@value");
 
         for (User user : User.getUsers()) {
             data = new String[][] {
@@ -475,7 +475,7 @@ public class DataGenerator {
                 } catch (IllegalStateException e2) {
                     log.error("Cannot add user to portal: "+user.getFirstName()+" "+user.getLastName());
                     response = portalClient.doGet(settings.getPortalUrl()+"/portal/pages/ListUsers2"); // todo the token is being returned in the error stream; rewrite it so you do not have to do this GET
-                    token = portalClient.extractString(response.getResponse(), "//div[@id='newUserDialog']/form[@id='createUserForm']/input[@name='struts.token']/@value");
+                    token = RestTools.extractString(response.getResponse(), "//div[@id='newUserDialog']/form[@id='createUserForm']/input[@name='struts.token']/@value");
                 }
             }
             try {
