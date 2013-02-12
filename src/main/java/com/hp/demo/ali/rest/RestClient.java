@@ -116,6 +116,12 @@ public class RestClient {
                     log.debug("Setting INTERNAL_DATA header: "+ state);
                     conn.setRequestProperty("INTERNAL_DATA", state);
                 }
+                if (urlAddress.endsWith("/qcbin/rest/api/portal/users")) { //todo an evil hack; set INTERNAL_DATA header when setting ALI DEV Bridge URL
+                    String state = cookies.get("LWSSO_COOKIE_KEY");
+                    cookies.put("AGM_STATE", state);
+                    log.debug("Setting INTERNAL_DATA header: "+ state);
+                    conn.setRequestProperty("INTERNAL_DATA", state);
+                }
                 String cookieList = getCookieList();
                 log.debug("Sending cookies: "+cookieList);
                 conn.setRequestProperty("Cookie", cookieList);

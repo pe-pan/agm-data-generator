@@ -12,11 +12,15 @@ public class User {
     private String id;
     private String login;
     private String password;
+    private String firstName;
+    private String lastName;
 
-    public User(String id, String login, String password) {
+    public User(String id, String login, String password, String firstName, String lastName) {
         this.id = id;
         this.login = login;
         this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public String getId() {
@@ -37,6 +41,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
     }
 
     static private Map<String, User> users = new HashMap<String, User>();

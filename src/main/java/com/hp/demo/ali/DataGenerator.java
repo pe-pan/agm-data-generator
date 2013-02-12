@@ -6,6 +6,7 @@ import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.ContentType;
 import com.hp.demo.ali.rest.Method;
 import com.hp.demo.ali.rest.RestClient;
+import com.hp.demo.ali.rest.RestTools;
 import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -95,6 +96,8 @@ public class DataGenerator {
                 } else {
                     log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
                 }
+                addUsers();
+
                 generateProject(reader);
             }
             if (settings.isGenerateBuilds()) {
@@ -156,7 +159,9 @@ public class DataGenerator {
             String id = EntityTools.getFieldValue(userEntity, "id");
             String login = EntityTools.getFieldValue(userEntity, "login");
             String password = EntityTools.getFieldValue(userEntity, "password");
-            User user = new User(id, login, password);
+            String firstName = EntityTools.getFieldValue(userEntity, "first name");
+            String lastName = EntityTools.getFieldValue(userEntity, "last name");
+            User user = new User(id, login, password, firstName, lastName);
             User.addUser(user);
         }
         return users;
@@ -338,22 +343,27 @@ public class DataGenerator {
                 { "password", admin.getPassword() }
         };
         RestClient.HttpResponse response = client.doPost(settings.getLoginUrl(), data);
-        String url = null;
+        String agmUrl = null;
+        String portalUrl = null;
         try {
-            url = client.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
+            agmUrl = client.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
+            portalUrl = client.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[2]/@href");
         } catch (IllegalStateException e) {
             log.debug(e);
             log.error("Incorrect credentials: " + admin.getLogin() + " / " + admin.getPassword());
             System.exit(-1);
         }
-        String[] tokens1 = url.split("/");
+        //todo use regexp to split the pattern
+        String[] tokens1 = agmUrl.split("/");
 
-        response = client.doGet(url);
+        response = client.doGet(agmUrl);
         String relativeUrl = client.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
         String[] tokens2 = relativeUrl.split("[/=&]");
 
         settings.setRestUrl("https://" + tokens1[2] + "/qcbin/rest/domains/" + tokens2[4] + "/projects/" + tokens2[5] + "/");
         settings.setTenantId(tokens2[9]);
+        settings.setPortalUrl(RestTools.getProtocolHost(portalUrl));
+        log.debug("Portal URL: " + portalUrl);
     }
 
     public static void synchronizeAliDevBridge() {
@@ -410,6 +420,76 @@ public class DataGenerator {
             String id = EntityTools.getFieldValue(sprint, "id");
             idTranslationTable.put("sprint#"+i++, id);
             log.debug("Learning sprint id: "+id);
+        }
+    }
+
+    public static void addUsers() {
+        RestClient portalClient = new RestClient();
+        User admin = User.getUser(settings.getAdmin());
+
+        String[][] data = {
+                { "username", admin.getLogin() },
+                { "password", admin.getPassword() }
+        };
+        portalClient.doPost(settings.getLoginUrl(), data);
+        portalClient.doGet(settings.getPortalUrl()+"/portal/pages/Dashboard?TENANTID=0");
+        RestClient.HttpResponse response = portalClient.doGet(settings.getPortalUrl()+"/portal/pages/ListUsers2");
+        String token = portalClient.extractString(response.getResponse(), "//div[@id='newUserDialog']/form[@id='createUserForm']/input[@name='struts.token']/@value");
+
+        for (User user : User.getUsers()) {
+            data = new String[][] {
+                    { "firstName", user.getFirstName() },
+                    { "lastName", user.getLastName() },
+                    { "email", user.getLogin() },
+                    { "phone", "1" },
+                    { "portalUser", "off" },
+                    { "timezone", "Europe/Prague" },
+                    { "roles", "" },
+                    { "struts.token.name", "struts.token" },
+                    { "struts.token", token }
+            };
+            log.info("Adding user: " + user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
+            try {
+                response = portalClient.doPost(settings.getPortalUrl()+"/portal/pages/CreateUser2", data);
+                int i = response.getResponse().indexOf("token");
+                i = response.getResponse().indexOf(':', i);
+                i = response.getResponse().indexOf('"', i)+1;
+                int lastI = response.getResponse().indexOf('"', i);
+                token = response.getResponse().substring(i, lastI);
+            } catch (IllegalStateException e) {
+                // perhaps, it was not added as it already exists -> trying to attach it as an existing user account
+                // todo handle it basing on the error stream value
+                try {
+                    log.debug("Trying to attach an existing user account: "+ user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
+                    data = new String[][] {
+                            { "email", user.getLogin() },
+                            { "struts.token.name", "struts.token" },
+                            { "struts.token", token }
+                    };
+                    response = portalClient.doPost(settings.getPortalUrl()+"/portal/pages/AttachUserToAccount", data);
+                    int i = response.getResponse().indexOf("token");
+                    i = response.getResponse().indexOf(':', i);
+                    i = response.getResponse().indexOf('"', i)+1;
+                    int lastI = response.getResponse().indexOf('"', i);
+                    token = response.getResponse().substring(i, lastI);
+                } catch (IllegalStateException e2) {
+                    log.error("Cannot add user to portal: "+user.getFirstName()+" "+user.getLastName());
+                    response = portalClient.doGet(settings.getPortalUrl()+"/portal/pages/ListUsers2"); // todo the token is being returned in the error stream; rewrite it so you do not have to do this GET
+                    token = portalClient.extractString(response.getResponse(), "//div[@id='newUserDialog']/form[@id='createUserForm']/input[@name='struts.token']/@value");
+                }
+            }
+            try {
+                //todo serialize using JSON library
+                String formData = "{\"users\":[{\"loginName\":\""+user.getLogin()+
+                        "\", \"firstName\":\""+user.getFirstName()+
+                        "\", \"lastName\":\""+user.getLastName()+
+                        "\", \"phone\":\"1\", \"email\":\""+user.getLogin()+
+                        "\", \"timezone\":\"Europe/Prague\"}]}";
+                //todo there should be a simpler way to learn the URL than using getProtocolHost method
+                client.doPut(RestTools.getProtocolHost(settings.getRestUrl())+"/qcbin/rest/api/portal/users", formData);
+            } catch (IllegalStateException e) {
+                log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
+            }
         }
     }
 }

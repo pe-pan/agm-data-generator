@@ -34,6 +34,7 @@ public class Settings {
     private long firstSvnRevision;
     private int firstDefectNumber;
     private int firstRequirementNumber;
+    private String portalUrl;
 
     public Settings(Sheet settings) {
         log.info("Reading settings...");
@@ -168,4 +169,11 @@ public class Settings {
         this.firstRequirementNumber = firstRequirementNumber;
     }
 
+    public String getPortalUrl() {
+        return portalUrl;
+    }
+
+    public void setPortalUrl(String portalUrl) {
+        this.portalUrl = portalUrl;
+    }
 }
