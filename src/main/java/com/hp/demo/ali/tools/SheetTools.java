@@ -14,7 +14,7 @@ public class SheetTools {
 
     private static DataFormatter formatter = new DataFormatter(true);
     public static String getStringValue(Sheet sheet, int row, int column) {
-        return formatter.formatCellValue(sheet.getRow(row).getCell(column));
+        return formatter.formatCellValue(sheet.getRow(row).getCell(column)).trim();
     }
 
     public static int getIntValue(Sheet sheet, int row, int column) {
