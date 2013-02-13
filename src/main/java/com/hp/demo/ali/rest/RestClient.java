@@ -65,6 +65,10 @@ public class RestClient {
         }
     }
 
+    public synchronized HttpResponse doRequest(String urlAddress, String formData, Method method, ContentType contentType) {
+        return doRequest(urlAddress, formData, method, contentType, null);
+    }
+
     /**
      * Posts given data to the given address and collects (re-send) cookies.
      * Also handles redirects; only first time it does POST, then it does GET.
@@ -72,9 +76,10 @@ public class RestClient {
      * @param urlAddress where the request is being sent
      * @param formData if null, GET method is used; POST otherwise
      * @param method which method will be used
+     * @param handler
      * @return response of the request
      */
-    public HttpResponse doRequest(String urlAddress, String formData, Method method, ContentType contentType) {
+    public synchronized HttpResponse doRequest(String urlAddress, String formData, Method method, ContentType contentType, AsyncHandler handler) {
         HttpURLConnection conn = null;
         try {
             boolean redirect = false;
@@ -141,11 +146,19 @@ public class RestClient {
 
             // Get the response
 
-            log.debug("Receiving:");
-            String response = IOUtils.toString(conn.getInputStream());
-            log.debug(response);
+            if (handler == null) {
+                log.debug("Receiving:");
+                String response = IOUtils.toString(conn.getInputStream());
+                log.debug(response);
 
-            return  new HttpResponse(response, conn.getResponseCode());
+                return  new HttpResponse(response, conn.getResponseCode());
+            } else {
+                log.debug("Handling asynchronously, starting a new thread");
+                Thread thread = new Thread(handler, handler.getClass().getSimpleName());
+                handler.setConnection(conn);
+                thread.start();
+                return new HttpResponse(null, conn.getResponseCode());
+            }
         } catch (IOException e) {
             log.debug("Exception caught", e);
             try {
@@ -157,7 +170,7 @@ public class RestClient {
             }
             throw new IllegalStateException(e);
         } finally {
-            if (conn != null) {
+            if (conn != null && handler == null) {  // close the connection only if received the data synchronously
                 conn.disconnect();
             }
         }
@@ -198,6 +211,10 @@ public class RestClient {
 
     public HttpResponse doPost(String url, String[][] data) {
         return doRequest(url, serializeParameters(data), Method.POST, ContentType.NONE);
+    }
+
+    public HttpResponse doPost(String url, String[][] data, AsyncHandler handler) {
+        return doRequest(url, serializeParameters(data), Method.POST, ContentType.NONE, handler);
     }
 
     public HttpResponse doPut(String url, String data) {

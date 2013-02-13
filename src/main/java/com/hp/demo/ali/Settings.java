@@ -35,6 +35,8 @@ public class Settings {
     private int firstDefectNumber;
     private int firstRequirementNumber;
     private String portalUrl;
+    private String devBridgeHome;
+    private String jettyWarFolder;
 
     public Settings(Sheet settings) {
         log.info("Reading settings...");
@@ -66,7 +68,9 @@ public class Settings {
         firstSvnRevision = SheetTools.getLongValue(settings, 19, 2);
         firstDefectNumber = SheetTools.getIntValue(settings, 20, 2);
         firstRequirementNumber = SheetTools.getIntValue(settings, 21, 2);
-        aliDevBridgeUrl = SheetTools.getStringValue(settings, 22    , 2);
+        aliDevBridgeUrl = SheetTools.getStringValue(settings, 22, 2);
+        devBridgeHome = SheetTools.getStringValue(settings, 23, 2);
+        jettyWarFolder = SheetTools.getStringValue(settings, 24, 2);
     }
 
     public boolean isGenerateProject() {
@@ -175,5 +179,13 @@ public class Settings {
 
     public void setPortalUrl(String portalUrl) {
         this.portalUrl = portalUrl;
+    }
+
+    public String getDevBridgeHome() {
+        return devBridgeHome;
+    }
+
+    public String getJettyWarFolder() {
+        return jettyWarFolder;
     }
 }

@@ -3,10 +3,7 @@ package com.hp.demo.ali;
 import com.hp.demo.ali.entity.*;
 import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
-import com.hp.demo.ali.rest.ContentType;
-import com.hp.demo.ali.rest.Method;
-import com.hp.demo.ali.rest.RestClient;
-import com.hp.demo.ali.rest.RestTools;
+import com.hp.demo.ali.rest.*;
 import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -57,6 +54,8 @@ public class DataGenerator {
                 }
                 log.debug("REST URL: " + settings.getRestUrl());
                 log.debug("Tenant ID:" + settings.getTenantId());
+
+                downloadDevBridge();
 
                 Pattern p = Pattern.compile("^https?://[^/]+/qcbin/rest/domains/([^/]+)/projects/([^/]+)/$");
                 Matcher m = p.matcher(settings.getRestUrl());
@@ -491,5 +490,11 @@ public class DataGenerator {
                 log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
             }
         }
+    }
+
+    public static void downloadDevBridge() {
+//        log.info("Downloading dev bridge war file");
+        String [][] data = { { "bridge_home", settings.getDevBridgeHome() } };
+        client.doPost(settings.getRestUrl()+"/scm/dev-bridge", data, new DevBridgeDowloader(settings, client));
     }
 }
