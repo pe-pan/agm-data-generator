@@ -495,6 +495,6 @@ public class DataGenerator {
     public static void downloadDevBridge() {
 //        log.info("Downloading dev bridge war file");
         String [][] data = { { "bridge_home", settings.getDevBridgeHome() } };
-        client.doPost(settings.getRestUrl()+"/scm/dev-bridge", data, new DevBridgeDowloader(settings, client));
+        client.doPost(settings.getRestUrl()+"scm/dev-bridge", data, new DevBridgeDowloader(settings, client));
     }
 }
