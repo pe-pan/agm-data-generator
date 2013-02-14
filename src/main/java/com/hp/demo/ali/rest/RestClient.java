@@ -134,6 +134,8 @@ public class RestClient {
                     conn.setRequestProperty("Content-Length", Integer.toString(formData.length()));
                     log.debug("Posting: " + formData);
                     IOUtils.write(formData, conn.getOutputStream());
+                    conn.getOutputStream().flush();
+                    conn.getOutputStream().close();
                 }
                 log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
 
@@ -158,6 +160,7 @@ public class RestClient {
             if (handler == null) {
                 log.debug("Receiving:");
                 String response = IOUtils.toString(conn.getInputStream());
+                conn.getInputStream().close();
                 log.debug(response);
 
                 return  new HttpResponse(response, conn.getResponseCode());
