@@ -19,6 +19,7 @@ public class RestClient {
     private static Logger log = Logger.getLogger(RestClient.class.getName());
 
     private HashMap<String, String> cookies = new HashMap<String, String>();
+    private String oldLocation = "";
 
     private void addCookieList(List<String> cookieList) {
         if (cookieList == null) {
@@ -120,6 +121,9 @@ public class RestClient {
                     log.debug("Setting INTERNAL_DATA header: "+ state);
                     conn.setRequestProperty("INTERNAL_DATA", state);
                 }
+                log.debug("Setting Referer into: "+oldLocation);
+                conn.setRequestProperty("Referer", oldLocation);
+
                 String cookieList = getCookieList();
                 log.debug("Sending cookies: "+cookieList);
                 conn.setRequestProperty("Cookie", cookieList);
@@ -132,6 +136,11 @@ public class RestClient {
                     IOUtils.write(formData, conn.getOutputStream());
                 }
                 log.debug("Code: "+conn.getResponseCode()+"; Message: "+conn.getResponseMessage());
+
+                String location = conn.getHeaderField("Location");
+                if (location != null) {
+                    oldLocation = location;
+                }
 
                 if (conn.getResponseCode() == 301 || conn.getResponseCode() == 302) {
                     urlAddress = conn.getHeaderField("Location");
