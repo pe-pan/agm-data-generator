@@ -174,7 +174,7 @@ public class RestClient {
         } catch (IOException e) {
             log.debug("Exception caught", e);
             try {
-                if (conn != null) {
+                if (conn != null && conn.getErrorStream() != null) {
                     log.debug("Error stream: "+ IOUtils.toString(conn.getErrorStream()));
                 }
             } catch (IOException e1) {
