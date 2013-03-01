@@ -38,32 +38,21 @@ public class BuildGenerator {
     public static final String HUDSON_JOB = "hudson-job";
 
     private static Logger log = Logger.getLogger(BuildGenerator.class.getName());
-    private String buildsFolder;
-    private Date firstBuildDate;
-    private int firstBuildNumber;
+    private Settings settings;
+
+    private Date currentBuildDate;
+    private int currentBuildNumber;
     private long startingRevision;
-    private String svnUrl;
-    private String hudsonUrl;
-    private String jobName;
-    private String templateJobName;
-    private String buildTemplateFolder;
 
     private RepositoryMender mender;
-    private boolean alterRepository;
 
     public BuildGenerator(Settings settings) {
-        this.buildsFolder = settings.getBuildFolder();
-        buildTemplateFolder = settings.getBuildTemplateFolder();
-        this.firstBuildDate = settings.getFirstBuildDate();
-        this.firstBuildNumber = settings.getFirstBuildNumber();
-        this.startingRevision = settings.getFirstSvnRevision();
-        this.svnUrl = settings.getSvnUrl();
-        hudsonUrl = settings.getHudsonUrl();
-        jobName = settings.getJobName();
-        templateJobName = settings.getTemplateJobName();
+        this.settings = settings;
+        currentBuildDate = settings.getFirstBuildDate();
+        currentBuildNumber = settings.getFirstBuildNumber();
+        startingRevision = settings.getFirstSvnRevision();
         mender = new RepositoryMender(settings);
-        alterRepository = settings.isMeldRepository();
-        log.debug("Build template folder is: " + buildTemplateFolder);
+        log.debug("Build template folder is: " + settings.getBuildTemplateFolder());
     }
 
     public void generate(Sheet sheet, List<Long> skipRevisions) {
@@ -86,24 +75,24 @@ public class BuildGenerator {
             int unassigned = EntityTools.getFieldIntValue(entity, "unassigned");
             int teamMembers = EntityTools.getFieldIntValue(entity, "team members");
 
-            firstBuildDate = new Date(firstBuildDate.getTime() + nextBuild);     //nextBuild is in milliseconds
-            String outputFolder = buildsFolder + File.separator + jobName + File.separator + "builds" + File.separator + sdf.format(firstBuildDate);
+            currentBuildDate = new Date(currentBuildDate.getTime() + nextBuild);     //nextBuild is in milliseconds
+            String outputFolder = settings.getBuildFolder() + File.separator + settings.getJobName() + File.separator + "builds" + File.separator + sdf.format(currentBuildDate);
             try {
-                log.info("Generating build " + sdf.format(firstBuildDate));
-                FileUtils.copyDirectory(new File(buildTemplateFolder), new File(outputFolder));
+                log.info("Generating build " + sdf.format(currentBuildDate));
+                FileUtils.copyDirectory(new File(settings.getBuildTemplateFolder()), new File(outputFolder));
                 File buildXmlFile = new File(outputFolder + File.separator + BUILD_XML);
                 UUID buildId = UUID.randomUUID();
                 long fromRevision = startingRevision;
                 startingRevision += increaseRevision;
                 long toRevision = startingRevision;
                 long[] subset = getRevisionSubSet(skipRevisions, fromRevision, toRevision - 1);
-                String oldBuildId = correctBuildFile(buildXmlFile, buildId, firstBuildNumber++, totalLines, coveredLines, totalTests, skippedTests, failedTests, status, duration, fromRevision, toRevision - 1, subset, svnUrl);
+                String oldBuildId = correctBuildFile(buildXmlFile, buildId, currentBuildNumber++, totalLines, coveredLines, totalTests, skippedTests, failedTests, status, duration, fromRevision, toRevision - 1, subset, settings.getSvnUrl());
                 File mavenBuildFile = new File(outputFolder + File.separator + MAVEN_XML_PREF + oldBuildId + ".xml");
                 File newMavenBuildFile = new File(outputFolder + File.separator + MAVEN_XML_PREF + buildId.toString() + ".xml");
                 mavenBuildFile.renameTo(newMavenBuildFile);
 
-                if (alterRepository) {
-                    mender.alterRepository(fromRevision, toRevision, firstBuildDate.getTime() - nextBuild, firstBuildDate.getTime(), requirements, defects, unassigned, teamMembers);
+                if (settings.isMeldRepository()) {
+                    mender.alterRepository(fromRevision, toRevision, currentBuildDate.getTime() - nextBuild, currentBuildDate.getTime(), requirements, defects, unassigned, teamMembers);
                 }
 
             } catch (IOException e) {
@@ -233,19 +222,19 @@ public class BuildGenerator {
     }
 
     public void createJob() {
-        log.info("Creating job " + jobName + " at Hudson...");
+        log.info("Creating job " + settings.getJobName() + " at Hudson...");
         final String data[][] = {
-                {"name", jobName},
+                {"name", settings.getJobName()},
                 {"mode", "copy"},
-                {"from", templateJobName},
-                {"json", "{\"name\": \"" + jobName + "\", \"mode\": \"copy\", \"from\": \"" + jobName + "\", \"Submit\": \"OK\"}"},
+                {"from", settings.getTemplateJobName()},
+                {"json", "{\"name\": \"" + settings.getJobName() + "\", \"mode\": \"copy\", \"from\": \"" + settings.getJobName() + "\", \"Submit\": \"OK\"}"},
                 {"Submit", "OK"}
         };
 
         RestClient client = new RestClient();
 
-        client.doPost(hudsonUrl + "createItem", data);
+        client.doPost(settings.getHudsonUrl() + "createItem", data);
         //todo verify status code -> fail or log error
-        DataGenerator.writeLogLine(HUDSON_JOB, jobName);
+        DataGenerator.writeLogLine(HUDSON_JOB, settings.getJobName());
     }
 }
