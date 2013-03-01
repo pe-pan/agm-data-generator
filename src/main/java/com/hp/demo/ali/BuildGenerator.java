@@ -35,8 +35,6 @@ import java.util.UUID;
  */
 public class BuildGenerator {
 
-    public static final String HUDSON_JOB = "hudson-job";
-
     private static Logger log = Logger.getLogger(BuildGenerator.class.getName());
     private Settings settings;
 
@@ -55,29 +53,39 @@ public class BuildGenerator {
         log.debug("Build template folder is: " + settings.getBuildTemplateFolder());
     }
 
+    public void deleteJob() {
+        log.info("Trying to delete job "+settings.getJobName()+" at Hudson...");
+        RestClient hudsonClient = new RestClient();
+        try {
+            hudsonClient.doPost(settings.getHudsonUrl()+"job/"+settings.getJobName()+"/doDelete", (String) null);
+        } catch (IllegalStateException e) {
+            log.info("Cannot delete the job, probably it does not exist");
+        }
+    }
+
     public void generate(Sheet sheet, List<Long> skipRevisions) {
         log.info("Generating builds...");
         EntityIterator iterator = new EntityIterator(sheet);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-'00'");
-        while (iterator.hasNext()) {
-            Entity entity = iterator.next();
-            int nextBuild = EntityTools.getFieldIntValue(entity, "next build");
-            int totalLines = EntityTools.getFieldIntValue(entity, "totalLines");
-            int coveredLines = EntityTools.getFieldIntValue(entity, "coveredLines");
-            int totalTests = EntityTools.getFieldIntValue(entity, "totalTests");
-            int failedTests = EntityTools.getFieldIntValue(entity, "failedTests");
-            int skippedTests = EntityTools.getFieldIntValue(entity, "skippedTests");
-            String status = EntityTools.getFieldValue(entity, "status");
-            int duration = EntityTools.getFieldIntValue(entity, "duration");
-            long increaseRevision = EntityTools.getFieldLongValue(entity, "revisions");
-            int requirements = EntityTools.getFieldIntValue(entity, "requirements");
-            int defects = EntityTools.getFieldIntValue(entity, "defects");
-            int unassigned = EntityTools.getFieldIntValue(entity, "unassigned");
-            int teamMembers = EntityTools.getFieldIntValue(entity, "team members");
+        try {
+            while (iterator.hasNext()) {
+                Entity entity = iterator.next();
+                int nextBuild = EntityTools.getFieldIntValue(entity, "next build");
+                int totalLines = EntityTools.getFieldIntValue(entity, "totalLines");
+                int coveredLines = EntityTools.getFieldIntValue(entity, "coveredLines");
+                int totalTests = EntityTools.getFieldIntValue(entity, "totalTests");
+                int failedTests = EntityTools.getFieldIntValue(entity, "failedTests");
+                int skippedTests = EntityTools.getFieldIntValue(entity, "skippedTests");
+                String status = EntityTools.getFieldValue(entity, "status");
+                int duration = EntityTools.getFieldIntValue(entity, "duration");
+                long increaseRevision = EntityTools.getFieldLongValue(entity, "revisions");
+                int requirements = EntityTools.getFieldIntValue(entity, "requirements");
+                int defects = EntityTools.getFieldIntValue(entity, "defects");
+                int unassigned = EntityTools.getFieldIntValue(entity, "unassigned");
+                int teamMembers = EntityTools.getFieldIntValue(entity, "team members");
 
-            currentBuildDate = new Date(currentBuildDate.getTime() + nextBuild);     //nextBuild is in milliseconds
-            String outputFolder = settings.getBuildFolder() + File.separator + settings.getJobName() + File.separator + "builds" + File.separator + sdf.format(currentBuildDate);
-            try {
+                currentBuildDate = new Date(currentBuildDate.getTime() + nextBuild);     //nextBuild is in milliseconds
+                String outputFolder = settings.getBuildFolder() + File.separator + settings.getJobName() + File.separator + "builds" + File.separator + sdf.format(currentBuildDate);
                 log.info("Generating build " + sdf.format(currentBuildDate));
                 FileUtils.copyDirectory(new File(settings.getBuildTemplateFolder()), new File(outputFolder));
                 File buildXmlFile = new File(outputFolder + File.separator + BUILD_XML);
@@ -94,12 +102,18 @@ public class BuildGenerator {
                 if (settings.isMeldRepository()) {
                     mender.alterRepository(fromRevision, toRevision, currentBuildDate.getTime() - nextBuild, currentBuildDate.getTime(), requirements, defects, unassigned, teamMembers);
                 }
-
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
             }
-
-
+            FileUtils.copyFile(  // the new build needs to know SVN credentials
+                    new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"subversion.credentials"),
+                    new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"subversion.credentials"));
+            FileUtils.copyFile(
+                    new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"config.xml"),
+                    new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"config.xml"));
+            FileUtils.writeStringToFile(
+                    new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"nextBuildNumber"),
+                    Integer.toString(currentBuildNumber));
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
     }
 
@@ -223,18 +237,13 @@ public class BuildGenerator {
 
     public void createJob() {
         log.info("Creating job " + settings.getJobName() + " at Hudson...");
-        final String data[][] = {
-                {"name", settings.getJobName()},
-                {"mode", "copy"},
-                {"from", settings.getTemplateJobName()},
-                {"json", "{\"name\": \"" + settings.getJobName() + "\", \"mode\": \"copy\", \"from\": \"" + settings.getJobName() + "\", \"Submit\": \"OK\"}"},
-                {"Submit", "OK"}
-        };
-
         RestClient client = new RestClient();
-
-        client.doPost(settings.getHudsonUrl() + "createItem", data);
-        //todo verify status code -> fail or log error
-        DataGenerator.writeLogLine(HUDSON_JOB, settings.getJobName());
+        log.debug("Reloading from disk (just generated data)");
+        try {
+            client.doGet(settings.getHudsonUrl()+ "reload");
+        } catch (IllegalStateException e) {
+            log.debug("Reload exception caught...");
+            //todo reload returns 503 (exception) -> check it's the correct one
+        }
     }
 }

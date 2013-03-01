@@ -82,12 +82,7 @@ public class DataGenerator {
                             previousEntity = entityName;
                         }
                         try {
-                            if (BuildGenerator.HUDSON_JOB.equals(entityName)) {
-                                RestClient hudsonClient = new RestClient();
-                                hudsonClient.doPost(settings.getHudsonUrl()+"job/"+agmId+"/doDelete", (String) null);
-                            } else {
-                                client.doDelete(settings.getRestUrl() + entityName + "s/" + agmId);
-                            }
+                            client.doDelete(settings.getRestUrl() + entityName + "s/" + agmId);
                         } catch (IllegalStateException e) {
                             log.error("Cannot delete "+entityName+" with ID: "+agmId);
                         }
@@ -102,6 +97,7 @@ public class DataGenerator {
             if (settings.isGenerateBuilds()) {
                 List<Long>skippedRevisions = readSkippedRevisions(reader.getSheet("Skip-Revisions"));
                 BuildGenerator generator = new BuildGenerator(settings);
+                generator.deleteJob();
                 generator.generate(reader.getSheet("Builds"), skippedRevisions);
                 generator.createJob();
             }
