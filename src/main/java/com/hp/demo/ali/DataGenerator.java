@@ -5,6 +5,9 @@ import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.*;
 import com.hp.demo.ali.tools.EntityTools;
+import org.apache.ant.compress.taskdefs.Unzip;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -48,6 +51,7 @@ public class DataGenerator {
                 admin.setPassword(args[2]);
             }
 
+            DevBridgeDownloader downloader = null;
             if (settings.isGenerateProject()) {
                 if (settings.getRestUrl().length() == 0 || settings.getTenantId().length() == 0) {
                     resolveTenantUrl();
@@ -55,7 +59,7 @@ public class DataGenerator {
                 log.debug("REST URL: " + settings.getRestUrl());
                 log.debug("Tenant ID:" + settings.getTenantId());
 
-                downloadDevBridge();
+                downloader = downloadDevBridge();
 
                 Pattern p = Pattern.compile("^https?://[^/]+/qcbin/rest/domains/([^/]+)/projects/([^/]+)/$");
                 Matcher m = p.matcher(settings.getRestUrl());
@@ -90,7 +94,9 @@ public class DataGenerator {
                 } else {
                     log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
                 }
-                addUsers();
+                if (settings.isAddUsers()) { // todo move this if out of [ if (settings.isGenerateProject()) ] condition
+                    addUsers();
+                }
 
                 generateProject(reader);
             }
@@ -103,6 +109,13 @@ public class DataGenerator {
             }
             if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
                 configureAliDevBridge();
+
+                stopDevBridge();
+                downloader.waitTillDownloaded();
+                replaceDevBridgeBits(downloader);
+                configureDevBridgeBits();
+                startDevBridge();
+
                 synchronizeAliDevBridge();
             }
         } finally {
@@ -488,9 +501,121 @@ public class DataGenerator {
         }
     }
 
-    public static void downloadDevBridge() {
-//        log.info("Downloading dev bridge war file");
+    public static DevBridgeDownloader downloadDevBridge() {
+        DevBridgeDownloader downloader = new DevBridgeDownloader(settings, client);
         String [][] data = { { "bridge_home", settings.getDevBridgeHome() } };
-        client.doPost(settings.getRestUrl()+"scm/dev-bridge", data, new DevBridgeDowloader(settings, client));
+        client.doPost(settings.getRestUrl()+"scm/dev-bridge/bundle", data, downloader);  // /scm/dev-bridge - downloads only war file!
+        return downloader;
+    }
+
+    public static final String DEV_BRIDGE_ZIP_ROOT = "\\DevBridge\\";
+
+    public static void stopDevBridge() {
+        log.info("Stopping ALI Dev Bridge...");
+        String devBridgeScript = settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"bin\\DevBridge.bat";   // todo this is Windows only!
+        Process devBridge = null;
+        try {
+            devBridge = Runtime.getRuntime().exec(devBridgeScript+" stop");
+            devBridge.waitFor();
+            if (devBridge.exitValue() != 0) {
+                log.debug(IOUtils.toString(devBridge.getErrorStream()));
+                log.debug("Cannot stop ALI Dev Bridge service; code " + devBridge.exitValue());
+            }
+            devBridge = Runtime.getRuntime().exec(devBridgeScript+" remove");
+            devBridge.waitFor();
+            if (devBridge.exitValue() != 0) {
+                log.debug(IOUtils.toString(devBridge.getErrorStream()));
+                log.debug("Cannot remove ALI Dev Bridge service; code " + devBridge.exitValue());
+            }
+        } catch (IOException e) {
+            log.debug("Cannot install or start ALI Dev Bridge service");
+        } catch (InterruptedException e) {
+            log.error("Process ALI Dev Bridge interrupted", e);
+        }
+
+    }
+
+    public static void replaceDevBridgeBits(DevBridgeDownloader downloader) {
+        log.debug("Deleting old Dev Bridge folder: "+settings.getDevBridgeFolder());
+        try {
+            FileUtils.deleteDirectory(new File(settings.getDevBridgeFolder()));
+        } catch (IOException e) {
+            log.debug("File " + settings.getDevBridgeFolder() + " cannot be deleted ", e);
+        }
+        log.debug("Unpacking downloaded Dev Bridge "+downloader.getFileName()+" into "+settings.getDevBridgeFolder());
+        Unzip u = new Unzip();
+        u.setSrc(new File(downloader.getFileName()));
+        u.setDest(new File(settings.getDevBridgeFolder()));
+        u.execute();
+    }
+
+    public static void startDevBridge() {
+        log.info("Starting ALI Dev Bridge...");
+        String devBridgeScript = settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"bin\\DevBridge.bat";
+        Process devBridge = null;
+        try {
+            devBridge = Runtime.getRuntime().exec(devBridgeScript+" install");
+            devBridge.waitFor();
+            log.debug("Service installed");
+            log.debug(IOUtils.toString(devBridge.getInputStream()));
+            if (devBridge.exitValue() != 0) {
+                log.error(IOUtils.toString(devBridge.getErrorStream()));
+                log.error("Cannot install ALI Dev Bridge service; code "+devBridge.exitValue());
+                throw new IllegalStateException("Cannot install ALI Dev Bridge service; code "+devBridge.exitValue());
+            }
+            devBridge = Runtime.getRuntime().exec(devBridgeScript+" start");
+            devBridge.waitFor();
+            log.debug("Service started");
+            log.debug(IOUtils.toString(devBridge.getInputStream()));
+            if (devBridge.exitValue() != 0) {
+                log.error(IOUtils.toString(devBridge.getErrorStream()));
+                log.error("Cannot start ALI Dev Bridge service; code "+devBridge.exitValue());
+                throw new IllegalStateException("Cannot start ALI Dev Bridge service; code "+devBridge.exitValue());
+            }
+            RestClient devBridgeClient = new RestClient();
+            int attempts = 15;
+            while (attempts > 0) {
+                try {
+                    Thread.sleep(2000);
+                    devBridgeClient.doGet(settings.getAliDevBridgeUrl());
+                    log.info("ALI Dev Bridge started!");
+                    attempts = 0;
+                } catch (IllegalStateException e) {
+                    log.info("ALI Dev Bridge has not started yet; attempts to try: "+attempts);
+                    attempts--;
+                }
+            }
+        } catch (IOException e) {
+            log.error("Cannot install or start ALI Dev Bridge service");
+            throw new IllegalStateException(e);
+        } catch (InterruptedException e) {
+            log.error("Process ALI Dev Bridge interrupted", e);
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static void configureDevBridgeBits() {  //todo rename; too similar to configureAliDevBridge method name
+        log.info("Configuring ALI Dev Bridge bits...");
+        try {
+            FileUtils.write(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"wrapper\\wrapper-custom.conf"),
+                    "\n"+
+                    "wrapper.java.additional.101=-Dali.bridge.port=8380\n"+
+                    "wrapper.java.additional.102=-Dali.bridge.ssl.port=8543\n"+
+                    "wrapper.java.additional.104=-Dali.bridge.http.warning=false\n"+
+                    "wrapper.java.command=c:\\Program Files\\Java\\jdk1.7.0_03\\bin\\java.exe", true);
+
+            Collection<File> descriptors = FileUtils.listFiles(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"deploy"), new String[] {"xml"}, false);
+            assert descriptors.size() == 1;
+            File tenantDescriptor = descriptors.iterator().next();
+            String tenantDescriptorName = tenantDescriptor.getName().substring(0, tenantDescriptor.getName().length()-4);
+            FileUtils.write(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"tenants\\"+tenantDescriptorName+"\\conf\\connection.properties"),
+                    "\n" +
+                    "httpProxy=156.152.46.12:8088\n" +
+                    "httpsProxy=156.152.46.12:8088\n" +
+                    "noProxyHosts=alm-server \n\n", true);
+        } catch (IOException e) {
+            log.error("Cannot configure installed dev bridge bits", e);
+            throw new IllegalStateException(e);
+        }
     }
 }
