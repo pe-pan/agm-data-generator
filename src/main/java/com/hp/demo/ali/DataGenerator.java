@@ -386,15 +386,7 @@ public class DataGenerator {
         RestClient devBridgeClient = new RestClient();
         RestClient.HttpResponse response = devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/j_spring_security_check", data);
 
-        String script = RestTools.extractString(response.getResponse(), "/html/head/script[2]/text()");
-
-        String token = "\"fid\""; // after this token is the value in " " characters
-        String scriptEnd = script.substring(script.indexOf(token) + token.length());
-        int first = scriptEnd.indexOf('"')+1;
-        int last = scriptEnd.indexOf('"', first);
-        String fid = scriptEnd.substring(first, last);
-
-        data = new String[][] { { "fid", fid } };
+        data = new String[][] { { "fid", response.getXFid() } };
         devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/rest/task/start/BuildSyncTask", data);
         log.info("Build synchronization started!");
         devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/rest/task/start/SourceSyncTask", data);
@@ -503,8 +495,7 @@ public class DataGenerator {
 
     public static DevBridgeDownloader downloadDevBridge() {
         DevBridgeDownloader downloader = new DevBridgeDownloader(settings, client);
-        String [][] data = { { "bridge_home", settings.getDevBridgeHome() } };
-        client.doPost(settings.getRestUrl()+"scm/dev-bridge/bundle", data, downloader);  // /scm/dev-bridge - downloads only war file!
+        client.doPost(settings.getRestUrl()+"scm/dev-bridge/bundle", null, downloader);  // /scm/dev-bridge - downloads only war file!
         return downloader;
     }
 
@@ -599,10 +590,10 @@ public class DataGenerator {
         try {
             FileUtils.write(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"wrapper\\wrapper-custom.conf"),
                     "\n"+
-                    "wrapper.java.additional.101=-Dali.bridge.port=8380\n"+
+                    "wrapper.java.additional.101=-Dali.bridge.port=8380\n"+                //todo remove this hard-coded options
                     "wrapper.java.additional.102=-Dali.bridge.ssl.port=8543\n"+
                     "wrapper.java.additional.104=-Dali.bridge.http.warning=false\n"+
-                    "wrapper.java.command=c:\\Program Files\\Java\\jdk1.7.0_03\\bin\\java.exe", true);
+                    "wrapper.java.command=c:\\Java\\jdk1.7.0_03\\bin\\java.exe\n", true);
 
             Collection<File> descriptors = FileUtils.listFiles(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"deploy"), new String[] {"xml"}, false);
             assert descriptors.size() == 1;
@@ -610,9 +601,9 @@ public class DataGenerator {
             String tenantDescriptorName = tenantDescriptor.getName().substring(0, tenantDescriptor.getName().length()-4);
             FileUtils.write(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"tenants\\"+tenantDescriptorName+"\\conf\\connection.properties"),
                     "\n" +
-                    "httpProxy=156.152.46.12:8088\n" +
+                    "httpProxy=156.152.46.12:8088\n" +                                     //todo remove this hard-coded options
                     "httpsProxy=156.152.46.12:8088\n" +
-                    "noProxyHosts=alm-server \n\n", true);
+                    "noProxyHosts=alm-server\n", true);
         } catch (IOException e) {
             log.error("Cannot configure installed dev bridge bits", e);
             throw new IllegalStateException(e);

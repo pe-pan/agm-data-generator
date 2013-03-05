@@ -4,9 +4,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -51,10 +49,12 @@ public class RestClient {
     public static class HttpResponse {
         private final String response;
         private final int responseCode;
+        private final String xFid;
 
-        public HttpResponse(String response, int responseCode) {
+        public HttpResponse(String response, int responseCode, String xFid) {
             this.response = response;
             this.responseCode = responseCode;
+            this.xFid = xFid;
         }
 
         public String getResponse() {
@@ -63,6 +63,10 @@ public class RestClient {
 
         public int getResponseCode() {
             return responseCode;
+        }
+
+        public String getXFid() {
+            return xFid;
         }
     }
 
@@ -122,7 +126,7 @@ public class RestClient {
                     conn.setRequestProperty("INTERNAL_DATA", state);
                 }
                 log.debug("Setting Referer into: "+oldLocation);
-                conn.setRequestProperty("Referer", oldLocation);
+                conn.setRequestProperty("Referer", oldLocation);      // todo an evil hack; this is because of downloading DevBridge... so they know the URL where DevBridge will be pointing at
 
                 String cookieList = getCookieList();
                 log.debug("Sending cookies: "+cookieList);
@@ -163,13 +167,14 @@ public class RestClient {
                 conn.getInputStream().close();
                 log.debug(response);
 
-                return  new HttpResponse(response, conn.getResponseCode());
+                String xFid = conn.getHeaderField("X-FID");                       // todo an evil hack
+                return  new HttpResponse(response, conn.getResponseCode(), xFid);
             } else {
                 log.debug("Handling asynchronously, starting a new thread");
                 Thread thread = new Thread(handler, handler.getClass().getSimpleName());
                 handler.setConnection(conn);
                 thread.start();
-                return new HttpResponse(null, conn.getResponseCode());
+                return new HttpResponse(null, conn.getResponseCode(), null);
             }
         } catch (IOException e) {
             log.debug("Exception caught", e);
@@ -189,6 +194,7 @@ public class RestClient {
     }
 
     private String serializeParameters(String [][]data) {
+        if (data == null) return null;
         StringBuilder returnValue = new StringBuilder();
         for (String[] parameter : data) {
             assert parameter.length == 2;
