@@ -35,7 +35,6 @@ public class Settings {
     private int firstDefectNumber;
     private int firstRequirementNumber;
     private String portalUrl;
-    private String devBridgeHome;
     private String devBridgeFolder;
     private boolean addUsers;
 
@@ -70,9 +69,8 @@ public class Settings {
         firstDefectNumber = SheetTools.getIntValue(settings, 20, 2);
         firstRequirementNumber = SheetTools.getIntValue(settings, 21, 2);
         aliDevBridgeUrl = SheetTools.getStringValue(settings, 22, 2);
-        devBridgeHome = SheetTools.getStringValue(settings, 23, 2);
-        devBridgeFolder = SheetTools.getStringValue(settings, 24, 2);
-        addUsers = "yes".equals(SheetTools.getStringValue(settings, 25, 2));
+        devBridgeFolder = SheetTools.getStringValue(settings, 23, 2);
+        addUsers = "yes".equals(SheetTools.getStringValue(settings, 24, 2));
     }
 
     public boolean isGenerateProject() {
@@ -181,10 +179,6 @@ public class Settings {
 
     public void setPortalUrl(String portalUrl) {
         this.portalUrl = portalUrl;
-    }
-
-    public String getDevBridgeHome() {
-        return devBridgeHome;
     }
 
     public String getDevBridgeFolder() {
