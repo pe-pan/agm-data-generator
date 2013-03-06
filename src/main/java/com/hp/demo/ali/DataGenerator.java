@@ -105,6 +105,7 @@ public class DataGenerator {
                 generator.createJob();
             }
             if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
+                configureSvnAgent();
                 configureAliDevBridge();
 
                 stopDevBridge();
@@ -617,6 +618,23 @@ public class DataGenerator {
                     "noProxyHosts=alm-server\n", true);
         } catch (IOException e) {
             log.error("Cannot configure installed dev bridge bits", e);
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static void configureSvnAgent() {
+        log.info("Configuring SVN agent...");
+        try {
+            File agentConfigFile = new File(settings.getSvnAgentFolder()+"\\config\\agent.xml");
+            String agentConfig = FileUtils.readFileToString(agentConfigFile);                    //todo not the quickest solution but easy to understand
+            agentConfig = agentConfig
+                    .replace("<AGM_HOST/QCBIN_URL_HERE>", "https://" + settings.getHost() + "/qcbin")
+                    .replace("<AGM_DOMAIN_HERE>", settings.getDomain())
+                    .replace("<AGM_PROJECT_HERE>", settings.getProject())
+                    .replace("<AGM_ADMIN_USER_NAME_HERE>", User.getUser(settings.getAdmin()).getLogin())
+                    .replace("<AGM_ADMIN_PASSWORD_HERE>", User.getUser(settings.getAdmin()).getPassword());
+            FileUtils.writeStringToFile(agentConfigFile, agentConfig);
+        } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }

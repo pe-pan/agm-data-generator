@@ -36,6 +36,7 @@ public class Settings {
     private int firstRequirementNumber;
     private String portalUrl;
     private String devBridgeFolder;
+    private String svnAgentFolder;
     private boolean addUsers;
     private String Host;
     private String domain;
@@ -73,7 +74,8 @@ public class Settings {
         firstRequirementNumber = SheetTools.getIntValue(settings, 21, 2);
         aliDevBridgeUrl = SheetTools.getStringValue(settings, 22, 2);
         devBridgeFolder = SheetTools.getStringValue(settings, 23, 2);
-        addUsers = "yes".equals(SheetTools.getStringValue(settings, 24, 2));
+        svnAgentFolder = SheetTools.getStringValue(settings, 24, 2);
+        addUsers = "yes".equals(SheetTools.getStringValue(settings, 25, 2));
     }
 
     public boolean isGenerateProject() {
@@ -189,6 +191,10 @@ public class Settings {
 
     public String getDevBridgeFolder() {
         return devBridgeFolder;
+    }
+
+    public String getSvnAgentFolder() {
+        return svnAgentFolder;
     }
 
     public boolean isAddUsers() {
