@@ -61,10 +61,7 @@ public class DataGenerator {
 
                 downloader = downloadDevBridge();
 
-                Pattern p = Pattern.compile("^https?://[^/]+/qcbin/rest/domains/([^/]+)/projects/([^/]+)/$");
-                Matcher m = p.matcher(settings.getRestUrl());
-                m.matches();
-                jobLog = new File("job-"+settings.getTenantId()+"-"+m.group(1)+"-"+m.group(2)+".log");
+                jobLog = new File("job-"+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+".log");
                 if (jobLog.exists()) {
                     log.info("Log from previous run found ("+jobLog.getName()+"), previously created data are going to be deleted...\n"+
                     "Type 'yes' and press <ENTER> if you wish to continue..."
@@ -346,11 +343,23 @@ public class DataGenerator {
         log.info("Resolving Tenant ID, domain and project name...");
         User admin = User.getUser(settings.getAdmin());
 
+        String loginUrl = settings.getLoginUrl().replace("https://", "http://");
+        RestClient.HttpResponse response;
+        String loginContext = null;
+        try {
+            response = client.doGet(loginUrl);
+            loginUrl = response.getLocation().length() > 0 ? response.getLocation() : settings.getLoginUrl();
+            loginContext = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/form[@id='loginForm']/@action");
+        } catch (IllegalStateException e) {
+            log.debug(e);
+            log.error("Incorrect credentials or URL: " + admin.getLogin() + " / " + admin.getPassword());
+            System.exit(-1);
+        }
         final String[][] data = {
                 { "username", admin.getLogin() },
                 { "password", admin.getPassword() }
         };
-        RestClient.HttpResponse response = client.doPost(settings.getLoginUrl(), data);
+        response = client.doPost(RestTools.getProtocolHost(loginUrl)+loginContext, data);
         String agmUrl = null;
         String portalUrl = null;
         try {
@@ -358,18 +367,20 @@ public class DataGenerator {
             portalUrl = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[2]/@href");
         } catch (IllegalStateException e) {
             log.debug(e);
-            log.error("Incorrect credentials: " + admin.getLogin() + " / " + admin.getPassword());
+            log.error("Incorrect credentials or URL: " + admin.getLogin() + " / " + admin.getPassword());
             System.exit(-1);
         }
-        //todo use regexp to split the pattern
-        String[] tokens1 = agmUrl.split("/");
-
         response = client.doGet(agmUrl);
-        String relativeUrl = RestTools.extractString(response.getResponse(), "/html/body/p[2]/a/@href");
-        String[] tokens2 = relativeUrl.split("[/=&]");
 
-        settings.setRestUrl("https://" + tokens1[2] + "/qcbin/rest/domains/" + tokens2[4] + "/projects/" + tokens2[5] + "/");
-        settings.setTenantId(tokens2[9]);
+        Pattern p = Pattern.compile("^https?://([^/]+)/agm/webui/alm/([^/]+)/([^/]+)/apm/[^/]+/\\?TENANTID=(.+)$");
+        Matcher m = p.matcher(response.getLocation());
+        m.matches();
+        settings.setHost(m.group(1));
+        settings.setDomain(m.group(2));
+        settings.setProject(m.group(3));
+        settings.setTenantId(m.group(4));
+
+        settings.setRestUrl("https://" + settings.getHost() + "/qcbin/rest/domains/" + settings.getDomain() + "/projects/" + settings.getProject() + "/");
         settings.setPortalUrl(RestTools.getProtocolHost(portalUrl));
         log.debug("Portal URL: " + portalUrl);
     }

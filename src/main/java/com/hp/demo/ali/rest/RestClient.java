@@ -50,11 +50,13 @@ public class RestClient {
         private final String response;
         private final int responseCode;
         private final String xFid;
+        private final String location;
 
-        public HttpResponse(String response, int responseCode, String xFid) {
+        public HttpResponse(String response, int responseCode, String xFid, String location) {
             this.response = response;
             this.responseCode = responseCode;
             this.xFid = xFid;
+            this.location = location;
         }
 
         public String getResponse() {
@@ -65,8 +67,12 @@ public class RestClient {
             return responseCode;
         }
 
-        public String getXFid() {
+        public String getXFid() {         //todo resolve this hack
             return xFid;
+        }
+
+        public String getLocation() {     //todo resolve this hack
+            return location;
         }
     }
 
@@ -113,6 +119,7 @@ public class RestClient {
                         break;
                     }
                 }
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.97 Safari/537.22");
                 if (urlAddress.endsWith("/scm/dev-bridge/deployment-url")) { //todo an evil hack; set INTERNAL_DATA header when setting ALI DEV Bridge URL
                     String state = cookies.get("LWSSO_COOKIE_KEY");
                     cookies.put("STATE", state);
@@ -145,6 +152,7 @@ public class RestClient {
 
                 String location = conn.getHeaderField("Location");
                 if (location != null) {
+                    log.debug("Location: "+location);
                     oldLocation = location;
                 }
 
@@ -168,13 +176,13 @@ public class RestClient {
                 log.debug(response);
 
                 String xFid = conn.getHeaderField("X-FID");                       // todo an evil hack
-                return  new HttpResponse(response, conn.getResponseCode(), xFid);
+                return  new HttpResponse(response, conn.getResponseCode(), xFid, oldLocation);
             } else {
                 log.debug("Handling asynchronously, starting a new thread");
                 Thread thread = new Thread(handler, handler.getClass().getSimpleName());
                 handler.setConnection(conn);
                 thread.start();
-                return new HttpResponse(null, conn.getResponseCode(), null);
+                return new HttpResponse(null, conn.getResponseCode(), null, null);
             }
         } catch (IOException e) {
             log.debug("Exception caught", e);

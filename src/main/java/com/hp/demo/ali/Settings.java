@@ -37,6 +37,9 @@ public class Settings {
     private String portalUrl;
     private String devBridgeFolder;
     private boolean addUsers;
+    private String Host;
+    private String domain;
+    private String project;
 
     public Settings(Sheet settings) {
         log.info("Reading settings...");
@@ -90,6 +93,7 @@ public class Settings {
     }
 
     public void setRestUrl(String restUrl) {
+        log.debug("Setting REST URL: "+restUrl);
         this.restUrl = restUrl;
     }
 
@@ -98,6 +102,7 @@ public class Settings {
     }
 
     public void setTenantId(String tenantId) {
+        log.debug("Setting tenant ID: "+tenantId);
         this.tenantId = tenantId;
     }
 
@@ -178,6 +183,7 @@ public class Settings {
     }
 
     public void setPortalUrl(String portalUrl) {
+        log.debug("Setting portal URL: "+portalUrl);
         this.portalUrl = portalUrl;
     }
 
@@ -187,5 +193,32 @@ public class Settings {
 
     public boolean isAddUsers() {
         return addUsers;
+    }
+
+    public String getHost() {
+        return Host;
+    }
+
+    public void setHost(String host) {
+        log.debug("Setting host: "+host);
+        this.Host = host;
+    }
+
+    public String getDomain() {
+        return domain;
+    }
+
+    public void setDomain(String domain) {
+        log.debug("Setting domain: "+domain);
+        this.domain = domain;
+    }
+
+    public String getProject() {
+        return project;
+    }
+
+    public void setProject(String project) {
+        log.debug("Setting project: "+project);
+        this.project = project;
     }
 }
