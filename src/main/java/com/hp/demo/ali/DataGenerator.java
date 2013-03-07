@@ -30,6 +30,8 @@ public class DataGenerator {
     private static Settings settings;
     private static RestClient client = new RestClient();
 
+    private static BuildGenerator buildGenerator;
+
     public static void main(String[] args) throws JAXBException, IOException {
         if (args.length != 1 && args.length != 3) {
             System.out.println("Usage: java -jar data-generator.jar excel-configuration-file.xlsx [admin_user_name admin_password]");
@@ -99,10 +101,10 @@ public class DataGenerator {
             }
             if (settings.isGenerateBuilds()) {
                 List<Long>skippedRevisions = readSkippedRevisions(reader.getSheet("Skip-Revisions"));
-                BuildGenerator generator = new BuildGenerator(settings);
-                generator.deleteJob();
-                generator.generate(reader.getSheet("Builds"), skippedRevisions);
-                generator.createJob();
+                buildGenerator = new BuildGenerator(settings);
+                buildGenerator.deleteJob();
+                buildGenerator.generate(reader.getSheet("Builds"), skippedRevisions);
+                buildGenerator.createJob();
             }
             if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
                 configureSvnAgent();
@@ -311,6 +313,10 @@ public class DataGenerator {
                     log.debug("Setting start of the release to: "+sdf.format(startDate));
                     endDateField.getValue().setValue(sdf.format(endDate));
                     log.debug("Setting end of the release to: "+sdf.format(endDate));
+                }
+                if (sheetName.equals("build-server")) {
+                    //todo an evil hack; remove it -> handles can resolve it
+                   buildGenerator.setBuildServerName(EntityTools.getField(excelEntity, "name").getValue().getValue());
                 }
                 String data = EntityTools.toXml(excelEntity);
                 if (sheetName.equals("release-backlog-item")) {
@@ -628,7 +634,7 @@ public class DataGenerator {
             File agentConfigFile = new File(settings.getSvnAgentFolder()+"\\config\\agent.xml");
             String agentConfig = FileUtils.readFileToString(agentConfigFile);                    //todo not the quickest solution but easy to understand
             agentConfig = agentConfig
-                    .replace("<AGM_HOST/QCBIN_URL_HERE>", "https://" + settings.getHost() + "/qcbin")
+                    .replace("<AGM_HOST/QCBIN_URL_HERE>", "https://" + settings.getHost() + "/qcbin")   //todo should parse as XML and replace XML nodes
                     .replace("<AGM_DOMAIN_HERE>", settings.getDomain())
                     .replace("<AGM_PROJECT_HERE>", settings.getProject())
                     .replace("<AGM_ADMIN_USER_NAME_HERE>", User.getUser(settings.getAdmin()).getLogin())

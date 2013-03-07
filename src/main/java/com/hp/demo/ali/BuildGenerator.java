@@ -1,10 +1,12 @@
 package com.hp.demo.ali;
 
 import com.hp.demo.ali.entity.Entity;
+import com.hp.demo.ali.entity.User;
 import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.svn.RepositoryMender;
 import com.hp.demo.ali.tools.EntityTools;
+import com.hp.demo.ali.tools.Scrambler;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -43,6 +45,8 @@ public class BuildGenerator {
     private long startingRevision;
 
     private RepositoryMender mender;
+
+    private String buildServerName;
 
     public BuildGenerator(Settings settings) {
         this.settings = settings;
@@ -106,15 +110,30 @@ public class BuildGenerator {
             FileUtils.copyFile(  // the new build needs to know SVN credentials
                     new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"subversion.credentials"),
                     new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"subversion.credentials"));
-            FileUtils.copyFile(
-                    new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"config.xml"),
-                    new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"config.xml"));
+            String config = FileUtils.readFileToString(new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"config.xml"));
+            config = config                                             //todo should parse as XML and replace XML nodes
+                    .replace("<almLocation></almLocation>", "<almLocation>https://" + settings.getHost() + "/qcbin</almLocation>")
+                    .replace("<almDomain></almDomain>", "<almDomain>" + settings.getDomain() + "</almDomain>")
+                    .replace("<almProject></almProject>", "<almProject>"+settings.getProject()+"</almProject>")
+                    .replace("<almUsername></almUsername>", "<almUsername>"+User.getUser(settings.getAdmin()).getLogin()+"</almUsername>")
+                    .replace("<almPassword></almPassword>", "<almPassword>"+ Scrambler.scramble(User.getUser(settings.getAdmin()).getPassword())+"</almPassword>")
+                    .replace("<almBuildServer></almBuildServer>", "<almBuildServer>"+buildServerName+"</almBuildServer>");
+            FileUtils.writeStringToFile(new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"config.xml"), config);
+
             FileUtils.writeStringToFile(
                     new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"nextBuildNumber"),
                     Integer.toString(currentBuildNumber));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public String getBuildServerName() {
+        return buildServerName;
+    }
+
+    public void setBuildServerName(String buildServerName) {
+        this.buildServerName = buildServerName;
     }
 
     private long[] getRevisionSubSet(List<Long> skipRevisions, long fromRevision, long toRevision) {
