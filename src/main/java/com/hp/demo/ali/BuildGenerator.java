@@ -46,8 +46,6 @@ public class BuildGenerator {
 
     private RepositoryMender mender;
 
-    private String buildServerName;
-
     public BuildGenerator(Settings settings) {
         this.settings = settings;
         currentBuildDate = settings.getFirstBuildDate();
@@ -58,12 +56,12 @@ public class BuildGenerator {
     }
 
     public void deleteJob() {
-        log.info("Trying to delete job "+settings.getJobName()+" at Hudson...");
+        log.debug("Trying to delete job "+settings.getJobName()+" at Hudson...");
         RestClient hudsonClient = new RestClient();
         try {
             hudsonClient.doPost(settings.getHudsonUrl()+"job/"+settings.getJobName()+"/doDelete", (String) null);
         } catch (IllegalStateException e) {
-            log.info("Cannot delete the job, probably it does not exist");
+            log.debug("Cannot delete the job, probably it does not exist");
         }
     }
 
@@ -117,7 +115,7 @@ public class BuildGenerator {
                     .replace("<almProject></almProject>", "<almProject>"+settings.getProject()+"</almProject>")
                     .replace("<almUsername></almUsername>", "<almUsername>"+User.getUser(settings.getAdmin()).getLogin()+"</almUsername>")
                     .replace("<almPassword></almPassword>", "<almPassword>"+ Scrambler.scramble(User.getUser(settings.getAdmin()).getPassword())+"</almPassword>")
-                    .replace("<almBuildServer></almBuildServer>", "<almBuildServer>"+buildServerName+"</almBuildServer>");
+                    .replace("<almBuildServer></almBuildServer>", "<almBuildServer>"+DataGenerator.buildServerName+"</almBuildServer>");
             FileUtils.writeStringToFile(new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"config.xml"), config);
 
             FileUtils.writeStringToFile(
@@ -126,14 +124,6 @@ public class BuildGenerator {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    public String getBuildServerName() {
-        return buildServerName;
-    }
-
-    public void setBuildServerName(String buildServerName) {
-        this.buildServerName = buildServerName;
     }
 
     private long[] getRevisionSubSet(List<Long> skipRevisions, long fromRevision, long toRevision) {

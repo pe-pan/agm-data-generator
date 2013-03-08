@@ -32,6 +32,8 @@ public class DataGenerator {
 
     private static BuildGenerator buildGenerator;
 
+    public static String buildServerName = "Hudson"; //todo should be set to null
+
     public static void main(String[] args) throws JAXBException, IOException {
         if (args.length != 1 && args.length != 3) {
             System.out.println("Usage: java -jar data-generator.jar excel-configuration-file.xlsx [admin_user_name admin_password]");
@@ -61,7 +63,6 @@ public class DataGenerator {
                 log.debug("REST URL: " + settings.getRestUrl());
                 log.debug("Tenant ID:" + settings.getTenantId());
 
-                downloader = downloadDevBridge();
 
                 jobLog = new File("job-"+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+".log");
                 if (jobLog.exists()) {
@@ -73,6 +74,7 @@ public class DataGenerator {
                     if (!input.equals("yes")) {
                         System.exit(-1);
                     }
+                    downloader = downloadDevBridge();
                     openLog();
                     String previousEntity = "";
                     for (String line = readLogLine(); line != null; line = readLogLine()) {
@@ -92,6 +94,7 @@ public class DataGenerator {
                     }
                 } else {
                     log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
+                    downloader = downloadDevBridge();
                 }
                 if (settings.isAddUsers()) { // todo move this if out of [ if (settings.isGenerateProject()) ] condition
                     addUsers();
@@ -316,7 +319,7 @@ public class DataGenerator {
                 }
                 if (sheetName.equals("build-server")) {
                     //todo an evil hack; remove it -> handles can resolve it
-                   buildGenerator.setBuildServerName(EntityTools.getField(excelEntity, "name").getValue().getValue());
+                   buildServerName = EntityTools.getField(excelEntity, "name").getValue().getValue();
                 }
                 String data = EntityTools.toXml(excelEntity);
                 if (sheetName.equals("release-backlog-item")) {
@@ -526,12 +529,14 @@ public class DataGenerator {
         try {
             devBridge = Runtime.getRuntime().exec(devBridgeScript+" stop");
             devBridge.waitFor();
+            log.debug("Service stopped");
             if (devBridge.exitValue() != 0) {
                 log.debug(IOUtils.toString(devBridge.getErrorStream()));
                 log.debug("Cannot stop ALI Dev Bridge service; code " + devBridge.exitValue());
             }
             devBridge = Runtime.getRuntime().exec(devBridgeScript+" remove");
             devBridge.waitFor();
+            log.debug("Service removed");
             if (devBridge.exitValue() != 0) {
                 log.debug(IOUtils.toString(devBridge.getErrorStream()));
                 log.debug("Cannot remove ALI Dev Bridge service; code " + devBridge.exitValue());
@@ -545,13 +550,13 @@ public class DataGenerator {
     }
 
     public static void replaceDevBridgeBits(DevBridgeDownloader downloader) {
-        log.debug("Deleting old Dev Bridge folder: "+settings.getDevBridgeFolder());
+        log.debug("Deleting old ALI Dev Bridge folder: "+settings.getDevBridgeFolder());
         try {
             FileUtils.deleteDirectory(new File(settings.getDevBridgeFolder()));
         } catch (IOException e) {
             log.debug("File " + settings.getDevBridgeFolder() + " cannot be deleted ", e);
         }
-        log.debug("Unpacking downloaded Dev Bridge "+downloader.getFileName()+" into "+settings.getDevBridgeFolder());
+        log.debug("Unpacking downloaded ALI Dev Bridge "+downloader.getFileName()+" into "+settings.getDevBridgeFolder());
         Unzip u = new Unzip();
         u.setSrc(new File(downloader.getFileName()));
         u.setDest(new File(settings.getDevBridgeFolder()));
@@ -623,7 +628,7 @@ public class DataGenerator {
                     "httpsProxy=156.152.46.12:8088\n" +
                     "noProxyHosts=alm-server\n", true);
         } catch (IOException e) {
-            log.error("Cannot configure installed dev bridge bits", e);
+            log.error("Cannot configure installed ALI Dev Bridge bits", e);
             throw new IllegalStateException(e);
         }
     }
