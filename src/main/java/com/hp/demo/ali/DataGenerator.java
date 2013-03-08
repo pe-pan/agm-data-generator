@@ -55,14 +55,11 @@ public class DataGenerator {
                 admin.setPassword(args[2]);
             }
 
+            resolveTenantUrl();
             DevBridgeDownloader downloader = null;
             if (settings.isGenerateProject()) {
-                if (settings.getRestUrl().length() == 0 || settings.getTenantId().length() == 0) {
-                    resolveTenantUrl();
-                }
                 log.debug("REST URL: " + settings.getRestUrl());
                 log.debug("Tenant ID:" + settings.getTenantId());
-
 
                 jobLog = new File("job-"+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+".log");
                 if (jobLog.exists()) {
@@ -132,20 +129,6 @@ public class DataGenerator {
 
     private static void generateProject(ExcelReader reader) {
         log.info("Generating project data...");
-        User adminUser = User.getUser(settings.getAdmin());
-        if ("on-premise".equals(settings.getEnvironment())) {
-            client.doGet(settings.getLoginUrl() + "?j_username=" + adminUser.getLogin() + "&j_password=" + adminUser.getPassword());
-        } else if ("SaaS".equals(settings.getEnvironment())) {
-            final String[][] data = {
-                    { "username", adminUser.getLogin() },
-                    { "password", adminUser.getPassword() }
-            };
-            client.doPost(settings.getLoginUrl(), data);
-        } else {
-            throw new IllegalStateException("Unknown environment type: "+settings.getEnvironment());
-        }
-        log.debug("Logged in to: " + settings.getLoginUrl());
-
         List<Sheet> entitySheets = reader.getAllEntitySheets();
         for (Sheet sheet : entitySheets) {
             String entityName = sheet.getSheetName();
@@ -158,7 +141,6 @@ public class DataGenerator {
             }
         }
         log.debug(idTranslationTable.toString());
-
     }
 
     private static Sheet readUsers(ExcelReader reader) {
@@ -353,13 +335,13 @@ public class DataGenerator {
         log.info("Resolving Tenant ID, domain and project name...");
         User admin = User.getUser(settings.getAdmin());
 
-        String loginUrl = settings.getLoginUrl().replace("https://", "http://");
         RestClient.HttpResponse response;
-        String loginContext = null;
         try {
+            String loginUrl = settings.getLoginUrl().replace("https://", "http://");
             response = client.doGet(loginUrl);
             loginUrl = response.getLocation().length() > 0 ? response.getLocation() : settings.getLoginUrl();
-            loginContext = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/form[@id='loginForm']/@action");
+            String loginContext = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/form[@id='loginForm']/@action");
+            settings.setLoginUrl(RestTools.getProtocolHost(loginUrl)+loginContext);
         } catch (IllegalStateException e) {
             log.debug(e);
             log.error("Incorrect credentials or URL: " + admin.getLogin() + " / " + admin.getPassword());
@@ -369,7 +351,8 @@ public class DataGenerator {
                 { "username", admin.getLogin() },
                 { "password", admin.getPassword() }
         };
-        response = client.doPost(RestTools.getProtocolHost(loginUrl)+loginContext, data);
+        response = client.doPost(settings.getLoginUrl(), data);
+        log.debug("Logged in to: " + settings.getLoginUrl());
         String agmUrl = null;
         String portalUrl = null;
         try {

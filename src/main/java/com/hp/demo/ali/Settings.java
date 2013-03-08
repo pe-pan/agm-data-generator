@@ -90,6 +90,11 @@ public class Settings {
         return loginUrl;
     }
 
+    public void setLoginUrl(String loginUrl) {
+        log.debug("Setting Login URL: "+loginUrl);
+        this.loginUrl = loginUrl;
+    }
+
     public String getRestUrl() {
         return restUrl;
     }
