@@ -1,12 +1,282 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <tests>
- <repository id="https://czvm64.devlab.ad:443/svn/hp-am-demo" location="https://czvm64.devlab.ad:443/svn/hp-am-demo">
-  <branch path="/trunk/fedex-demo">
-   <file path="src/test/java/com/hp/demo/fedex/ShipWebServiceClientTest.java" total="4" skipped="0" failed="0" href="testReport/com.hp.demo.fedex/ShipWebServiceClientTest">
-    <test name="testCreateClientDetail" status="PASSED" />
-    <test name="testUpdateEndPoint" status="PASSED" />
-    <test name="testGetPayorAccountNumber" status="PASSED" />
-    <test name="testCreateWebAuthenticationDetail" status="PASSED" />
+ <repository id="https://alm-server:8443/svn/uimafit" location="https://alm-server:8443/svn/uimafit">
+  <branch path="/trunk">
+   <file path="uimaFIT-examples/src/test/java/org/uimafit/examples/LicenseTest.java" total="2" skipped="0" failed="0" href="testReport/org.uimafit.examples/LicenseTest">
+    <test name="testLicenseStatedInSource" status="PASSED" />
+    <test name="testLicenseStatedInTestSource" status="PASSED" />
+   </file>
+   <file path="uimaFIT-examples/src/test/java/org/uimafit/examples/tutorial/ex1/RoomNumberAnnotator1Test.java" total="3" skipped="0" failed="0" href="testReport/org.uimafit.examples.tutorial.ex1/RoomNumberAnnotator1Test">
+    <test name="testRNA3" status="PASSED" />
+    <test name="testRNA2" status="PASSED" />
+    <test name="testRNA1" status="PASSED" />
+   </file>
+   <file path="uimaFIT-examples/src/test/java/org/uimafit/examples/tutorial/ex1/RoomNumberAnnotator2Test.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.examples.tutorial.ex1/RoomNumberAnnotator2Test">
+    <test name="testRNA1" status="PASSED" />
+   </file>
+   <file path="uimaFIT-examples/src/test/java/org/uimafit/examples/xmi/XmiTest.java" total="2" skipped="0" failed="0" href="testReport/org.uimafit.examples.xmi/XmiTest">
+    <test name="testWithoutXmi" status="PASSED" />
+    <test name="testWithXmi" status="PASSED" />
+   </file>
+   <file path="uimaFIT-spring/src/test/java/org/uimafit/spring/LicenseTest.java" total="2" skipped="0" failed="0" href="testReport/org.uimafit.spring/LicenseTest">
+    <test name="testLicenseStatedInSource" status="PASSED" />
+    <test name="testLicenseStatedInTestSource" status="PASSED" />
+   </file>
+   <file path="uimaFIT-spring/src/test/java/org/uimafit/spring/SpringContextResourceManagerTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.spring/SpringContextResourceManagerTest">
+    <test name="test" status="PASSED" />
+   </file>
+   <file path="uimaFIT-spring/src/test/java/org/uimafit/spring/UimaFactoryInjectionTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.spring/UimaFactoryInjectionTest">
+    <test name="test" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/DefaultPackageAETest.java" total="1" skipped="0" failed="0" href="testReport/DefaultPackageAETest">
+    <test name="testPackageLessAE" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/LicenseTest.java" total="2" skipped="0" failed="0" href="testReport/org.uimafit/LicenseTest">
+    <test name="testLicenseStatedInSource" status="PASSED" />
+    <test name="testLicenseStatedInTestSource" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/component/JCasCollectionReader_ImplBaseTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.component/JCasCollectionReader_ImplBaseTest">
+    <test name="test" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/component/ViewCreatorAnnotatorTest.java" total="5" skipped="0" failed="0" href="testReport/org.uimafit.component/ViewCreatorAnnotatorTest">
+    <test name="testViewCreatorAnnotator" status="PASSED" />
+    <test name="testDefaultView" status="PASSED" />
+    <test name="testOtherViewAware" status="PASSED" />
+    <test name="testOtherViewUnaware" status="PASSED" />
+    <test name="testSofaInitializer" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/component/ViewTextCopierAnnotatorTest.java" total="2" skipped="0" failed="0" href="testReport/org.uimafit.component/ViewTextCopierAnnotatorTest">
+    <test name="testViewTextCopier" status="PASSED" />
+    <test name="testExceptions" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/component/initialize/ConfigurationParameterInitializerTest.java" total="9" skipped="0" failed="0" href="testReport/org.uimafit.component.initialize/ConfigurationParameterInitializerTest">
+    <test name="testInitialize2" status="PASSED" />
+    <test name="testInitialize3" status="PASSED" />
+    <test name="testParameterSetToNull" status="PASSED" />
+    <test name="testUnsetOptionalParameter" status="PASSED" />
+    <test name="testEnumDefaultValue" status="PASSED" />
+    <test name="testLocaleParams" status="PASSED" />
+    <test name="testInitialize" status="PASSED" />
+    <test name="testMandatoryParameterSetToNull" status="PASSED" />
+    <test name="testNonUimaCompatibleParameterValue" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/component/xwriter/CASDumpWriterTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.component.xwriter/CASDumpWriterTest">
+    <test name="testXWriter" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/component/xwriter/XWriterTest.java" total="4" skipped="0" failed="0" href="testReport/org.uimafit.component.xwriter/XWriterTest">
+    <test name="testXWriter" status="PASSED" />
+    <test name="testXmi" status="PASSED" />
+    <test name="testXcas" status="PASSED" />
+    <test name="testBadXmlSchemeName" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/descriptor/TypeCapabilityTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.descriptor/TypeCapabilityTest">
+    <test name="testTC" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/AggregateBuilderTest.java" total="6" skipped="0" failed="0" href="testReport/org.uimafit.factory/AggregateBuilderTest">
+    <test name="testAggregateBuilderWithFlowController" status="PASSED" />
+    <test name="testOddNumberOfViewNames" status="PASSED" />
+    <test name="testDuplicateComponentNames" status="PASSED" />
+    <test name="testAggregateBuilder2" status="PASSED" />
+    <test name="testAggregateBuilder" status="PASSED" />
+    <test name="testBadSofaMapping" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/AggregateWithReaderTest.java" total="2" skipped="0" failed="0" href="testReport/org.uimafit.factory/AggregateWithReaderTest">
+    <test name="demoAggregateWithReader" status="PASSED" />
+    <test name="demoAggregateWithDisguisedReader" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/AnalysisEngineFactoryExternalResourceTest.java" total="10" skipped="0" failed="0" href="testReport/org.uimafit.factory/AnalysisEngineFactoryExternalResourceTest">
+    <test name="resource_testInjection" status="PASSED" />
+    <test name="resource_testSharedInjection" status="PASSED" />
+    <test name="resource_testSimpleNesting" status="PASSED" />
+    <test name="resource_testDeeperNesting" status="PASSED" />
+    <test name="resource_testSelfInjection" status="PASSED" />
+    <test name="sharedObject_testInjection" status="PASSED" />
+    <test name="resource_testSharedSimpleNesting" status="PASSED" />
+    <test name="resource_testDoubleSelfInjection" status="PASSED" />
+    <test name="sharedObject_testSharedInjection" status="PASSED" />
+    <test name="sharedObject_testSelfInjection" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/AnalysisEngineFactoryTest.java" total="14" skipped="0" failed="0" href="testReport/org.uimafit.factory/AnalysisEngineFactoryTest">
+    <test name="testProcess2" status="PASSED" />
+    <test name="testProcess1" status="PASSED" />
+    <test name="testViewAE" status="PASSED" />
+    <test name="testIssue5a" status="PASSED" />
+    <test name="testIssue5b" status="PASSED" />
+    <test name="testAggregate" status="PASSED" />
+    <test name="testAggregate2" status="PASSED" />
+    <test name="testPrimitiveDescription" status="PASSED" />
+    <test name="testCreateAnalysisEngineFromPath" status="PASSED" />
+    <test name="testCreateAnalysisEngineWithPrioritizedTypes" status="PASSED" />
+    <test name="testReflectPrimitiveDescription" status="PASSED" />
+    <test name="testComponentAnnotationOnAncestor" status="PASSED" />
+    <test name="testAAEMultipleDeploymentPolicyProblem" status="PASSED" />
+    <test name="testAAEMultipleDeploymentPolicy" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/AnnotationFactoryTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.factory/AnnotationFactoryTest">
+    <test name="testCreateAnnotation" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/CollectionReaderFactoryExternalResourceTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.factory/CollectionReaderFactoryExternalResourceTest">
+    <test name="testAutoExternalResourceBinding" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/CollectionReaderFactoryTest.java" total="2" skipped="0" failed="0" href="testReport/org.uimafit.factory/CollectionReaderFactoryTest">
+    <test name="testExceptions" status="PASSED" />
+    <test name="testCreateCollectionReader" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/ConfigurationParameterFactoryTest.java" total="8" skipped="0" failed="0" href="testReport/org.uimafit.factory/ConfigurationParameterFactoryTest">
+    <test name="test1" status="PASSED" />
+    <test name="test2" status="PASSED" />
+    <test name="testParam1" status="PASSED" />
+    <test name="testParam2" status="PASSED" />
+    <test name="testParam3" status="PASSED" />
+    <test name="testParam4" status="PASSED" />
+    <test name="testFileList" status="PASSED" />
+    <test name="testStringSet" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/ExternalResourceConfiguratorTest.java" total="2" skipped="0" failed="0" href="testReport/org.uimafit.factory/ExternalResourceConfiguratorTest">
+    <test name="testAnalyze" status="PASSED" />
+    <test name="testDescriptor" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/ExternalResourceFactoryTest.java" total="4" skipped="0" failed="0" href="testReport/org.uimafit.factory/ExternalResourceFactoryTest">
+    <test name="testDirectInjection" status="PASSED" />
+    <test name="testDirectInjectionAutowire" status="PASSED" />
+    <test name="testMultiBinding" status="PASSED" />
+    <test name="testScanBind" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/FlowControllerFactoryExternalResourceTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.factory/FlowControllerFactoryExternalResourceTest">
+    <test name="testAutoExternalResourceBinding" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/FsIndexFactoryTest.java" total="3" skipped="0" failed="0" href="testReport/org.uimafit.factory/FsIndexFactoryTest">
+    <test name="testCreateIndexCollection" status="PASSED" />
+    <test name="testIndexesWork" status="PASSED" />
+    <test name="testAutoDetectIndexes" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/JCasBuilderTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.factory/JCasBuilderTest">
+    <test name="test" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/JCasFactoryTest.java" total="4" skipped="0" failed="0" href="testReport/org.uimafit.factory/JCasFactoryTest">
+    <test name="testCreate" status="PASSED" />
+    <test name="testXCAS" status="PASSED" />
+    <test name="testXMI" status="PASSED" />
+    <test name="testFromPath" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/LoggingTest.java" total="2" skipped="0" failed="0" href="testReport/org.uimafit.factory/LoggingTest">
+    <test name="testAllKindsOfComponents" status="PASSED" />
+    <test name="testLogger" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/ResourceCreationSpecifierFactoryTest.java" total="4" skipped="0" failed="0" href="testReport/org.uimafit.factory/ResourceCreationSpecifierFactoryTest">
+    <test name="test1" status="PASSED" />
+    <test name="test2" status="PASSED" />
+    <test name="test4" status="PASSED" />
+    <test name="test3" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/SofaMappingFactoryTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.factory/SofaMappingFactoryTest">
+    <test name="test" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/TypePrioritiesFactoryTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.factory/TypePrioritiesFactoryTest">
+    <test name="testCreateTypePrioritiesClassOfQArray" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/TypeSystemDescriptionFactoryTest.java" total="2" skipped="0" failed="0" href="testReport/org.uimafit.factory/TypeSystemDescriptionFactoryTest">
+    <test name="testFromPath" status="PASSED" />
+    <test name="testScanning" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/UimaContextFactoryTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.factory/UimaContextFactoryTest">
+    <test name="test" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/initializable/InitializableFactoryTest.java" total="3" skipped="0" failed="0" href="testReport/org.uimafit.factory.initializable/InitializableFactoryTest">
+    <test name="testInitializableFactory" status="PASSED" />
+    <test name="testBadConstructor" status="PASSED" />
+    <test name="testBadClass" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/factory/testCrs/SingleFileXReaderTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.factory.testCrs/SingleFileXReaderTest">
+    <test name="testXReader" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/pipeline/CpePipelineTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.pipeline/CpePipelineTest">
+    <test name="test" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/pipeline/SimplePipelineTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.pipeline/SimplePipelineTest">
+    <test name="test" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/testing/factory/TokenBuilderTest.java" total="9" skipped="0" failed="0" href="testReport/org.uimafit.testing.factory/TokenBuilderTest">
+    <test name="test1" status="PASSED" />
+    <test name="test2" status="PASSED" />
+    <test name="testSpaceSplit" status="PASSED" />
+    <test name="testNewlinesFromFile" status="PASSED" />
+    <test name="test4" status="PASSED" />
+    <test name="test3" status="PASSED" />
+    <test name="testBadInput" status="PASSED" />
+    <test name="testStems" status="PASSED" />
+    <test name="test5" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/util/CasUtilTest.java" total="8" skipped="0" failed="0" href="testReport/org.uimafit.util/CasUtilTest">
+    <test name="testGetNonExistingType" status="PASSED" />
+    <test name="testGetNonAnnotationType" status="PASSED" />
+    <test name="testSelectByIndex" status="PASSED" />
+    <test name="testSelectOnAnnotations" status="PASSED" />
+    <test name="testSelectOnArrays" status="PASSED" />
+    <test name="testGetType" status="PASSED" />
+    <test name="testIterator" status="PASSED" />
+    <test name="testIterate" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/util/ContainmentIndexTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.util/ContainmentIndexTest">
+    <test name="test" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/util/DisableLoggingTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.util/DisableLoggingTest">
+    <test name="test" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/util/FSCollectionFactoryTest.java" total="13" skipped="0" failed="0" href="testReport/org.uimafit.util/FSCollectionFactoryTest">
+    <test name="testCreateFSList" status="PASSED" />
+    <test name="testCreateFSArray" status="PASSED" />
+    <test name="testCreateBooleanArray" status="PASSED" />
+    <test name="testCreateByteArray" status="PASSED" />
+    <test name="testCreateDoubleArray" status="PASSED" />
+    <test name="testCreateFloatArray" status="PASSED" />
+    <test name="testCreateFloatList" status="PASSED" />
+    <test name="testCreateIntArray" status="PASSED" />
+    <test name="testCreateIntegerList" status="PASSED" />
+    <test name="testCreateLongArray" status="PASSED" />
+    <test name="testCreateShortArray" status="PASSED" />
+    <test name="testCreateStringArray" status="PASSED" />
+    <test name="testCreateStringList" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/util/HideOutputTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.util/HideOutputTest">
+    <test name="testHideOutput" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/util/JCasIterableTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.util/JCasIterableTest">
+    <test name="testResetViews" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/util/JCasUtilTest.java" total="25" skipped="0" failed="0" href="testReport/org.uimafit.util/JCasUtilTest">
+    <test name="testGetNonAnnotationType" status="PASSED" />
+    <test name="testSelectByIndex" status="PASSED" />
+    <test name="testSelectOnArrays" status="PASSED" />
+    <test name="testSelectCoveredOverlapping" status="PASSED" />
+    <test name="testSelectCoveredNoOverlap" status="PASSED" />
+    <test name="testSelectCoverRandom" status="PASSED" />
+    <test name="testSelectBetweenInclusion" status="PASSED" />
+    <test name="testSelectBetweenRandom" status="PASSED" />
+    <test name="testSelectOnLists" status="PASSED" />
+    <test name="testSelectSingleRelative" status="PASSED" />
+    <test name="testSelectFollowingPreceding" status="PASSED" />
+    <test name="testSelectSingle" status="PASSED" />
+    <test name="testSelectIsCovered" status="PASSED" />
+    <test name="testGetInternalUimaType" status="PASSED" />
+    <test name="testGetNonExistingView" status="PASSED" />
+    <test name="testIndexCovering" status="PASSED" />
+    <test name="testSelectCoveringOverlapping" status="PASSED" />
+    <test name="testSelectFollowingPrecedingBuiltinTypes" status="PASSED" />
+    <test name="testSelectFollowingPrecedingDifferentTypes" status="PASSED" />
+    <test name="testGetType" status="PASSED" />
+    <test name="testIterator" status="PASSED" />
+    <test name="testToText" status="PASSED" />
+    <test name="testExists" status="PASSED" />
+    <test name="testGetView" status="PASSED" />
+    <test name="testSelectFollowingPrecedingDifferentTypesMatchingSpansReversePriorities" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/util/LocaleUtilTest.java" total="2" skipped="0" failed="0" href="testReport/org.uimafit.util/LocaleUtilTest">
+    <test name="testGetLocaleConstant" status="PASSED" />
+    <test name="testCreateLocale" status="PASSED" />
+   </file>
+   <file path="uimaFIT/src/test/java/org/uimafit/util/SimplePipelineTest.java" total="1" skipped="0" failed="0" href="testReport/org.uimafit.util/SimplePipelineTest">
+    <test name="test1" status="PASSED" />
    </file>
   </branch>
  </repository>

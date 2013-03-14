@@ -1,132 +1,1604 @@
 Started by user anonymous
-Checking out a fresh workspace because the workspace is not https://czvm64.devlab.ad:443/svn/hp-am-demo/trunk/fedex-demo
-Cleaning workspace C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace
-Checking out https://czvm64.devlab.ad:443/svn/hp-am-demo/trunk/fedex-demo revision: Oct 12, 2012 1:29:50 PM depth:infinity ignoreExternals: false
-AU        .classpath
-AU        .project
-A         src
-A         src\test
-A         src\test\java
-A         src\test\java\com
-A         src\test\java\com\hp
-A         src\test\java\com\hp\demo
-A         src\test\java\com\hp\demo\fedex
-AU        src\test\java\com\hp\demo\fedex\ShipWebServiceClientTest.java
-A         src\main
-A         src\main\java
-A         src\main\java\com
-A         src\main\java\com\hp
-A         src\main\java\com\hp\demo
-A         src\main\java\com\hp\demo\fedex
-AU        src\main\java\com\hp\demo\fedex\ShipWebServiceClient.java
-A         src\main\wsdl
-AU        src\main\wsdl\ShipService_v9.wsdl
-AU        pom.xml
-A         .settings
-AU        .settings\org.eclipse.jdt.core.prefs
-AU        .settings\org.eclipse.m2e.core.prefs
-At revision 9
-no revision recorded for https://czvm64.devlab.ad:443/svn/hp-am-demo/trunk/fedex-demo in the previous build
+Checking out a fresh workspace because there's no workspace at C:\Java\hudson\jobs\uimafit\workspace
+Cleaning workspace C:\Java\hudson\jobs\uimafit\workspace
+Checking out https://alm-server:8443/svn/uimafit/trunk revision: Jan 28, 2013 10:07:59 AM depth:infinity ignoreExternals: false
+A         apidocs
+AU        apidocs\stylesheet.css
+AU        apidocs\index-all.html
+AU        apidocs\allclasses-frame.html
+A         apidocs\org
+A         apidocs\org\uimafit
+A         apidocs\org\uimafit\component
+AU        apidocs\org\uimafit\component\ViewCreatorAnnotator.html
+AU        apidocs\org\uimafit\component\CasCollectionReader_ImplBase.html
+AU        apidocs\org\uimafit\component\JCasAnnotator_ImplBase.html
+AU        apidocs\org\uimafit\component\package-frame.html
+AU        apidocs\org\uimafit\component\package-use.html
+AU        apidocs\org\uimafit\component\package-summary.html
+AU        apidocs\org\uimafit\component\package-tree.html
+AU        apidocs\org\uimafit\component\JCasFlowController_ImplBase.html
+AU        apidocs\org\uimafit\component\CasMultiplier_ImplBase.html
+AU        apidocs\org\uimafit\component\JCasCollectionReader_ImplBase.html
+A         apidocs\org\uimafit\component\class-use
+AU        apidocs\org\uimafit\component\class-use\CasConsumer_ImplBase.html
+AU        apidocs\org\uimafit\component\class-use\ViewCreatorAnnotator.html
+AU        apidocs\org\uimafit\component\class-use\CasCollectionReader_ImplBase.html
+AU        apidocs\org\uimafit\component\class-use\NoOpAnnotator.html
+AU        apidocs\org\uimafit\component\class-use\JCasAnnotator_ImplBase.html
+AU        apidocs\org\uimafit\component\class-use\JCasMultiplier_ImplBase.html
+AU        apidocs\org\uimafit\component\class-use\Resource_ImplBase.html
+AU        apidocs\org\uimafit\component\class-use\ViewTextCopierAnnotator.html
+AU        apidocs\org\uimafit\component\class-use\CasAnnotator_ImplBase.html
+AU        apidocs\org\uimafit\component\class-use\JCasConsumer_ImplBase.html
+AU        apidocs\org\uimafit\component\class-use\JCasFlowController_ImplBase.html
+AU        apidocs\org\uimafit\component\class-use\CasMultiplier_ImplBase.html
+AU        apidocs\org\uimafit\component\class-use\JCasCollectionReader_ImplBase.html
+AU        apidocs\org\uimafit\component\CasConsumer_ImplBase.html
+A         apidocs\org\uimafit\component\initialize
+AU        apidocs\org\uimafit\component\initialize\ConfigurationParameterInitializer.html
+A         apidocs\org\uimafit\component\initialize\class-use
+AU        apidocs\org\uimafit\component\initialize\class-use\ConfigurationParameterInitializer.html
+AU        apidocs\org\uimafit\component\initialize\class-use\ExternalResourceInitializer.html
+AU        apidocs\org\uimafit\component\initialize\ExternalResourceInitializer.html
+AU        apidocs\org\uimafit\component\initialize\package-frame.html
+AU        apidocs\org\uimafit\component\initialize\package-use.html
+AU        apidocs\org\uimafit\component\initialize\package-summary.html
+AU        apidocs\org\uimafit\component\initialize\package-tree.html
+A         apidocs\org\uimafit\component\xwriter
+A         apidocs\org\uimafit\component\xwriter\class-use
+AU        apidocs\org\uimafit\component\xwriter\class-use\IntegerFileNamer.html
+AU        apidocs\org\uimafit\component\xwriter\class-use\XWriter.html
+AU        apidocs\org\uimafit\component\xwriter\class-use\XWriterFileNamer.html
+AU        apidocs\org\uimafit\component\xwriter\class-use\CASDumpWriter.html
+AU        apidocs\org\uimafit\component\xwriter\IntegerFileNamer.html
+AU        apidocs\org\uimafit\component\xwriter\package-frame.html
+AU        apidocs\org\uimafit\component\xwriter\XWriter.html
+AU        apidocs\org\uimafit\component\xwriter\package-use.html
+AU        apidocs\org\uimafit\component\xwriter\package-summary.html
+AU        apidocs\org\uimafit\component\xwriter\XWriterFileNamer.html
+AU        apidocs\org\uimafit\component\xwriter\package-tree.html
+AU        apidocs\org\uimafit\component\xwriter\CASDumpWriter.html
+AU        apidocs\org\uimafit\component\NoOpAnnotator.html
+AU        apidocs\org\uimafit\component\Resource_ImplBase.html
+AU        apidocs\org\uimafit\component\JCasMultiplier_ImplBase.html
+AU        apidocs\org\uimafit\component\ViewTextCopierAnnotator.html
+AU        apidocs\org\uimafit\component\JCasConsumer_ImplBase.html
+AU        apidocs\org\uimafit\component\CasAnnotator_ImplBase.html
+A         apidocs\org\uimafit\spring
+A         apidocs\org\uimafit\spring\class-use
+AU        apidocs\org\uimafit\spring\class-use\SpringContextResourceManager.html
+AU        apidocs\org\uimafit\spring\package-frame.html
+A         apidocs\org\uimafit\spring\factory
+A         apidocs\org\uimafit\spring\factory\class-use
+AU        apidocs\org\uimafit\spring\factory\class-use\AnalysisEngineFactory_impl.html
+AU        apidocs\org\uimafit\spring\factory\class-use\CasInitializerFactory_impl.html
+AU        apidocs\org\uimafit\spring\factory\class-use\CollectionReaderFactory_impl.html
+AU        apidocs\org\uimafit\spring\factory\class-use\CasConsumerFactory_impl.html
+AU        apidocs\org\uimafit\spring\factory\class-use\CustomResourceFactory_impl.html
+AU        apidocs\org\uimafit\spring\factory\AnalysisEngineFactory_impl.html
+AU        apidocs\org\uimafit\spring\factory\CasInitializerFactory_impl.html
+AU        apidocs\org\uimafit\spring\factory\package-frame.html
+AU        apidocs\org\uimafit\spring\factory\package-use.html
+AU        apidocs\org\uimafit\spring\factory\package-summary.html
+AU        apidocs\org\uimafit\spring\factory\CollectionReaderFactory_impl.html
+AU        apidocs\org\uimafit\spring\factory\package-tree.html
+AU        apidocs\org\uimafit\spring\factory\CasConsumerFactory_impl.html
+AU        apidocs\org\uimafit\spring\factory\CustomResourceFactory_impl.html
+AU        apidocs\org\uimafit\spring\package-use.html
+AU        apidocs\org\uimafit\spring\package-summary.html
+AU        apidocs\org\uimafit\spring\package-tree.html
+AU        apidocs\org\uimafit\spring\SpringContextResourceManager.html
+A         apidocs\org\uimafit\spring\util
+A         apidocs\org\uimafit\spring\util\class-use
+AU        apidocs\org\uimafit\spring\util\class-use\ResourceInitializationUtil.html
+AU        apidocs\org\uimafit\spring\util\ResourceInitializationUtil.html
+AU        apidocs\org\uimafit\spring\util\package-frame.html
+AU        apidocs\org\uimafit\spring\util\package-use.html
+AU        apidocs\org\uimafit\spring\util\package-summary.html
+AU        apidocs\org\uimafit\spring\util\package-tree.html
+A         apidocs\org\uimafit\pipeline
+A         apidocs\org\uimafit\pipeline\class-use
+AU        apidocs\org\uimafit\pipeline\class-use\SimplePipeline.html
+AU        apidocs\org\uimafit\pipeline\class-use\JCasIterable.html
+AU        apidocs\org\uimafit\pipeline\SimplePipeline.html
+AU        apidocs\org\uimafit\pipeline\package-frame.html
+AU        apidocs\org\uimafit\pipeline\package-use.html
+AU        apidocs\org\uimafit\pipeline\package-summary.html
+AU        apidocs\org\uimafit\pipeline\JCasIterable.html
+AU        apidocs\org\uimafit\pipeline\package-tree.html
+A         apidocs\org\uimafit\factory
+A         apidocs\org\uimafit\factory\initializable
+A         apidocs\org\uimafit\factory\initializable\class-use
+AU        apidocs\org\uimafit\factory\initializable\class-use\Initializable.html
+AU        apidocs\org\uimafit\factory\initializable\class-use\InitializableFactory.html
+AU        apidocs\org\uimafit\factory\initializable\Initializable.html
+AU        apidocs\org\uimafit\factory\initializable\package-frame.html
+AU        apidocs\org\uimafit\factory\initializable\package-use.html
+AU        apidocs\org\uimafit\factory\initializable\package-summary.html
+AU        apidocs\org\uimafit\factory\initializable\InitializableFactory.html
+AU        apidocs\org\uimafit\factory\initializable\package-tree.html
+AU        apidocs\org\uimafit\factory\ExternalResourceFactory.html
+AU        apidocs\org\uimafit\factory\TypeSystemDescriptionFactory.html
+AU        apidocs\org\uimafit\factory\package-frame.html
+AU        apidocs\org\uimafit\factory\TypePrioritiesFactory.html
+AU        apidocs\org\uimafit\factory\package-use.html
+AU        apidocs\org\uimafit\factory\package-summary.html
+AU        apidocs\org\uimafit\factory\JCasBuilder.html
+AU        apidocs\org\uimafit\factory\package-tree.html
+AU        apidocs\org\uimafit\factory\UimaContextFactory.html
+AU        apidocs\org\uimafit\factory\FsIndexFactory.html
+A         apidocs\org\uimafit\factory\class-use
+AU        apidocs\org\uimafit\factory\class-use\ExternalResourceFactory.html
+AU        apidocs\org\uimafit\factory\class-use\TypeSystemDescriptionFactory.html
+AU        apidocs\org\uimafit\factory\class-use\TypePrioritiesFactory.html
+AU        apidocs\org\uimafit\factory\class-use\JCasBuilder.html
+AU        apidocs\org\uimafit\factory\class-use\UimaContextFactory.html
+AU        apidocs\org\uimafit\factory\class-use\FsIndexFactory.html
+AU        apidocs\org\uimafit\factory\class-use\SofaMappingFactory.html
+AU        apidocs\org\uimafit\factory\class-use\AggregateBuilder.html
+AU        apidocs\org\uimafit\factory\class-use\ResourceCreationSpecifierFactory.html
+AU        apidocs\org\uimafit\factory\class-use\ConfigurationParameterFactory.ConfigurationData.html
+AU        apidocs\org\uimafit\factory\class-use\ConfigurationParameterFactory.html
+AU        apidocs\org\uimafit\factory\class-use\AnalysisEngineFactory.html
+AU        apidocs\org\uimafit\factory\class-use\AnnotationFactory.html
+AU        apidocs\org\uimafit\factory\class-use\FlowControllerFactory.html
+AU        apidocs\org\uimafit\factory\class-use\CollectionReaderFactory.html
+AU        apidocs\org\uimafit\factory\class-use\JCasFactory.html
+AU        apidocs\org\uimafit\factory\class-use\CapabilityFactory.html
+AU        apidocs\org\uimafit\factory\SofaMappingFactory.html
+AU        apidocs\org\uimafit\factory\AggregateBuilder.html
+AU        apidocs\org\uimafit\factory\ResourceCreationSpecifierFactory.html
+AU        apidocs\org\uimafit\factory\ConfigurationParameterFactory.html
+AU        apidocs\org\uimafit\factory\ConfigurationParameterFactory.ConfigurationData.html
+A         apidocs\org\uimafit\factory\locator
+A         apidocs\org\uimafit\factory\locator\class-use
+AU        apidocs\org\uimafit\factory\locator\class-use\JndiResourceLocator.html
+AU        apidocs\org\uimafit\factory\locator\JndiResourceLocator.html
+AU        apidocs\org\uimafit\factory\locator\package-frame.html
+AU        apidocs\org\uimafit\factory\locator\package-use.html
+AU        apidocs\org\uimafit\factory\locator\package-summary.html
+AU        apidocs\org\uimafit\factory\locator\package-tree.html
+AU        apidocs\org\uimafit\factory\AnalysisEngineFactory.html
+AU        apidocs\org\uimafit\factory\AnnotationFactory.html
+AU        apidocs\org\uimafit\factory\FlowControllerFactory.html
+AU        apidocs\org\uimafit\factory\CollectionReaderFactory.html
+AU        apidocs\org\uimafit\factory\JCasFactory.html
+AU        apidocs\org\uimafit\factory\CapabilityFactory.html
+A         apidocs\org\uimafit\testing
+A         apidocs\org\uimafit\testing\factory
+A         apidocs\org\uimafit\testing\factory\class-use
+AU        apidocs\org\uimafit\testing\factory\class-use\TokenBuilder.html
+AU        apidocs\org\uimafit\testing\factory\package-frame.html
+AU        apidocs\org\uimafit\testing\factory\package-use.html
+AU        apidocs\org\uimafit\testing\factory\package-summary.html
+AU        apidocs\org\uimafit\testing\factory\TokenBuilder.html
+AU        apidocs\org\uimafit\testing\factory\package-tree.html
+A         apidocs\org\uimafit\testing\util
+A         apidocs\org\uimafit\testing\util\class-use
+AU        apidocs\org\uimafit\testing\util\class-use\DisableLogging.html
+AU        apidocs\org\uimafit\testing\util\class-use\HideOutput.html
+AU        apidocs\org\uimafit\testing\util\package-frame.html
+AU        apidocs\org\uimafit\testing\util\package-use.html
+AU        apidocs\org\uimafit\testing\util\package-summary.html
+AU        apidocs\org\uimafit\testing\util\package-tree.html
+AU        apidocs\org\uimafit\testing\util\DisableLogging.html
+AU        apidocs\org\uimafit\testing\util\HideOutput.html
+A         apidocs\org\uimafit\util
+AU        apidocs\org\uimafit\util\FSCollectionFactory.html
+A         apidocs\org\uimafit\util\class-use
+AU        apidocs\org\uimafit\util\class-use\FSCollectionFactory.html
+AU        apidocs\org\uimafit\util\class-use\LocaleUtil.html
+AU        apidocs\org\uimafit\util\class-use\JCasUtil.html
+AU        apidocs\org\uimafit\util\class-use\SimpleNamedResourceManager.html
+AU        apidocs\org\uimafit\util\class-use\JCasGenPomFriendly.html
+AU        apidocs\org\uimafit\util\class-use\CasUtil.html
+AU        apidocs\org\uimafit\util\class-use\ContainmentIndex.Type.html
+AU        apidocs\org\uimafit\util\class-use\ContainmentIndex.html
+AU        apidocs\org\uimafit\util\class-use\ReflectionUtil.html
+AU        apidocs\org\uimafit\util\LocaleUtil.html
+AU        apidocs\org\uimafit\util\JCasUtil.html
+AU        apidocs\org\uimafit\util\SimpleNamedResourceManager.html
+AU        apidocs\org\uimafit\util\JCasGenPomFriendly.html
+AU        apidocs\org\uimafit\util\package-frame.html
+AU        apidocs\org\uimafit\util\CasUtil.html
+AU        apidocs\org\uimafit\util\package-use.html
+AU        apidocs\org\uimafit\util\package-summary.html
+AU        apidocs\org\uimafit\util\ContainmentIndex.Type.html
+AU        apidocs\org\uimafit\util\ContainmentIndex.html
+AU        apidocs\org\uimafit\util\ReflectionUtil.html
+AU        apidocs\org\uimafit\util\package-tree.html
+A         apidocs\org\uimafit\descriptor
+AU        apidocs\org\uimafit\descriptor\FsIndexCollection.html
+A         apidocs\org\uimafit\descriptor\class-use
+AU        apidocs\org\uimafit\descriptor\class-use\FsIndexCollection.html
+AU        apidocs\org\uimafit\descriptor\class-use\FsIndex.NoClassSet.html
+AU        apidocs\org\uimafit\descriptor\class-use\ExternalResourceLocator.html
+AU        apidocs\org\uimafit\descriptor\class-use\FsIndex.html
+AU        apidocs\org\uimafit\descriptor\class-use\TypeCapability.html
+AU        apidocs\org\uimafit\descriptor\class-use\ConfigurationParameter.html
+AU        apidocs\org\uimafit\descriptor\class-use\FsIndexKey.html
+AU        apidocs\org\uimafit\descriptor\class-use\ExternalResource.html
+AU        apidocs\org\uimafit\descriptor\class-use\OperationalProperties.html
+AU        apidocs\org\uimafit\descriptor\class-use\SofaCapability.html
+AU        apidocs\org\uimafit\descriptor\FsIndex.NoClassSet.html
+AU        apidocs\org\uimafit\descriptor\ExternalResourceLocator.html
+AU        apidocs\org\uimafit\descriptor\FsIndex.html
+AU        apidocs\org\uimafit\descriptor\TypeCapability.html
+AU        apidocs\org\uimafit\descriptor\package-frame.html
+AU        apidocs\org\uimafit\descriptor\package-use.html
+AU        apidocs\org\uimafit\descriptor\package-summary.html
+AU        apidocs\org\uimafit\descriptor\ConfigurationParameter.html
+AU        apidocs\org\uimafit\descriptor\package-tree.html
+AU        apidocs\org\uimafit\descriptor\FsIndexKey.html
+AU        apidocs\org\uimafit\descriptor\ExternalResource.html
+AU        apidocs\org\uimafit\descriptor\OperationalProperties.html
+AU        apidocs\org\uimafit\descriptor\SofaCapability.html
+A         apidocs\org\uimafit\examples
+A         apidocs\org\uimafit\examples\experiment
+A         apidocs\org\uimafit\examples\experiment\pos
+AU        apidocs\org\uimafit\examples\experiment\pos\BaselineTagger.html
+A         apidocs\org\uimafit\examples\experiment\pos\class-use
+AU        apidocs\org\uimafit\examples\experiment\pos\class-use\BaselineTagger.html
+AU        apidocs\org\uimafit\examples\experiment\pos\class-use\ViewNames.html
+AU        apidocs\org\uimafit\examples\experiment\pos\class-use\GoldTagger.html
+AU        apidocs\org\uimafit\examples\experiment\pos\class-use\Evaluator.html
+AU        apidocs\org\uimafit\examples\experiment\pos\class-use\RunExperiment.html
+AU        apidocs\org\uimafit\examples\experiment\pos\class-use\LineReader.html
+AU        apidocs\org\uimafit\examples\experiment\pos\class-use\SentenceAndTokenCopier.html
+AU        apidocs\org\uimafit\examples\experiment\pos\ViewNames.html
+AU        apidocs\org\uimafit\examples\experiment\pos\GoldTagger.html
+AU        apidocs\org\uimafit\examples\experiment\pos\Evaluator.html
+AU        apidocs\org\uimafit\examples\experiment\pos\package-frame.html
+AU        apidocs\org\uimafit\examples\experiment\pos\RunExperiment.html
+AU        apidocs\org\uimafit\examples\experiment\pos\package-use.html
+AU        apidocs\org\uimafit\examples\experiment\pos\package-summary.html
+AU        apidocs\org\uimafit\examples\experiment\pos\package-tree.html
+AU        apidocs\org\uimafit\examples\experiment\pos\LineReader.html
+AU        apidocs\org\uimafit\examples\experiment\pos\SentenceAndTokenCopier.html
+A         apidocs\org\uimafit\examples\tutorial
+A         apidocs\org\uimafit\examples\tutorial\ex6
+AU        apidocs\org\uimafit\examples\tutorial\ex6\StringMapResource.html
+A         apidocs\org\uimafit\examples\tutorial\ex6\class-use
+AU        apidocs\org\uimafit\examples\tutorial\ex6\class-use\StringMapResource.html
+AU        apidocs\org\uimafit\examples\tutorial\ex6\class-use\StringMapResource_impl.html
+AU        apidocs\org\uimafit\examples\tutorial\ex6\class-use\UimaAcronymAnnotator.html
+AU        apidocs\org\uimafit\examples\tutorial\ex6\class-use\UimaMeetingAnnotator.html
+AU        apidocs\org\uimafit\examples\tutorial\ex6\StringMapResource_impl.html
+AU        apidocs\org\uimafit\examples\tutorial\ex6\package-frame.html
+AU        apidocs\org\uimafit\examples\tutorial\ex6\package-use.html
+AU        apidocs\org\uimafit\examples\tutorial\ex6\package-summary.html
+AU        apidocs\org\uimafit\examples\tutorial\ex6\package-tree.html
+AU        apidocs\org\uimafit\examples\tutorial\ex6\UimaAcronymAnnotator.html
+AU        apidocs\org\uimafit\examples\tutorial\ex6\UimaMeetingAnnotator.html
+A         apidocs\org\uimafit\examples\tutorial\ex1
+A         apidocs\org\uimafit\examples\tutorial\ex1\class-use
+AU        apidocs\org\uimafit\examples\tutorial\ex1\class-use\RoomNumberAnnotatorPipeline.html
+AU        apidocs\org\uimafit\examples\tutorial\ex1\class-use\RoomNumberAnnotatorDescriptor.html
+AU        apidocs\org\uimafit\examples\tutorial\ex1\class-use\RoomNumberAnnotator.html
+AU        apidocs\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotatorPipeline.html
+AU        apidocs\org\uimafit\examples\tutorial\ex1\package-frame.html
+AU        apidocs\org\uimafit\examples\tutorial\ex1\package-use.html
+AU        apidocs\org\uimafit\examples\tutorial\ex1\package-summary.html
+AU        apidocs\org\uimafit\examples\tutorial\ex1\package-tree.html
+AU        apidocs\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotatorDescriptor.html
+AU        apidocs\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotator.html
+A         apidocs\org\uimafit\examples\tutorial\ex2
+A         apidocs\org\uimafit\examples\tutorial\ex2\class-use
+AU        apidocs\org\uimafit\examples\tutorial\ex2\class-use\RoomNumberAnnotatorPipeline.html
+AU        apidocs\org\uimafit\examples\tutorial\ex2\class-use\RoomNumberAnnotator.html
+AU        apidocs\org\uimafit\examples\tutorial\ex2\RoomNumberAnnotatorPipeline.html
+AU        apidocs\org\uimafit\examples\tutorial\ex2\package-frame.html
+AU        apidocs\org\uimafit\examples\tutorial\ex2\package-use.html
+AU        apidocs\org\uimafit\examples\tutorial\ex2\package-summary.html
+AU        apidocs\org\uimafit\examples\tutorial\ex2\package-tree.html
+AU        apidocs\org\uimafit\examples\tutorial\ex2\RoomNumberAnnotator.html
+A         apidocs\org\uimafit\examples\getstarted
+A         apidocs\org\uimafit\examples\getstarted\class-use
+AU        apidocs\org\uimafit\examples\getstarted\class-use\GetStartedQuickDescriptor.html
+AU        apidocs\org\uimafit\examples\getstarted\class-use\GetStartedQuickAE.html
+AU        apidocs\org\uimafit\examples\getstarted\class-use\GetStartedQuickPipeline.html
+AU        apidocs\org\uimafit\examples\getstarted\GetStartedQuickDescriptor.html
+AU        apidocs\org\uimafit\examples\getstarted\package-frame.html
+AU        apidocs\org\uimafit\examples\getstarted\package-use.html
+AU        apidocs\org\uimafit\examples\getstarted\package-summary.html
+AU        apidocs\org\uimafit\examples\getstarted\package-tree.html
+AU        apidocs\org\uimafit\examples\getstarted\GetStartedQuickAE.html
+AU        apidocs\org\uimafit\examples\getstarted\GetStartedQuickPipeline.html
+A         apidocs\org\uimafit\examples\resource
+AU        apidocs\org\uimafit\examples\resource\ExternalResourceExample.SharedModel.html
+A         apidocs\org\uimafit\examples\resource\class-use
+AU        apidocs\org\uimafit\examples\resource\class-use\ExternalResourceExample.SharedModel.html
+AU        apidocs\org\uimafit\examples\resource\class-use\ExternalResourceExample.html
+AU        apidocs\org\uimafit\examples\resource\class-use\ExternalResourceExample.Annotator.html
+AU        apidocs\org\uimafit\examples\resource\package-frame.html
+AU        apidocs\org\uimafit\examples\resource\package-use.html
+AU        apidocs\org\uimafit\examples\resource\ExternalResourceExample.html
+AU        apidocs\org\uimafit\examples\resource\package-summary.html
+AU        apidocs\org\uimafit\examples\resource\package-tree.html
+AU        apidocs\org\uimafit\examples\resource\ExternalResourceExample.Annotator.html
+AU        apidocs\constant-values.html
+A         apidocs\src-html
+A         apidocs\src-html\org
+A         apidocs\src-html\org\uimafit
+A         apidocs\src-html\org\uimafit\component
+AU        apidocs\src-html\org\uimafit\component\CasConsumer_ImplBase.html
+A         apidocs\src-html\org\uimafit\component\initialize
+AU        apidocs\src-html\org\uimafit\component\initialize\ConfigurationParameterInitializer.html
+AU        apidocs\src-html\org\uimafit\component\initialize\ExternalResourceInitializer.html
+AU        apidocs\src-html\org\uimafit\component\ViewCreatorAnnotator.html
+AU        apidocs\src-html\org\uimafit\component\CasCollectionReader_ImplBase.html
+AU        apidocs\src-html\org\uimafit\component\NoOpAnnotator.html
+A         apidocs\src-html\org\uimafit\component\xwriter
+AU        apidocs\src-html\org\uimafit\component\xwriter\IntegerFileNamer.html
+AU        apidocs\src-html\org\uimafit\component\xwriter\XWriter.html
+AU        apidocs\src-html\org\uimafit\component\xwriter\XWriterFileNamer.html
+AU        apidocs\src-html\org\uimafit\component\xwriter\CASDumpWriter.html
+AU        apidocs\src-html\org\uimafit\component\JCasAnnotator_ImplBase.html
+AU        apidocs\src-html\org\uimafit\component\JCasMultiplier_ImplBase.html
+AU        apidocs\src-html\org\uimafit\component\Resource_ImplBase.html
+AU        apidocs\src-html\org\uimafit\component\ViewTextCopierAnnotator.html
+AU        apidocs\src-html\org\uimafit\component\CasAnnotator_ImplBase.html
+AU        apidocs\src-html\org\uimafit\component\JCasConsumer_ImplBase.html
+AU        apidocs\src-html\org\uimafit\component\JCasFlowController_ImplBase.html
+AU        apidocs\src-html\org\uimafit\component\CasMultiplier_ImplBase.html
+AU        apidocs\src-html\org\uimafit\component\JCasCollectionReader_ImplBase.html
+A         apidocs\src-html\org\uimafit\spring
+A         apidocs\src-html\org\uimafit\spring\factory
+AU        apidocs\src-html\org\uimafit\spring\factory\AnalysisEngineFactory_impl.html
+AU        apidocs\src-html\org\uimafit\spring\factory\CasInitializerFactory_impl.html
+AU        apidocs\src-html\org\uimafit\spring\factory\CollectionReaderFactory_impl.html
+AU        apidocs\src-html\org\uimafit\spring\factory\CasConsumerFactory_impl.html
+AU        apidocs\src-html\org\uimafit\spring\factory\CustomResourceFactory_impl.html
+AU        apidocs\src-html\org\uimafit\spring\SpringContextResourceManager.html
+A         apidocs\src-html\org\uimafit\spring\util
+AU        apidocs\src-html\org\uimafit\spring\util\ResourceInitializationUtil.html
+A         apidocs\src-html\org\uimafit\pipeline
+AU        apidocs\src-html\org\uimafit\pipeline\SimplePipeline.html
+AU        apidocs\src-html\org\uimafit\pipeline\JCasIterable.html
+A         apidocs\src-html\org\uimafit\factory
+A         apidocs\src-html\org\uimafit\factory\initializable
+AU        apidocs\src-html\org\uimafit\factory\initializable\Initializable.html
+AU        apidocs\src-html\org\uimafit\factory\initializable\InitializableFactory.html
+AU        apidocs\src-html\org\uimafit\factory\ExternalResourceFactory.html
+AU        apidocs\src-html\org\uimafit\factory\TypeSystemDescriptionFactory.html
+AU        apidocs\src-html\org\uimafit\factory\TypePrioritiesFactory.html
+AU        apidocs\src-html\org\uimafit\factory\JCasBuilder.html
+AU        apidocs\src-html\org\uimafit\factory\UimaContextFactory.html
+AU        apidocs\src-html\org\uimafit\factory\FsIndexFactory.html
+AU        apidocs\src-html\org\uimafit\factory\SofaMappingFactory.html
+AU        apidocs\src-html\org\uimafit\factory\AggregateBuilder.html
+AU        apidocs\src-html\org\uimafit\factory\ResourceCreationSpecifierFactory.html
+A         apidocs\src-html\org\uimafit\factory\locator
+AU        apidocs\src-html\org\uimafit\factory\locator\JndiResourceLocator.html
+AU        apidocs\src-html\org\uimafit\factory\ConfigurationParameterFactory.ConfigurationData.html
+AU        apidocs\src-html\org\uimafit\factory\ConfigurationParameterFactory.html
+AU        apidocs\src-html\org\uimafit\factory\AnalysisEngineFactory.html
+AU        apidocs\src-html\org\uimafit\factory\AnnotationFactory.html
+AU        apidocs\src-html\org\uimafit\factory\FlowControllerFactory.html
+AU        apidocs\src-html\org\uimafit\factory\CollectionReaderFactory.html
+AU        apidocs\src-html\org\uimafit\factory\JCasFactory.html
+AU        apidocs\src-html\org\uimafit\factory\CapabilityFactory.html
+A         apidocs\src-html\org\uimafit\testing
+A         apidocs\src-html\org\uimafit\testing\factory
+AU        apidocs\src-html\org\uimafit\testing\factory\TokenBuilder.html
+A         apidocs\src-html\org\uimafit\testing\util
+AU        apidocs\src-html\org\uimafit\testing\util\DisableLogging.html
+AU        apidocs\src-html\org\uimafit\testing\util\HideOutput.html
+A         apidocs\src-html\org\uimafit\util
+AU        apidocs\src-html\org\uimafit\util\FSCollectionFactory.html
+AU        apidocs\src-html\org\uimafit\util\LocaleUtil.html
+AU        apidocs\src-html\org\uimafit\util\JCasUtil.html
+AU        apidocs\src-html\org\uimafit\util\SimpleNamedResourceManager.html
+AU        apidocs\src-html\org\uimafit\util\JCasGenPomFriendly.html
+AU        apidocs\src-html\org\uimafit\util\CasUtil.html
+AU        apidocs\src-html\org\uimafit\util\ContainmentIndex.Type.html
+AU        apidocs\src-html\org\uimafit\util\ContainmentIndex.html
+AU        apidocs\src-html\org\uimafit\util\ReflectionUtil.html
+A         apidocs\src-html\org\uimafit\descriptor
+AU        apidocs\src-html\org\uimafit\descriptor\FsIndexCollection.html
+AU        apidocs\src-html\org\uimafit\descriptor\FsIndex.NoClassSet.html
+AU        apidocs\src-html\org\uimafit\descriptor\ExternalResourceLocator.html
+AU        apidocs\src-html\org\uimafit\descriptor\FsIndex.html
+AU        apidocs\src-html\org\uimafit\descriptor\TypeCapability.html
+AU        apidocs\src-html\org\uimafit\descriptor\ConfigurationParameter.html
+AU        apidocs\src-html\org\uimafit\descriptor\FsIndexKey.html
+AU        apidocs\src-html\org\uimafit\descriptor\ExternalResource.html
+AU        apidocs\src-html\org\uimafit\descriptor\OperationalProperties.html
+AU        apidocs\src-html\org\uimafit\descriptor\SofaCapability.html
+A         apidocs\src-html\org\uimafit\examples
+A         apidocs\src-html\org\uimafit\examples\experiment
+A         apidocs\src-html\org\uimafit\examples\experiment\pos
+AU        apidocs\src-html\org\uimafit\examples\experiment\pos\BaselineTagger.html
+AU        apidocs\src-html\org\uimafit\examples\experiment\pos\ViewNames.html
+AU        apidocs\src-html\org\uimafit\examples\experiment\pos\GoldTagger.html
+AU        apidocs\src-html\org\uimafit\examples\experiment\pos\Evaluator.html
+AU        apidocs\src-html\org\uimafit\examples\experiment\pos\RunExperiment.html
+AU        apidocs\src-html\org\uimafit\examples\experiment\pos\LineReader.html
+AU        apidocs\src-html\org\uimafit\examples\experiment\pos\SentenceAndTokenCopier.html
+A         apidocs\src-html\org\uimafit\examples\tutorial
+A         apidocs\src-html\org\uimafit\examples\tutorial\ex6
+AU        apidocs\src-html\org\uimafit\examples\tutorial\ex6\StringMapResource.html
+AU        apidocs\src-html\org\uimafit\examples\tutorial\ex6\StringMapResource_impl.html
+AU        apidocs\src-html\org\uimafit\examples\tutorial\ex6\UimaAcronymAnnotator.html
+AU        apidocs\src-html\org\uimafit\examples\tutorial\ex6\UimaMeetingAnnotator.html
+A         apidocs\src-html\org\uimafit\examples\tutorial\ex1
+AU        apidocs\src-html\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotatorPipeline.html
+AU        apidocs\src-html\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotatorDescriptor.html
+AU        apidocs\src-html\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotator.html
+A         apidocs\src-html\org\uimafit\examples\tutorial\ex2
+AU        apidocs\src-html\org\uimafit\examples\tutorial\ex2\RoomNumberAnnotatorPipeline.html
+AU        apidocs\src-html\org\uimafit\examples\tutorial\ex2\RoomNumberAnnotator.html
+A         apidocs\src-html\org\uimafit\examples\getstarted
+AU        apidocs\src-html\org\uimafit\examples\getstarted\GetStartedQuickDescriptor.html
+AU        apidocs\src-html\org\uimafit\examples\getstarted\GetStartedQuickAE.html
+AU        apidocs\src-html\org\uimafit\examples\getstarted\GetStartedQuickPipeline.html
+A         apidocs\src-html\org\uimafit\examples\resource
+AU        apidocs\src-html\org\uimafit\examples\resource\ExternalResourceExample.SharedModel.html
+AU        apidocs\src-html\org\uimafit\examples\resource\ExternalResourceExample.html
+AU        apidocs\src-html\org\uimafit\examples\resource\ExternalResourceExample.Annotator.html
+A         apidocs\options
+AU        apidocs\help-doc.html
+AU        apidocs\swimming-icon.jpg
+AU        apidocs\overview-frame.html
+AU        apidocs\overview-summary.html
+A         apidocs\package-list
+AU        apidocs\overview-tree.html
+AU        apidocs\index.html
+A         apidocs\resources
+AU        apidocs\resources\inherit.gif
+AU        apidocs\deprecated-list.html
+A         apidocs\packages
+AU        apidocs\allclasses-noframe.html
+A         scripts
+AU        scripts\build.xml
+A         pom.xml
+A         uimaFIT-examples
+A         uimaFIT-examples\src
+A         uimaFIT-examples\src\test
+A         uimaFIT-examples\src\test\java
+A         uimaFIT-examples\src\test\java\org
+A         uimaFIT-examples\src\test\java\org\uimafit
+A         uimaFIT-examples\src\test\java\org\uimafit\examples
+AU        uimaFIT-examples\src\test\java\org\uimafit\examples\LicenseTest.java
+A         uimaFIT-examples\src\test\java\org\uimafit\examples\tutorial
+AU        uimaFIT-examples\src\test\java\org\uimafit\examples\tutorial\ExamplesTestBase.java
+A         uimaFIT-examples\src\test\java\org\uimafit\examples\tutorial\ex1
+AU        uimaFIT-examples\src\test\java\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotator1Test.java
+AU        uimaFIT-examples\src\test\java\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotator2Test.java
+A         uimaFIT-examples\src\test\java\org\uimafit\examples\xmi
+AU        uimaFIT-examples\src\test\java\org\uimafit\examples\xmi\XmiTest.java
+A         uimaFIT-examples\src\test\resources
+A         uimaFIT-examples\src\main
+A         uimaFIT-examples\src\main\java
+A         uimaFIT-examples\src\main\java\org
+A         uimaFIT-examples\src\main\java\org\uimafit
+A         uimaFIT-examples\src\main\java\org\uimafit\examples
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\experiment
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\experiment\pos
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\experiment\pos\GoldTagger.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\experiment\pos\Evaluator.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\experiment\pos\package-info.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\experiment\pos\RunExperiment.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\experiment\pos\LineReader.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\experiment\pos\SentenceAndTokenCopier.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\experiment\pos\BaselineTagger.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\experiment\pos\ViewNames.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\type
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\type\Token.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\type\Token_Type.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\type\Sentence.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\type\Sentence_Type.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\UimaAcronym.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\UimaMeeting.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\RoomNumber.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\UimaAcronym_Type.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\UimaMeeting_Type.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\RoomNumber_Type.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\DateTimeAnnotation.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\DateAnnotation.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\DateTimeAnnotation_Type.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\Meeting.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\DateAnnotation_Type.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\Meeting_Type.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\TimeAnnotation.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\type\TimeAnnotation_Type.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex6
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex6\package-info.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex6\UimaAcronymAnnotator.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex6\UimaMeetingAnnotator.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex6\StringMapResource.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex6\StringMapResource_impl.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex1
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotatorPipeline.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex1\package-info.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotatorDescriptor.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotator.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex2
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex2\RoomNumberAnnotatorPipeline.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex2\package-info.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\tutorial\ex2\RoomNumberAnnotator.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\getstarted
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\getstarted\GetStartedQuickDescriptor.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\getstarted\package-info.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\getstarted\GetStartedQuickAE.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\getstarted\GetStartedQuickPipeline.java
+A         uimaFIT-examples\src\main\java\org\uimafit\examples\resource
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\resource\package-info.java
+AU        uimaFIT-examples\src\main\java\org\uimafit\examples\resource\ExternalResourceExample.java
+A         uimaFIT-examples\src\main\resources
+A         uimaFIT-examples\src\main\resources\META-INF
+A         uimaFIT-examples\src\main\resources\META-INF\org.uimafit
+AU        uimaFIT-examples\src\main\resources\META-INF\org.uimafit\types.txt
+A         uimaFIT-examples\src\main\resources\org
+A         uimaFIT-examples\src\main\resources\org\uimafit
+A         uimaFIT-examples\src\main\resources\org\uimafit\tutorial
+A         uimaFIT-examples\src\main\resources\org\uimafit\tutorial\ex1
+A         uimaFIT-examples\src\main\resources\org\uimafit\tutorial\ex1\RoomNumberAnnotator.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\pos
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\pos\sample.txt.pos
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\type
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\type\Token.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\type\Sentence.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\type
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\type\UimaAcronym.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\type\UimaMeeting.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\type\RoomNumber.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\type\DateTimeAnnotation.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\type\Meeting.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\type\TimeAnnotation.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\type\DateAnnotaton.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\ex6
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\ex6\uimaAcronyms.txt
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\ex6\UimaMeetingDetectorTAE.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\ex6\UimaAcronymAnnotator.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\ex6\UimaMeetingAnnotator.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\ex1
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\tutorial\ex1\RoomNumberAnnotator.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\TypeSystem.xml
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\xmi
+A         uimaFIT-examples\src\main\resources\org\uimafit\examples\xmi\1.xmi
+A         uimaFIT-examples\pom.xml
+A         uimaFIT
+AU        uimaFIT\pmd.xml
+A         uimaFIT\NOTICE
+A         uimaFIT\LICENSE
+A         uimaFIT\src
+A         uimaFIT\src\test
+A         uimaFIT\src\test\java
+AU        uimaFIT\src\test\java\DefaultPackageAE.java
+AU        uimaFIT\src\test\java\DefaultPackageAETest.java
+A         uimaFIT\src\test\java\org
+A         uimaFIT\src\test\java\org\uimafit
+AU        uimaFIT\src\test\java\org\uimafit\LicenseTest.java
+A         uimaFIT\src\test\java\org\uimafit\component
+AU        uimaFIT\src\test\java\org\uimafit\component\ViewCreatorAnnotatorTest.java
+A         uimaFIT\src\test\java\org\uimafit\component\initialize
+AU        uimaFIT\src\test\java\org\uimafit\component\initialize\ConfigurationParameterInitializerTest.java
+A         uimaFIT\src\test\java\org\uimafit\component\xwriter
+AU        uimaFIT\src\test\java\org\uimafit\component\xwriter\XWriterTest.java
+AU        uimaFIT\src\test\java\org\uimafit\component\xwriter\CASDumpWriterTest.java
+AU        uimaFIT\src\test\java\org\uimafit\component\ViewTextCopierAnnotatorTest.java
+AU        uimaFIT\src\test\java\org\uimafit\component\JCasCollectionReader_ImplBaseTest.java
+A         uimaFIT\src\test\java\org\uimafit\pipeline
+AU        uimaFIT\src\test\java\org\uimafit\pipeline\SimplePipelineTest.java
+AU        uimaFIT\src\test\java\org\uimafit\pipeline\CpePipelineTest.java
+A         uimaFIT\src\test\java\org\uimafit\factory
+A         uimaFIT\src\test\java\org\uimafit\factory\initializable
+AU        uimaFIT\src\test\java\org\uimafit\factory\initializable\InitializableFactoryTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\ConfigurationParameterFactoryTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\AnalysisEngineFactoryTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\AnnotationFactoryTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\AggregateWithReaderTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\CollectionReaderFactoryTest.java
+A         uimaFIT\src\test\java\org\uimafit\factory\testCrs
+AU        uimaFIT\src\test\java\org\uimafit\factory\testCrs\SingleFileXReader.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testCrs\SingleFileXReaderTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\JCasFactoryTest.java
+A         uimaFIT\src\test\java\org\uimafit\factory\testRes
+AU        uimaFIT\src\test\java\org\uimafit\factory\testRes\TestSharedResourceObject.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testRes\TestExternalResource.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\AnalysisEngineFactoryExternalResourceTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\ExternalResourceConfiguratorTest.java
+A         uimaFIT\src\test\java\org\uimafit\factory\FlowControllerFactoryExternalResourceTest.java
+A         uimaFIT\src\test\java\org\uimafit\factory\CollectionReaderFactoryExternalResourceTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\TypeSystemDescriptionFactoryTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\ExternalResourceFactoryTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\TypePrioritiesFactoryTest.java
+A         uimaFIT\src\test\java\org\uimafit\factory\locator
+AU        uimaFIT\src\test\java\org\uimafit\factory\LoggingTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\JCasBuilderTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\FsIndexFactoryTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\UimaContextFactoryTest.java
+A         uimaFIT\src\test\java\org\uimafit\factory\testAes
+AU        uimaFIT\src\test\java\org\uimafit\factory\testAes\FlowAE2.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testAes\FlowAE3.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testAes\ParameterizedAE.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testAes\ParameterizedAE2.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testAes\Annotator1.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testAes\ReversableTestFlowController.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testAes\Annotator2.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testAes\Annotator3.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testAes\Annotator4.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testAes\FlowAE1.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\testAes\ViewNames.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\SofaMappingFactoryTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\AggregateBuilderTest.java
+AU        uimaFIT\src\test\java\org\uimafit\factory\ResourceCreationSpecifierFactoryTest.java
+A         uimaFIT\src\test\java\org\uimafit\data
+AU        uimaFIT\src\test\java\org\uimafit\data\CreateSampleXMIFile.java
+AU        uimaFIT\src\test\java\org\uimafit\data\CreateSampleXCASFile.java
+AU        uimaFIT\src\test\java\org\uimafit\ComponentTestBase.java
+A         uimaFIT\src\test\java\org\uimafit\testing
+A         uimaFIT\src\test\java\org\uimafit\testing\factory
+AU        uimaFIT\src\test\java\org\uimafit\testing\factory\TokenBuilderTest.java
+A         uimaFIT\src\test\java\org\uimafit\util
+AU        uimaFIT\src\test\java\org\uimafit\util\SimplePipelineTest.java
+AU        uimaFIT\src\test\java\org\uimafit\util\CasUtilTest.java
+AU        uimaFIT\src\test\java\org\uimafit\util\TypeSystemUtil.java
+AU        uimaFIT\src\test\java\org\uimafit\util\ContainmentIndexTest.java
+AU        uimaFIT\src\test\java\org\uimafit\util\JCasIterableTest.java
+AU        uimaFIT\src\test\java\org\uimafit\util\DisableLoggingTest.java
+AU        uimaFIT\src\test\java\org\uimafit\util\HideOutputTest.java
+AU        uimaFIT\src\test\java\org\uimafit\util\FSCollectionFactoryTest.java
+AU        uimaFIT\src\test\java\org\uimafit\util\LocaleUtilTest.java
+AU        uimaFIT\src\test\java\org\uimafit\util\JCasUtilTest.java
+A         uimaFIT\src\test\java\org\uimafit\descriptor
+AU        uimaFIT\src\test\java\org\uimafit\descriptor\TypeCapabilityTest.java
+A         uimaFIT\src\test\resources
+A         uimaFIT\src\test\resources\META-INF
+A         uimaFIT\src\test\resources\META-INF\org.uimafit
+A         uimaFIT\src\test\resources\META-INF\org.uimafit\types.txt
+AU        uimaFIT\src\test\resources\META-INF\org.uimafit\fsindexes.txt
+A         uimaFIT\src\test\resources\org
+A         uimaFIT\src\test\resources\org\uimafit
+A         uimaFIT\src\test\resources\org\uimafit\type
+A         uimaFIT\src\test\resources\org\uimafit\type\Token.xml
+A         uimaFIT\src\test\resources\org\uimafit\type\Sentence.xml
+A         uimaFIT\src\test\resources\org\uimafit\type\AnalyzedText.xml
+A         uimaFIT\src\test\resources\org\uimafit\factory
+A         uimaFIT\src\test\resources\org\uimafit\factory\testCrs
+A         uimaFIT\src\test\resources\org\uimafit\factory\testCrs\SingleFileXReader.xml
+A         uimaFIT\src\test\resources\org\uimafit\index
+AU        uimaFIT\src\test\resources\org\uimafit\index\AutoImportableIndex.xml
+A         uimaFIT\src\test\resources\data
+A         uimaFIT\src\test\resources\data\html
+A         uimaFIT\src\test\resources\data\html\2
+AU        uimaFIT\src\test\resources\data\html\2\2.1.html
+AU        uimaFIT\src\test\resources\data\html\2\2.2.html
+AU        uimaFIT\src\test\resources\data\html\1.html
+A         uimaFIT\src\test\resources\data\html\4
+A         uimaFIT\src\test\resources\data\html\4\1
+AU        uimaFIT\src\test\resources\data\html\4\1\4.1.1.html
+A         uimaFIT\src\test\resources\data\html\4\2
+AU        uimaFIT\src\test\resources\data\html\3.html
+A         uimaFIT\src\test\resources\data\docs
+A         uimaFIT\src\test\resources\data\docs\bad.xcas
+AU        uimaFIT\src\test\resources\data\docs\unix-newlines.txt
+AU        uimaFIT\src\test\resources\data\docs\windows-newlines.txt
+A         uimaFIT\src\test\resources\data\docs\test.xmi
+A         uimaFIT\src\test\resources\data\docs\test.xcas
+AU        uimaFIT\src\test\resources\data\docs\A.txt
+A         uimaFIT\src\test\resources\data\descriptor
+A         uimaFIT\src\test\resources\data\descriptor\DefaultValueAE1.xml
+A         uimaFIT\src\test\resources\data\descriptor\DefaultValueAE2.xml
+A         uimaFIT\src\test\resources\data\descriptor\README
+A         uimaFIT\src\test\resources\data\reference
+A         uimaFIT\src\test\resources\data\reference\test.xmi.dump
+A         uimaFIT\src\test\resources\data\reference\JCasBuilderTest.dump
+A         uimaFIT\src\main
+A         uimaFIT\src\main\assembly
+A         uimaFIT\src\main\assembly\bin-packed.xml
+A         uimaFIT\src\main\java
+A         uimaFIT\src\main\java\org
+A         uimaFIT\src\main\java\org\uimafit
+A         uimaFIT\src\main\java\org\uimafit\component
+AU        uimaFIT\src\main\java\org\uimafit\component\NoOpAnnotator.java
+AU        uimaFIT\src\main\java\org\uimafit\component\JCasMultiplier_ImplBase.java
+AU        uimaFIT\src\main\java\org\uimafit\component\Resource_ImplBase.java
+AU        uimaFIT\src\main\java\org\uimafit\component\ViewTextCopierAnnotator.java
+AU        uimaFIT\src\main\java\org\uimafit\component\CasAnnotator_ImplBase.java
+AU        uimaFIT\src\main\java\org\uimafit\component\JCasConsumer_ImplBase.java
+AU        uimaFIT\src\main\java\org\uimafit\component\ExternalResourceAware.java
+AU        uimaFIT\src\main\java\org\uimafit\component\CasFlowController_ImplBase.java
+AU        uimaFIT\src\main\java\org\uimafit\component\ViewCreatorAnnotator.java
+AU        uimaFIT\src\main\java\org\uimafit\component\CasCollectionReader_ImplBase.java
+A         uimaFIT\src\main\java\org\uimafit\component\initialize
+AU        uimaFIT\src\main\java\org\uimafit\component\initialize\package-info.java
+AU        uimaFIT\src\main\java\org\uimafit\component\initialize\ConfigurationParameterInitializer.java
+AU        uimaFIT\src\main\java\org\uimafit\component\initialize\ExternalResourceInitializer.java
+AU        uimaFIT\src\main\java\org\uimafit\component\JCasAnnotator_ImplBase.java
+A         uimaFIT\src\main\java\org\uimafit\component\xwriter
+AU        uimaFIT\src\main\java\org\uimafit\component\xwriter\IntegerFileNamer.java
+AU        uimaFIT\src\main\java\org\uimafit\component\xwriter\XWriter.java
+AU        uimaFIT\src\main\java\org\uimafit\component\xwriter\XWriterFileNamer.java
+AU        uimaFIT\src\main\java\org\uimafit\component\xwriter\CASDumpWriter.java
+AU        uimaFIT\src\main\java\org\uimafit\component\package-info.java
+AU        uimaFIT\src\main\java\org\uimafit\component\JCasFlowController_ImplBase.java
+AU        uimaFIT\src\main\java\org\uimafit\component\CasMultiplier_ImplBase.java
+AU        uimaFIT\src\main\java\org\uimafit\component\JCasCollectionReader_ImplBase.java
+AU        uimaFIT\src\main\java\org\uimafit\component\CasConsumer_ImplBase.java
+A         uimaFIT\src\main\java\org\uimafit\pipeline
+AU        uimaFIT\src\main\java\org\uimafit\pipeline\SimplePipeline.java
+AU        uimaFIT\src\main\java\org\uimafit\pipeline\package-info.java
+AU        uimaFIT\src\main\java\org\uimafit\pipeline\JCasIterable.java
+AU        uimaFIT\src\main\java\org\uimafit\pipeline\CpePipeline.java
+A         uimaFIT\src\main\java\org\uimafit\factory
+A         uimaFIT\src\main\java\org\uimafit\factory\initializable
+AU        uimaFIT\src\main\java\org\uimafit\factory\initializable\Initializable.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\initializable\InitializableFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\ConfigurationParameterFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\AnalysisEngineFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\AnnotationFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\FlowControllerFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\CollectionReaderFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\JCasFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\CapabilityFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\CpeBuilder.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\ExternalResourceFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\TypeSystemDescriptionFactory.java
+A         uimaFIT\src\main\java\org\uimafit\factory\locator
+AU        uimaFIT\src\main\java\org\uimafit\factory\locator\JndiResourceLocator.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\TypePrioritiesFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\package-info.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\JCasBuilder.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\FsIndexFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\UimaContextFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\SofaMappingFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\AggregateBuilder.java
+AU        uimaFIT\src\main\java\org\uimafit\factory\ResourceCreationSpecifierFactory.java
+A         uimaFIT\src\main\java\org\uimafit\testing
+A         uimaFIT\src\main\java\org\uimafit\testing\factory
+AU        uimaFIT\src\main\java\org\uimafit\testing\factory\TokenBuilder.java
+A         uimaFIT\src\main\java\org\uimafit\testing\util
+AU        uimaFIT\src\main\java\org\uimafit\testing\util\DisableLogging.java
+AU        uimaFIT\src\main\java\org\uimafit\testing\util\HideOutput.java
+A         uimaFIT\src\main\java\org\uimafit\util
+AU        uimaFIT\src\main\java\org\uimafit\util\ExtendedExternalResourceDescription_impl.java
+AU        uimaFIT\src\main\java\org\uimafit\util\ExtendedLogger.java
+AU        uimaFIT\src\main\java\org\uimafit\util\SimpleNamedResourceManager.java
+AU        uimaFIT\src\main\java\org\uimafit\util\JCasGenPomFriendly.java
+AU        uimaFIT\src\main\java\org\uimafit\util\CasUtil.java
+AU        uimaFIT\src\main\java\org\uimafit\util\package-info.java
+AU        uimaFIT\src\main\java\org\uimafit\util\ContainmentIndex.java
+AU        uimaFIT\src\main\java\org\uimafit\util\ReflectionUtil.java
+AU        uimaFIT\src\main\java\org\uimafit\util\FSCollectionFactory.java
+AU        uimaFIT\src\main\java\org\uimafit\util\LocaleUtil.java
+AU        uimaFIT\src\main\java\org\uimafit\util\JCasUtil.java
+A         uimaFIT\src\main\java\org\uimafit\descriptor
+AU        uimaFIT\src\main\java\org\uimafit\descriptor\FsIndex.java
+AU        uimaFIT\src\main\java\org\uimafit\descriptor\TypeCapability.java
+AU        uimaFIT\src\main\java\org\uimafit\descriptor\package-info.java
+AU        uimaFIT\src\main\java\org\uimafit\descriptor\ConfigurationParameter.java
+AU        uimaFIT\src\main\java\org\uimafit\descriptor\FsIndexKey.java
+AU        uimaFIT\src\main\java\org\uimafit\descriptor\ExternalResource.java
+AU        uimaFIT\src\main\java\org\uimafit\descriptor\OperationalProperties.java
+AU        uimaFIT\src\main\java\org\uimafit\descriptor\SofaCapability.java
+AU        uimaFIT\src\main\java\org\uimafit\descriptor\FsIndexCollection.java
+AU        uimaFIT\src\main\java\org\uimafit\descriptor\ExternalResourceLocator.java
+A         uimaFIT\src\main\java\org\uimafit\propertyeditors
+AU        uimaFIT\src\main\java\org\uimafit\propertyeditors\GetAsTextStringEditor.java
+AU        uimaFIT\src\main\java\org\uimafit\propertyeditors\LocaleEditor.java
+AU        uimaFIT\src\main\java\org\uimafit\propertyeditors\PropertyEditorUtil.java
+A         uimaFIT\src\main\resources
+A         uimaFIT\src\main\resources\org
+A         uimaFIT\src\main\resources\org\uimafit
+A         uimaFIT\src\main\resources\org\uimafit\component
+A         uimaFIT\src\main\resources\org\uimafit\component\NoOpAnnotator.xml
+A         uimaFIT\CHANGES
+A         uimaFIT\pom.xml
+A         uimaFIT\README
+A         uimaFIT\.pmd
+A         uimaFIT\.settings
+A         uimaFIT\.settings\org.eclipse.jdt.core.prefs
+A         uimaFIT\.settings\org.eclipse.jdt.ui.prefs
+A         uimaFIT\.settings\org.eclipse.core.resources.prefs
+A         uimaFIT-spring
+A         uimaFIT-spring\LICENSE
+A         uimaFIT-spring\src
+A         uimaFIT-spring\src\test
+A         uimaFIT-spring\src\test\java
+A         uimaFIT-spring\src\test\java\org
+A         uimaFIT-spring\src\test\java\org\uimafit
+A         uimaFIT-spring\src\test\java\org\uimafit\spring
+AU        uimaFIT-spring\src\test\java\org\uimafit\spring\LicenseTest.java
+AU        uimaFIT-spring\src\test\java\org\uimafit\spring\UimaFactoryInjectionTest.java
+AU        uimaFIT-spring\src\test\java\org\uimafit\spring\SpringContextResourceManagerTest.java
+A         uimaFIT-spring\src\test\resources
+A         uimaFIT-spring\src\main
+A         uimaFIT-spring\src\main\java
+A         uimaFIT-spring\src\main\java\org
+A         uimaFIT-spring\src\main\java\org\uimafit
+A         uimaFIT-spring\src\main\java\org\uimafit\spring
+A         uimaFIT-spring\src\main\java\org\uimafit\spring\factory
+AU        uimaFIT-spring\src\main\java\org\uimafit\spring\factory\AnalysisEngineFactory_impl.java
+AU        uimaFIT-spring\src\main\java\org\uimafit\spring\factory\CasInitializerFactory_impl.java
+AU        uimaFIT-spring\src\main\java\org\uimafit\spring\factory\CollectionReaderFactory_impl.java
+AU        uimaFIT-spring\src\main\java\org\uimafit\spring\factory\CasConsumerFactory_impl.java
+AU        uimaFIT-spring\src\main\java\org\uimafit\spring\factory\CustomResourceFactory_impl.java
+AU        uimaFIT-spring\src\main\java\org\uimafit\spring\SpringContextResourceManager.java
+A         uimaFIT-spring\src\main\java\org\uimafit\spring\util
+AU        uimaFIT-spring\src\main\java\org\uimafit\spring\util\ResourceInitializationUtil.java
+A         uimaFIT-spring\src\main\resources
+A         uimaFIT-spring\CHANGES
+AU        uimaFIT-spring\pom.xml
+A         uimaFIT-spring\.settings
+A         uimaFIT-spring\.settings\org.eclipse.jdt.core.prefs
+A         uimaFIT-spring\.settings\org.eclipse.jdt.ui.prefs
+A         uimaFIT-spring\.settings\org.eclipse.core.resources.prefs
+ U        .
+At revision 923
+no revision recorded for https://alm-server:8443/svn/uimafit/trunk in the previous build
 [INFO] Using bundled Maven 3 installation
 [INFO] Checking Maven 3 installation environment
-[workspace] $ C:\Users\panuska\.hudson\maven\slavebundle\bundled-maven\bin\mvn.bat --help
+[workspace] $ C:\Java\hudson\maven\slavebundle\bundled-maven\bin\mvn.bat --help
 [INFO] Checking Maven 3 installation version
 [INFO] Detected Maven 3 installation version: 3.0.3
-[workspace] $ C:\Users\panuska\.hudson\maven\slavebundle\bundled-maven\bin\mvn.bat clean cobertura:cobertura -V -B -Dmaven.ext.class.path=C:\Users\panuska\.hudson\maven\slavebundle\resources;C:\Users\panuska\.hudson\maven\slavebundle\lib\maven3-eventspy-3.0.jar;C:\Users\panuska\.hudson\war\WEB-INF\lib\hudson-remoting-2.2.1.jar -Dhudson.eventspy.port=19832 -f pom.xml
-[DEBUG] Waiting for connection on port: 19832
-Apache Maven 3.0.3 (r1075438; 2011-02-28 18:31:09+0100)
-Maven home: C:\Users\panuska\.hudson\maven\slavebundle\bundled-maven
+[workspace] $ C:\Java\hudson\maven\slavebundle\bundled-maven\bin\mvn.bat clean cobertura:cobertura -V -B -Dmaven.ext.class.path=C:\Java\hudson\maven\slavebundle\resources;C:\Java\hudson\maven\slavebundle\lib\maven3-eventspy-3.0.jar;C:\Java\hudson\war\WEB-INF\lib\hudson-remoting-2.2.0.jar -Dhudson.eventspy.port=2652 -f pom.xml
+[DEBUG] Waiting for connection on port: 2652
+Apache Maven 3.0.3 (r1075438; 2011-02-28 10:31:09-0700)
+Maven home: C:\Java\hudson\maven\slavebundle\bundled-maven
 Java version: 1.7.0_03, vendor: Oracle Corporation
-Java home: c:\Program Files\Java\jdk1.7.0_03\jre
+Java home: c:\Java\jdk1.7.0_03\jre
 Default locale: en_US, platform encoding: Cp1252
-OS name: "windows server 2008", version: "6.0", arch: "amd64", family: "windows"
+OS name: "windows server 2008 r2", version: "6.1", arch: "amd64", family: "windows"
 [DEBUG] Connected to remote
 [INFO] Scanning for projects...
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/sonatype/oss/oss-parent/7/oss-parent-7.pom
+Downloading: http://download.java.net/maven/2/org/sonatype/oss/oss-parent/7/oss-parent-7.pom
+Downloading: http://repo1.maven.org/maven2/org/sonatype/oss/oss-parent/7/oss-parent-7.pom
+Downloaded: http://repo1.maven.org/maven2/org/sonatype/oss/oss-parent/7/oss-parent-7.pom (5 KB at 19.4 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/jvnet/wagon-svn/wagon-svn/1.9/wagon-svn-1.9.pom
+Downloaded: http://repo1.maven.org/maven2/org/jvnet/wagon-svn/wagon-svn/1.9/wagon-svn-1.9.pom (3 KB at 9.7 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/jvnet/hudson/svnkit/svnkit/1.1.4-hudson-4/svnkit-1.1.4-hudson-4.pom
+Downloaded: http://repo1.maven.org/maven2/org/jvnet/hudson/svnkit/svnkit/1.1.4-hudson-4/svnkit-1.1.4-hudson-4.pom (2 KB at 4.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/ch/ethz/ganymed/ganymed-ssh2/build210/ganymed-ssh2-build210.pom
+Downloaded: http://repo1.maven.org/maven2/ch/ethz/ganymed/ganymed-ssh2/build210/ganymed-ssh2-build210.pom (710 B at 3.8 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/wagon/wagon-provider-api/1.0-beta-2/wagon-provider-api-1.0-beta-2.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/wagon/wagon-provider-api/1.0-beta-2/wagon-provider-api-1.0-beta-2.pom (680 B at 5.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/1.0-beta-2/wagon-1.0-beta-2.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/wagon/wagon/1.0-beta-2/wagon-1.0-beta-2.pom (6 KB at 44.5 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/4/maven-parent-4.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/4/maven-parent-4.pom (10 KB at 75.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/jvnet/wagon-svn/wagon-svn/1.9/wagon-svn-1.9.jar
+Downloading: http://repo1.maven.org/maven2/org/jvnet/hudson/svnkit/svnkit/1.1.4-hudson-4/svnkit-1.1.4-hudson-4.jar
+Downloading: http://repo1.maven.org/maven2/ch/ethz/ganymed/ganymed-ssh2/build210/ganymed-ssh2-build210.jar
+Downloading: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils/1.4.1/plexus-utils-1.4.1.jar
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils/1.4.1/plexus-utils-1.4.1.jar (185 KB at 493.9 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/jvnet/wagon-svn/wagon-svn/1.9/wagon-svn-1.9.jar (20 KB at 51.6 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/ch/ethz/ganymed/ganymed-ssh2/build210/ganymed-ssh2-build210.jar (240 KB at 609.9 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/jvnet/hudson/svnkit/svnkit/1.1.4-hudson-4/svnkit-1.1.4-hudson-4.jar (1195 KB at 1911.4 KB/sec)
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] uimaFIT Parent
+[INFO] uimaFIT
+[INFO] uimaFIT Examples
+[INFO] uimaFIT - Spring integration
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-enforcer-plugin/1.0/maven-enforcer-plugin-1.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-enforcer-plugin/1.0/maven-enforcer-plugin-1.0.pom (7 KB at 42.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/enforcer/enforcer/1.0/enforcer-1.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/enforcer/enforcer/1.0/enforcer-1.0.pom (12 KB at 57.7 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/17/maven-parent-17.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/17/maven-parent-17.pom (25 KB at 181.6 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-enforcer-plugin/1.0/maven-enforcer-plugin-1.0.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-enforcer-plugin/1.0/maven-enforcer-plugin-1.0.jar (22 KB at 144.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/2.5/maven-resources-plugin-2.5.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/2.5/maven-resources-plugin-2.5.pom (7 KB at 55.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-plugins/19/maven-plugins-19.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-plugins/19/maven-plugins-19.pom (11 KB at 84.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/19/maven-parent-19.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/19/maven-parent-19.pom (25 KB at 154.6 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/2.5/maven-resources-plugin-2.5.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-resources-plugin/2.5/maven-resources-plugin-2.5.jar (26 KB at 211.2 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/2.4/maven-jar-plugin-2.4.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/2.4/maven-jar-plugin-2.4.pom (6 KB at 43.8 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-plugins/22/maven-plugins-22.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-plugins/22/maven-plugins-22.pom (13 KB at 95.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/21/maven-parent-21.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/21/maven-parent-21.pom (26 KB at 201.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/apache/10/apache-10.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/apache/10/apache-10.pom (15 KB at 112.9 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/2.4/maven-jar-plugin-2.4.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-jar-plugin/2.4/maven-jar-plugin-2.4.jar (34 KB at 190.9 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-source-plugin/2.1.2/maven-source-plugin-2.1.2.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-source-plugin/2.1.2/maven-source-plugin-2.1.2.pom (6 KB at 42.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-source-plugin/2.1.2/maven-source-plugin-2.1.2.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-source-plugin/2.1.2/maven-source-plugin-2.1.2.jar (24 KB at 217.5 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-release-plugin/2.2.2/maven-release-plugin-2.2.2.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-release-plugin/2.2.2/maven-release-plugin-2.2.2.pom (9 KB at 63.4 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/release/maven-release/2.2.2/maven-release-2.2.2.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/release/maven-release/2.2.2/maven-release-2.2.2.pom (9 KB at 65.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-release-plugin/2.2.2/maven-release-plugin-2.2.2.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-release-plugin/2.2.2/maven-release-plugin-2.2.2.jar (43 KB at 325.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-antrun-plugin/1.7/maven-antrun-plugin-1.7.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-antrun-plugin/1.7/maven-antrun-plugin-1.7.pom (5 KB at 23.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-antrun-plugin/1.7/maven-antrun-plugin-1.7.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-antrun-plugin/1.7/maven-antrun-plugin-1.7.jar (31 KB at 293.9 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-javadoc-plugin/2.8.1/maven-javadoc-plugin-2.8.1.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-javadoc-plugin/2.8.1/maven-javadoc-plugin-2.8.1.pom (15 KB at 130.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-javadoc-plugin/2.8.1/maven-javadoc-plugin-2.8.1.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-javadoc-plugin/2.8.1/maven-javadoc-plugin-2.8.1.jar (289 KB at 1427.2 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-install-plugin/2.3.1/maven-install-plugin-2.3.1.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-install-plugin/2.3.1/maven-install-plugin-2.3.1.pom (5 KB at 28.6 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-install-plugin/2.3.1/maven-install-plugin-2.3.1.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-install-plugin/2.3.1/maven-install-plugin-2.3.1.jar (23 KB at 143.4 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-deploy-plugin/2.7/maven-deploy-plugin-2.7.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-deploy-plugin/2.7/maven-deploy-plugin-2.7.pom (6 KB at 42.2 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-deploy-plugin/2.7/maven-deploy-plugin-2.7.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-deploy-plugin/2.7/maven-deploy-plugin-2.7.jar (27 KB at 166.9 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-site-plugin/3.0/maven-site-plugin-3.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-site-plugin/3.0/maven-site-plugin-3.0.pom (20 KB at 151.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-plugins/21/maven-plugins-21.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-plugins/21/maven-plugins-21.pom (13 KB at 67.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/20/maven-parent-20.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/20/maven-parent-20.pom (25 KB at 197.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-site-plugin/3.0/maven-site-plugin-3.0.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-site-plugin/3.0/maven-site-plugin-3.0.jar (112 KB at 562.8 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-surefire-plugin/2.12/maven-surefire-plugin-2.12.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-surefire-plugin/2.12/maven-surefire-plugin-2.12.pom (10 KB at 80.7 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire/2.12/surefire-2.12.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire/2.12/surefire-2.12.pom (11 KB at 88.6 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-surefire-plugin/2.12/maven-surefire-plugin-2.12.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-surefire-plugin/2.12/maven-surefire-plugin-2.12.jar (31 KB at 180.5 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/mojo/rat-maven-plugin/1.0-alpha-3/rat-maven-plugin-1.0-alpha-3.pom
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/mojo/rat-maven-plugin/1.0-alpha-3/rat-maven-plugin-1.0-alpha-3.pom (5 KB at 16.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/mojo/mojo/16/mojo-16.pom
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/mojo/mojo/16/mojo-16.pom (9 KB at 66.2 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/mojo/rat-maven-plugin/1.0-alpha-3/rat-maven-plugin-1.0-alpha-3.jar
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/mojo/rat-maven-plugin/1.0-alpha-3/rat-maven-plugin-1.0-alpha-3.jar (22 KB at 175.6 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/mojo/build-helper-maven-plugin/1.7/build-helper-maven-plugin-1.7.pom
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/mojo/build-helper-maven-plugin/1.7/build-helper-maven-plugin-1.7.pom (6 KB at 42.5 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/mojo/build-helper-maven-plugin/1.7/build-helper-maven-plugin-1.7.jar
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/mojo/build-helper-maven-plugin/1.7/build-helper-maven-plugin-1.7.jar (32 KB at 258.5 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-assembly-plugin/2.3/maven-assembly-plugin-2.3.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-assembly-plugin/2.3/maven-assembly-plugin-2.3.pom (15 KB at 131.2 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-assembly-plugin/2.3/maven-assembly-plugin-2.3.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-assembly-plugin/2.3/maven-assembly-plugin-2.3.jar (217 KB at 907.9 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-dependency-plugin/2.1/maven-dependency-plugin-2.1.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-dependency-plugin/2.1/maven-dependency-plugin-2.1.pom (8 KB at 61.6 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-plugins/12/maven-plugins-12.pom (12 KB at 88.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/9/maven-parent-9.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/maven-parent/9/maven-parent-9.pom (33 KB at 222.7 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-dependency-plugin/2.1/maven-dependency-plugin-2.1.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-dependency-plugin/2.1/maven-dependency-plugin-2.1.jar (104 KB at 643.5 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/mojo/exec-maven-plugin/1.2/exec-maven-plugin-1.2.pom
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/mojo/exec-maven-plugin/1.2/exec-maven-plugin-1.2.pom (7 KB at 50.9 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/mojo/exec-maven-plugin/1.2/exec-maven-plugin-1.2.jar
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/mojo/exec-maven-plugin/1.2/exec-maven-plugin-1.2.jar (36 KB at 299.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-pmd-plugin/2.7.1/maven-pmd-plugin-2.7.1.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-pmd-plugin/2.7.1/maven-pmd-plugin-2.7.1.pom (8 KB at 54.6 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-pmd-plugin/2.7.1/maven-pmd-plugin-2.7.1.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-pmd-plugin/2.7.1/maven-pmd-plugin-2.7.1.jar (88 KB at 553.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-gpg-plugin/1.4/maven-gpg-plugin-1.4.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-gpg-plugin/1.4/maven-gpg-plugin-1.4.pom (5 KB at 30.7 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-gpg-plugin/1.4/maven-gpg-plugin-1.4.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/plugins/maven-gpg-plugin/1.4/maven-gpg-plugin-1.4.jar (37 KB at 302.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/mojo/cobertura-maven-plugin/2.5.2/cobertura-maven-plugin-2.5.2.pom
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/mojo/cobertura-maven-plugin/2.5.2/cobertura-maven-plugin-2.5.2.pom (9 KB at 64.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/mojo/mojo-parent/30/mojo-parent-30.pom
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/mojo/mojo-parent/30/mojo-parent-30.pom (27 KB at 198.5 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/codehaus-parent/4/codehaus-parent-4.pom
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/codehaus-parent/4/codehaus-parent-4.pom (5 KB at 38.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/mojo/cobertura-maven-plugin/2.5.2/cobertura-maven-plugin-2.5.2.jar
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/mojo/cobertura-maven-plugin/2.5.2/cobertura-maven-plugin-2.5.2.jar (47 KB at 291.8 KB/sec)
 [INFO]                                                                         
 [INFO] ------------------------------------------------------------------------
-[INFO] Building fedex-demo 1.0
+[INFO] Building uimaFIT Parent 1.5.0-SNAPSHOT
 [INFO] ------------------------------------------------------------------------
 [INFO] 
-[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ fedex-demo ---
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ uimafit-parent ---
 [INFO] 
-[INFO] >>> cobertura-maven-plugin:2.5.1:cobertura (default-cli) @ fedex-demo >>>
+[INFO] >>> cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit-parent >>>
 [INFO] 
-[INFO] --- axistools-maven-plugin:1.4:wsdl2java (default) @ fedex-demo ---
-[INFO] about to add compile source root
-[INFO] Processing wsdl: C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\src\main\wsdl\ShipService_v9.wsdl
-Oct 12, 2012 1:30:14 PM org.apache.axis.utils.JavaUtils isAttachmentSupported
-WARNING: Unable to find required classes (javax.activation.DataHandler and javax.mail.internet.MimeMultipart). Attachment support is disabled.
+[INFO] --- maven-enforcer-plugin:1.0:enforce (enforce-maven) @ uimafit-parent ---
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-10/doxia-sink-api-1.0-alpha-10.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-10/doxia-sink-api-1.0-alpha-10.pom (2 KB at 10.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/doxia/doxia/1.0-alpha-10/doxia-1.0-alpha-10.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/doxia/doxia/1.0-alpha-10/doxia-1.0-alpha-10.pom (9 KB at 66.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/commons-lang/commons-lang/2.3/commons-lang-2.3.pom
+Downloaded: http://repo1.maven.org/maven2/commons-lang/commons-lang/2.3/commons-lang-2.3.pom (11 KB at 85.5 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/enforcer/enforcer-api/1.0/enforcer-api-1.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/enforcer/enforcer-api/1.0/enforcer-api-1.0.pom (4 KB at 25.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/enforcer/enforcer-rules/1.0/enforcer-rules-1.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/enforcer/enforcer-rules/1.0/enforcer-rules-1.0.pom (5 KB at 32.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.pom (5 KB at 34.5 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-plugin-testing-harness/1.1/maven-plugin-testing-harness-1.1.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-plugin-testing-harness/1.1/maven-plugin-testing-harness-1.1.pom (7 KB at 47.6 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-shared-components/7/maven-shared-components-7.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-shared-components/7/maven-shared-components-7.pom (3 KB at 20.6 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-archiver/1.0-alpha-7/plexus-archiver-1.0-alpha-7.pom
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-archiver/1.0-alpha-7/plexus-archiver-1.0-alpha-7.pom (2 KB at 8.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/beanshell/bsh/2.0b4/bsh-2.0b4.pom
+Downloaded: http://repo1.maven.org/maven2/org/beanshell/bsh/2.0b4/bsh-2.0b4.pom (2 KB at 9.6 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/beanshell/beanshell/2.0b4/beanshell-2.0b4.pom
+Downloaded: http://repo1.maven.org/maven2/org/beanshell/beanshell/2.0b4/beanshell-2.0b4.pom (2 KB at 11.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.pom (4 KB at 24.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-shared-components/9/maven-shared-components-9.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-shared-components/9/maven-shared-components-9.pom (4 KB at 27.4 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-i18n/1.0-beta-6/plexus-i18n-1.0-beta-6.pom
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-i18n/1.0-beta-6/plexus-i18n-1.0-beta-6.pom (771 B at 6.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-components/1.1.4/plexus-components-1.1.4.pom
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-components/1.1.4/plexus-components-1.1.4.pom (3 KB at 14.8 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-10/doxia-sink-api-1.0-alpha-10.jar
+Downloading: http://repo1.maven.org/maven2/commons-lang/commons-lang/2.3/commons-lang-2.3.jar
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/enforcer/enforcer-rules/1.0/enforcer-rules-1.0.jar
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/enforcer/enforcer-api/1.0/enforcer-api-1.0.jar
+Downloading: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils/1.5.8/plexus-utils-1.5.8.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/doxia/doxia-sink-api/1.0-alpha-10/doxia-sink-api-1.0-alpha-10.jar (10 KB at 66.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/enforcer/enforcer-api/1.0/enforcer-api-1.0.jar (10 KB at 55.7 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/beanshell/bsh/2.0b4/bsh-2.0b4.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/enforcer/enforcer-rules/1.0/enforcer-rules-1.0.jar (60 KB at 257.8 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-common-artifact-filters/1.2/maven-common-artifact-filters-1.2.jar (31 KB at 204.4 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-i18n/1.0-beta-6/plexus-i18n-1.0-beta-6.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-dependency-tree/1.2/maven-dependency-tree-1.2.jar (34 KB at 222.0 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/commons-lang/commons-lang/2.3/commons-lang-2.3.jar (240 KB at 614.2 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-i18n/1.0-beta-6/plexus-i18n-1.0-beta-6.jar (12 KB at 95.3 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils/1.5.8/plexus-utils-1.5.8.jar (262 KB at 644.3 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/beanshell/bsh/2.0b4/bsh-2.0b4.jar (276 KB at 751.6 KB/sec)
 [INFO] 
-[INFO] --- maven-resources-plugin:2.4.3:resources (default-resources) @ fedex-demo ---
-[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
-[INFO] skip non existing resourceDirectory C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\src\main\resources
+[INFO] --- cobertura-maven-plugin:2.5.2:instrument (default-cli) @ uimafit-parent ---
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/maven-plugin-api/2.0.1/maven-plugin-api-2.0.1.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/maven-plugin-api/2.0.1/maven-plugin-api-2.0.1.pom (643 B at 6.2 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/maven/2.0.1/maven-2.0.1.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/maven/2.0.1/maven-2.0.1.pom (12 KB at 88.4 KB/sec)
+[INFO] Skipping cobertura mojo for project with packaging type 'pom'
 [INFO] 
-[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ fedex-demo ---
-[WARNING] File encoding has not been set, using platform encoding Cp1252, i.e. build is platform dependent!
-[INFO] Compiling 251 source files to C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\target\classes
+[INFO] <<< cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit-parent <<<
 [INFO] 
-[INFO] --- cobertura-maven-plugin:2.5.1:instrument (default-cli) @ fedex-demo ---
+[INFO] --- cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit-parent ---
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building uimaFIT 1.5.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ uimafit ---
+[INFO] 
+[INFO] >>> cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit >>>
+Downloading: http://people.apache.org/repo/m2-incubating-repository/commons-lang/commons-lang/2.6/commons-lang-2.6.pom
+Downloading: http://download.java.net/maven/2/commons-lang/commons-lang/2.6/commons-lang-2.6.pom
+Downloading: http://repo1.maven.org/maven2/commons-lang/commons-lang/2.6/commons-lang-2.6.pom
+Downloaded: http://repo1.maven.org/maven2/commons-lang/commons-lang/2.6/commons-lang-2.6.pom (18 KB at 101.1 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/commons/commons-parent/17/commons-parent-17.pom
+Downloading: http://download.java.net/maven/2/org/apache/commons/commons-parent/17/commons-parent-17.pom
+Downloading: http://repo1.maven.org/maven2/org/apache/commons/commons-parent/17/commons-parent-17.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/commons/commons-parent/17/commons-parent-17.pom (31 KB at 180.2 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/commons-io/commons-io/2.4/commons-io-2.4.pom
+Downloading: http://download.java.net/maven/2/commons-io/commons-io/2.4/commons-io-2.4.pom
+Downloading: http://repo1.maven.org/maven2/commons-io/commons-io/2.4/commons-io-2.4.pom
+Downloaded: http://repo1.maven.org/maven2/commons-io/commons-io/2.4/commons-io-2.4.pom (10 KB at 69.9 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/commons/commons-parent/25/commons-parent-25.pom
+Downloading: http://download.java.net/maven/2/org/apache/commons/commons-parent/25/commons-parent-25.pom
+Downloading: http://repo1.maven.org/maven2/org/apache/commons/commons-parent/25/commons-parent-25.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/commons/commons-parent/25/commons-parent-25.pom (48 KB at 207.8 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/uimaj-core/2.4.0/uimaj-core-2.4.0.pom
+Downloading: http://download.java.net/maven/2/org/apache/uima/uimaj-core/2.4.0/uimaj-core-2.4.0.pom
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/uimaj-core/2.4.0/uimaj-core-2.4.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/uimaj-core/2.4.0/uimaj-core-2.4.0.pom (8 KB at 25.5 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/uimaj-parent/2.4.0/uimaj-parent-2.4.0.pom
+Downloading: http://download.java.net/maven/2/org/apache/uima/uimaj-parent/2.4.0/uimaj-parent-2.4.0.pom
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/uimaj-parent/2.4.0/uimaj-parent-2.4.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/uimaj-parent/2.4.0/uimaj-parent-2.4.0.pom (5 KB at 16.8 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/parent-pom/3/parent-pom-3.pom
+Downloading: http://download.java.net/maven/2/org/apache/uima/parent-pom/3/parent-pom-3.pom
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/parent-pom/3/parent-pom-3.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/parent-pom/3/parent-pom-3.pom (74 KB at 190.2 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/uimaj-tools/2.4.0/uimaj-tools-2.4.0.pom
+Downloading: http://download.java.net/maven/2/org/apache/uima/uimaj-tools/2.4.0/uimaj-tools-2.4.0.pom
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/uimaj-tools/2.4.0/uimaj-tools-2.4.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/uimaj-tools/2.4.0/uimaj-tools-2.4.0.pom (5 KB at 14.8 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/uimaj-cpe/2.4.0/uimaj-cpe-2.4.0.pom
+Downloading: http://download.java.net/maven/2/org/apache/uima/uimaj-cpe/2.4.0/uimaj-cpe-2.4.0.pom
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/uimaj-cpe/2.4.0/uimaj-cpe-2.4.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/uimaj-cpe/2.4.0/uimaj-cpe-2.4.0.pom (5 KB at 13.4 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/uimaj-adapter-vinci/2.4.0/uimaj-adapter-vinci-2.4.0.pom
+Downloading: http://download.java.net/maven/2/org/apache/uima/uimaj-adapter-vinci/2.4.0/uimaj-adapter-vinci-2.4.0.pom
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/uimaj-adapter-vinci/2.4.0/uimaj-adapter-vinci-2.4.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/uimaj-adapter-vinci/2.4.0/uimaj-adapter-vinci-2.4.0.pom (4 KB at 12.2 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/jVinci/2.4.0/jVinci-2.4.0.pom
+Downloading: http://download.java.net/maven/2/org/apache/uima/jVinci/2.4.0/jVinci-2.4.0.pom
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/jVinci/2.4.0/jVinci-2.4.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/jVinci/2.4.0/jVinci-2.4.0.pom (3 KB at 9.5 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/uimaj-document-annotation/2.4.0/uimaj-document-annotation-2.4.0.pom
+Downloading: http://download.java.net/maven/2/org/apache/uima/uimaj-document-annotation/2.4.0/uimaj-document-annotation-2.4.0.pom
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/uimaj-document-annotation/2.4.0/uimaj-document-annotation-2.4.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/uimaj-document-annotation/2.4.0/uimaj-document-annotation-2.4.0.pom (4 KB at 5.2 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/jdom/jdom/1.1.3/jdom-1.1.3.pom
+Downloading: http://download.java.net/maven/2/org/jdom/jdom/1.1.3/jdom-1.1.3.pom
+Downloading: http://repo1.maven.org/maven2/org/jdom/jdom/1.1.3/jdom-1.1.3.pom
+Downloaded: http://repo1.maven.org/maven2/org/jdom/jdom/1.1.3/jdom-1.1.3.pom (2 KB at 8.2 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-core/3.1.2.RELEASE/spring-core-3.1.2.RELEASE.pom
+Downloading: http://download.java.net/maven/2/org/springframework/spring-core/3.1.2.RELEASE/spring-core-3.1.2.RELEASE.pom
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-core/3.1.2.RELEASE/spring-core-3.1.2.RELEASE.pom
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-core/3.1.2.RELEASE/spring-core-3.1.2.RELEASE.pom (3 KB at 20.4 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-parent/3.1.2.RELEASE/spring-parent-3.1.2.RELEASE.pom
+Downloading: http://download.java.net/maven/2/org/springframework/spring-parent/3.1.2.RELEASE/spring-parent-3.1.2.RELEASE.pom
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-parent/3.1.2.RELEASE/spring-parent-3.1.2.RELEASE.pom
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-parent/3.1.2.RELEASE/spring-parent-3.1.2.RELEASE.pom (9 KB at 58.4 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-asm/3.1.2.RELEASE/spring-asm-3.1.2.RELEASE.pom
+Downloading: http://download.java.net/maven/2/org/springframework/spring-asm/3.1.2.RELEASE/spring-asm-3.1.2.RELEASE.pom
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-asm/3.1.2.RELEASE/spring-asm-3.1.2.RELEASE.pom
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-asm/3.1.2.RELEASE/spring-asm-3.1.2.RELEASE.pom (3 KB at 20.0 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-test/3.1.2.RELEASE/spring-test-3.1.2.RELEASE.pom
+Downloading: http://download.java.net/maven/2/org/springframework/spring-test/3.1.2.RELEASE/spring-test-3.1.2.RELEASE.pom
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-test/3.1.2.RELEASE/spring-test-3.1.2.RELEASE.pom
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-test/3.1.2.RELEASE/spring-test-3.1.2.RELEASE.pom (6 KB at 42.1 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-context/3.1.2.RELEASE/spring-context-3.1.2.RELEASE.pom
+Downloading: http://download.java.net/maven/2/org/springframework/spring-context/3.1.2.RELEASE/spring-context-3.1.2.RELEASE.pom
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-context/3.1.2.RELEASE/spring-context-3.1.2.RELEASE.pom
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-context/3.1.2.RELEASE/spring-context-3.1.2.RELEASE.pom (9 KB at 65.0 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-aop/3.1.2.RELEASE/spring-aop-3.1.2.RELEASE.pom
+Downloading: http://download.java.net/maven/2/org/springframework/spring-aop/3.1.2.RELEASE/spring-aop-3.1.2.RELEASE.pom
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-aop/3.1.2.RELEASE/spring-aop-3.1.2.RELEASE.pom
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-aop/3.1.2.RELEASE/spring-aop-3.1.2.RELEASE.pom (3 KB at 22.2 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/aopalliance/aopalliance/1.0/aopalliance-1.0.pom
+Downloading: http://download.java.net/maven/2/aopalliance/aopalliance/1.0/aopalliance-1.0.pom
+Downloading: http://repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0.pom
+Downloaded: http://repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0.pom (363 B at 3.0 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-beans/3.1.2.RELEASE/spring-beans-3.1.2.RELEASE.pom
+Downloading: http://download.java.net/maven/2/org/springframework/spring-beans/3.1.2.RELEASE/spring-beans-3.1.2.RELEASE.pom
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-beans/3.1.2.RELEASE/spring-beans-3.1.2.RELEASE.pom
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-beans/3.1.2.RELEASE/spring-beans-3.1.2.RELEASE.pom (3 KB at 16.0 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-expression/3.1.2.RELEASE/spring-expression-3.1.2.RELEASE.pom
+Downloading: http://download.java.net/maven/2/org/springframework/spring-expression/3.1.2.RELEASE/spring-expression-3.1.2.RELEASE.pom
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-expression/3.1.2.RELEASE/spring-expression-3.1.2.RELEASE.pom
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-expression/3.1.2.RELEASE/spring-expression-3.1.2.RELEASE.pom (2 KB at 11.9 KB/sec)
+Downloading: http://people.apache.org/repo/m2-incubating-repository/commons-lang/commons-lang/2.6/commons-lang-2.6.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/commons-io/commons-io/2.4/commons-io-2.4.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/uimaj-core/2.4.0/uimaj-core-2.4.0.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/uimaj-tools/2.4.0/uimaj-tools-2.4.0.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/uimaj-cpe/2.4.0/uimaj-cpe-2.4.0.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/uimaj-adapter-vinci/2.4.0/uimaj-adapter-vinci-2.4.0.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/jVinci/2.4.0/jVinci-2.4.0.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/apache/uima/uimaj-document-annotation/2.4.0/uimaj-document-annotation-2.4.0.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/jdom/jdom/1.1.3/jdom-1.1.3.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-core/3.1.2.RELEASE/spring-core-3.1.2.RELEASE.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-asm/3.1.2.RELEASE/spring-asm-3.1.2.RELEASE.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-test/3.1.2.RELEASE/spring-test-3.1.2.RELEASE.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-context/3.1.2.RELEASE/spring-context-3.1.2.RELEASE.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-aop/3.1.2.RELEASE/spring-aop-3.1.2.RELEASE.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/aopalliance/aopalliance/1.0/aopalliance-1.0.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-beans/3.1.2.RELEASE/spring-beans-3.1.2.RELEASE.jar
+Downloading: http://people.apache.org/repo/m2-incubating-repository/org/springframework/spring-expression/3.1.2.RELEASE/spring-expression-3.1.2.RELEASE.jar
+Downloading: http://download.java.net/maven/2/commons-io/commons-io/2.4/commons-io-2.4.jar
+Downloading: http://download.java.net/maven/2/org/apache/uima/uimaj-tools/2.4.0/uimaj-tools-2.4.0.jar
+Downloading: http://download.java.net/maven/2/commons-lang/commons-lang/2.6/commons-lang-2.6.jar
+Downloading: http://download.java.net/maven/2/org/apache/uima/uimaj-core/2.4.0/uimaj-core-2.4.0.jar
+Downloading: http://download.java.net/maven/2/org/apache/uima/uimaj-cpe/2.4.0/uimaj-cpe-2.4.0.jar
+Downloading: http://download.java.net/maven/2/org/apache/uima/uimaj-adapter-vinci/2.4.0/uimaj-adapter-vinci-2.4.0.jar
+Downloading: http://download.java.net/maven/2/org/apache/uima/jVinci/2.4.0/jVinci-2.4.0.jar
+Downloading: http://download.java.net/maven/2/org/apache/uima/uimaj-document-annotation/2.4.0/uimaj-document-annotation-2.4.0.jar
+Downloading: http://download.java.net/maven/2/org/jdom/jdom/1.1.3/jdom-1.1.3.jar
+Downloading: http://download.java.net/maven/2/org/springframework/spring-core/3.1.2.RELEASE/spring-core-3.1.2.RELEASE.jar
+Downloading: http://download.java.net/maven/2/org/springframework/spring-asm/3.1.2.RELEASE/spring-asm-3.1.2.RELEASE.jar
+Downloading: http://download.java.net/maven/2/org/springframework/spring-test/3.1.2.RELEASE/spring-test-3.1.2.RELEASE.jar
+Downloading: http://download.java.net/maven/2/org/springframework/spring-context/3.1.2.RELEASE/spring-context-3.1.2.RELEASE.jar
+Downloading: http://download.java.net/maven/2/org/springframework/spring-aop/3.1.2.RELEASE/spring-aop-3.1.2.RELEASE.jar
+Downloading: http://download.java.net/maven/2/aopalliance/aopalliance/1.0/aopalliance-1.0.jar
+Downloading: http://download.java.net/maven/2/org/springframework/spring-beans/3.1.2.RELEASE/spring-beans-3.1.2.RELEASE.jar
+Downloading: http://download.java.net/maven/2/org/springframework/spring-expression/3.1.2.RELEASE/spring-expression-3.1.2.RELEASE.jar
+Downloading: http://repo1.maven.org/maven2/commons-lang/commons-lang/2.6/commons-lang-2.6.jar
+Downloading: http://repo1.maven.org/maven2/commons-io/commons-io/2.4/commons-io-2.4.jar
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/uimaj-core/2.4.0/uimaj-core-2.4.0.jar
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/uimaj-cpe/2.4.0/uimaj-cpe-2.4.0.jar
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/uimaj-tools/2.4.0/uimaj-tools-2.4.0.jar
+Downloaded: http://repo1.maven.org/maven2/commons-io/commons-io/2.4/commons-io-2.4.jar (181 KB at 542.9 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/uimaj-adapter-vinci/2.4.0/uimaj-adapter-vinci-2.4.0.jar
+Downloaded: http://repo1.maven.org/maven2/commons-lang/commons-lang/2.6/commons-lang-2.6.jar (278 KB at 750.2 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/jVinci/2.4.0/jVinci-2.4.0.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/uimaj-cpe/2.4.0/uimaj-cpe-2.4.0.jar (334 KB at 580.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/uima/uimaj-document-annotation/2.4.0/uimaj-document-annotation-2.4.0.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/uimaj-adapter-vinci/2.4.0/uimaj-adapter-vinci-2.4.0.jar (48 KB at 141.8 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/jdom/jdom/1.1.3/jdom-1.1.3.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/jVinci/2.4.0/jVinci-2.4.0.jar (147 KB at 396.2 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-core/3.1.2.RELEASE/spring-core-3.1.2.RELEASE.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/uimaj-document-annotation/2.4.0/uimaj-document-annotation-2.4.0.jar (12 KB at 39.8 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-asm/3.1.2.RELEASE/spring-asm-3.1.2.RELEASE.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/uimaj-tools/2.4.0/uimaj-tools-2.4.0.jar (513 KB at 560.5 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-test/3.1.2.RELEASE/spring-test-3.1.2.RELEASE.jar
+Downloaded: http://repo1.maven.org/maven2/org/jdom/jdom/1.1.3/jdom-1.1.3.jar (148 KB at 479.7 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-context/3.1.2.RELEASE/spring-context-3.1.2.RELEASE.jar
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-asm/3.1.2.RELEASE/spring-asm-3.1.2.RELEASE.jar (52 KB at 316.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-aop/3.1.2.RELEASE/spring-aop-3.1.2.RELEASE.jar
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-test/3.1.2.RELEASE/spring-test-3.1.2.RELEASE.jar (225 KB at 868.5 KB/sec)
+Downloading: http://repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0.jar
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-core/3.1.2.RELEASE/spring-core-3.1.2.RELEASE.jar (440 KB at 871.3 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-beans/3.1.2.RELEASE/spring-beans-3.1.2.RELEASE.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/uima/uimaj-core/2.4.0/uimaj-core-2.4.0.jar (1255 KB at 1009.2 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/springframework/spring-expression/3.1.2.RELEASE/spring-expression-3.1.2.RELEASE.jar
+Downloaded: http://repo1.maven.org/maven2/aopalliance/aopalliance/1.0/aopalliance-1.0.jar (5 KB at 34.3 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-aop/3.1.2.RELEASE/spring-aop-3.1.2.RELEASE.jar (325 KB at 981.4 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-expression/3.1.2.RELEASE/spring-expression-3.1.2.RELEASE.jar (172 KB at 687.8 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-context/3.1.2.RELEASE/spring-context-3.1.2.RELEASE.jar (813 KB at 1302.1 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/springframework/spring-beans/3.1.2.RELEASE/spring-beans-3.1.2.RELEASE.jar (579 KB at 1177.9 KB/sec)
+[INFO] 
+[INFO] --- maven-enforcer-plugin:1.0:enforce (enforce-maven) @ uimafit ---
+[INFO] 
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ uimafit ---
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-filtering/1.0/maven-filtering-1.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-filtering/1.0/maven-filtering-1.0.pom (6 KB at 42.7 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-shared-components/16/maven-shared-components-16.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-shared-components/16/maven-shared-components-16.pom (9 KB at 40.8 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-filtering/1.0/maven-filtering-1.0.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/shared/maven-filtering/1.0/maven-filtering-1.0.jar (42 KB at 194.1 KB/sec)
+[debug] execute contextualize
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ uimafit ---
+[INFO] Compiling 75 source files to C:\Java\hudson\jobs\uimafit\workspace\uimaFIT\target\classes
+[INFO] 
+[INFO] --- cobertura-maven-plugin:2.5.2:instrument (default-cli) @ uimafit ---
 [INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
-Instrumenting 1 file to C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\target\generated-classes\cobertura
-Cobertura: Saved information on 1 classes.
-Instrument time: 410ms
+Instrumenting 82 files to C:\Java\hudson\jobs\uimafit\workspace\uimaFIT\target\generated-classes\cobertura
+[cobertura] WARN  [main] net.sourceforge.cobertura.instrument.ClassInstrumenter - No line number information found for class org.uimafit.pipeline.CpePipeline$1.  Perhaps you need to compile with debug=true?
+Cobertura: Saved information on 82 classes.
+Instrument time: 1559ms
 
 [INFO] Instrumentation was successful.
 [INFO] NOT adding cobertura ser file to attached artifacts list.
 [INFO] 
-[INFO] --- maven-resources-plugin:2.4.3:testResources (default-testResources) @ fedex-demo ---
-[WARNING] Using platform encoding (Cp1252 actually) to copy filtered resources, i.e. build is platform dependent!
-[INFO] skip non existing resourceDirectory C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\src\test\resources
+[INFO] >>> exec-maven-plugin:1.2:java (default) @ uimafit >>>
 [INFO] 
-[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ fedex-demo ---
-[WARNING] File encoding has not been set, using platform encoding Cp1252, i.e. build is platform dependent!
-[INFO] Compiling 1 source file to C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\target\test-classes
+[INFO] --- maven-enforcer-plugin:1.0:enforce (enforce-maven) @ uimafit ---
 [INFO] 
-[INFO] --- maven-surefire-plugin:2.7.2:test (default-test) @ fedex-demo ---
-[INFO] Surefire report directory: C:\Users\panuska\.hudson\jobs\FedEx Ship Service\workspace\target\surefire-reports
+[INFO] <<< exec-maven-plugin:1.2:java (default) @ uimafit <<<
+[INFO] 
+[INFO] --- exec-maven-plugin:1.2:java (default) @ uimafit ---
+Downloading: http://repo1.maven.org/maven2/org/apache/commons/commons-exec/1.0.1/commons-exec-1.0.1.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/commons/commons-exec/1.0.1/commons-exec-1.0.1.pom (8 KB at 43.2 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/commons/commons-parent/11/commons-parent-11.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/commons/commons-parent/11/commons-parent-11.pom (25 KB at 145.0 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/commons/commons-exec/1.0.1/commons-exec-1.0.1.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/commons/commons-exec/1.0.1/commons-exec-1.0.1.jar (49 KB at 310.4 KB/sec)
+Jan 28, 2013 10:09:55 AM org.apache.uima.tools.jcasgen.UimaLoggerProgressMonitor subTask(35)
+INFO:  >>JCasGen Creating: 'org.uimafit.type.Token'.
+Jan 28, 2013 10:09:55 AM org.apache.uima.tools.jcasgen.UimaLoggerProgressMonitor subTask(35)
+INFO:  >>JCasGen Creating: 'org.uimafit.type.Token_Type'.
+Jan 28, 2013 10:09:55 AM org.apache.uima.tools.jcasgen.UimaLoggerProgressMonitor subTask(35)
+INFO:  >>JCasGen Creating: 'org.uimafit.type.AnalyzedText'.
+Jan 28, 2013 10:09:55 AM org.apache.uima.tools.jcasgen.UimaLoggerProgressMonitor subTask(35)
+INFO:  >>JCasGen Creating: 'org.uimafit.type.AnalyzedText_Type'.
+Jan 28, 2013 10:09:55 AM org.apache.uima.tools.jcasgen.UimaLoggerProgressMonitor subTask(35)
+INFO:  >>JCasGen Creating: 'org.uimafit.type.Sentence'.
+Jan 28, 2013 10:09:55 AM org.apache.uima.tools.jcasgen.UimaLoggerProgressMonitor subTask(35)
+INFO:  >>JCasGen Creating: 'org.uimafit.type.Sentence_Type'.
+[INFO] 
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ uimafit ---
+[debug] execute contextualize
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 23 resources
+[INFO] 
+[INFO] --- build-helper-maven-plugin:1.7:add-test-source (add-test-source) @ uimafit ---
+[INFO] Test Source directory: C:\Java\hudson\jobs\uimafit\workspace\uimaFIT\target\generated-sources\jcasgen added.
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ uimafit ---
+[INFO] Compiling 68 source files to C:\Java\hudson\jobs\uimafit\workspace\uimaFIT\target\test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.12:test (default-test) @ uimafit ---
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-booter/2.12/surefire-booter-2.12.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-booter/2.12/surefire-booter-2.12.pom (3 KB at 16.8 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-api/2.12/surefire-api-2.12.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-api/2.12/surefire-api-2.12.pom (3 KB at 19.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/surefire/maven-surefire-common/2.12/maven-surefire-common-2.12.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/surefire/maven-surefire-common/2.12/maven-surefire-common-2.12.pom (6 KB at 37.7 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils/3.0/plexus-utils-3.0.pom
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils/3.0/plexus-utils-3.0.pom (4 KB at 30.1 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/sonatype/spice/spice-parent/16/spice-parent-16.pom
+Downloaded: http://repo1.maven.org/maven2/org/sonatype/spice/spice-parent/16/spice-parent-16.pom (9 KB at 58.7 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/sonatype/forge/forge-parent/5/forge-parent-5.pom
+Downloaded: http://repo1.maven.org/maven2/org/sonatype/forge/forge-parent/5/forge-parent-5.pom (9 KB at 47.2 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-booter/2.12/surefire-booter-2.12.jar
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-api/2.12/surefire-api-2.12.jar
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/surefire/maven-surefire-common/2.12/maven-surefire-common-2.12.jar
+Downloading: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils/3.0/plexus-utils-3.0.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-api/2.12/surefire-api-2.12.jar (122 KB at 477.7 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-booter/2.12/surefire-booter-2.12.jar (33 KB at 123.2 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/surefire/maven-surefire-common/2.12/maven-surefire-common-2.12.jar (219 KB at 593.6 KB/sec)
+Downloaded: http://repo1.maven.org/maven2/org/codehaus/plexus/plexus-utils/3.0/plexus-utils-3.0.jar (221 KB at 564.6 KB/sec)
+[INFO] Surefire report directory: C:\Java\hudson\jobs\uimafit\workspace\uimaFIT\target\surefire-reports
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-junit4/2.12/surefire-junit4-2.12.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-junit4/2.12/surefire-junit4-2.12.pom (3 KB at 17.8 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-providers/2.12/surefire-providers-2.12.pom
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-providers/2.12/surefire-providers-2.12.pom (3 KB at 16.6 KB/sec)
+Downloading: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-junit4/2.12/surefire-junit4-2.12.jar
+Downloaded: http://repo1.maven.org/maven2/org/apache/maven/surefire/surefire-junit4/2.12/surefire-junit4-2.12.jar (34 KB at 274.8 KB/sec)
 
 -------------------------------------------------------
  T E S T S
 -------------------------------------------------------
-Running com.hp.demo.fedex.ShipWebServiceClientTest
-Oct 12, 2012 1:30:56 PM org.apache.axis.utils.JavaUtils isAttachmentSupported
-WARNING: Unable to find required classes (javax.activation.DataHandler and javax.mail.internet.MimeMultipart). Attachment support is disabled.
-Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.115 sec
+Running DefaultPackageAETest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.859 sec
+Running org.uimafit.component.initialize.ConfigurationParameterInitializerTest
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.574 sec
+Running org.uimafit.component.JCasCollectionReader_ImplBaseTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.041 sec
+Running org.uimafit.component.ViewCreatorAnnotatorTest
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.083 sec
+Running org.uimafit.component.ViewTextCopierAnnotatorTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.component.xwriter.CASDumpWriterTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.126 sec
+Running org.uimafit.component.xwriter.XWriterTest
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.266 sec
+Running org.uimafit.descriptor.TypeCapabilityTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.factory.AggregateBuilderTest
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.233 sec
+Running org.uimafit.factory.AggregateWithReaderTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.factory.AnalysisEngineFactoryExternalResourceTest
+Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.905 sec
+Running org.uimafit.factory.AnalysisEngineFactoryTest
+Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.234 sec
+Running org.uimafit.factory.AnnotationFactoryTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.factory.CollectionReaderFactoryExternalResourceTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.factory.CollectionReaderFactoryTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 sec
+Running org.uimafit.factory.ConfigurationParameterFactoryTest
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.factory.ExternalResourceConfiguratorTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 sec
+Running org.uimafit.factory.ExternalResourceFactoryTest
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.47 sec
+Running org.uimafit.factory.FlowControllerFactoryExternalResourceTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.034 sec
+Running org.uimafit.factory.FsIndexFactoryTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.06 sec
+Running org.uimafit.factory.initializable.InitializableFactoryTest
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 sec
+Running org.uimafit.factory.JCasBuilderTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 sec
+Running org.uimafit.factory.JCasFactoryTest
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.056 sec
+Running org.uimafit.factory.LoggingTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.127 sec
+Running org.uimafit.factory.ResourceCreationSpecifierFactoryTest
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.factory.SofaMappingFactoryTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 sec
+Running org.uimafit.factory.testCrs.SingleFileXReaderTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 sec
+Running org.uimafit.factory.TypePrioritiesFactoryTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 sec
+Running org.uimafit.factory.TypeSystemDescriptionFactoryTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 sec
+Running org.uimafit.factory.UimaContextFactoryTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.LicenseTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.081 sec
+Running org.uimafit.pipeline.CpePipelineTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.205 sec
+Running org.uimafit.pipeline.SimplePipelineTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 sec
+Running org.uimafit.testing.factory.TokenBuilderTest
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.util.CasUtilTest
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.util.ContainmentIndexTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0 sec
+Running org.uimafit.util.DisableLoggingTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.util.FSCollectionFactoryTest
+Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.267 sec
+Running org.uimafit.util.HideOutputTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.util.JCasIterableTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.util.JCasUtilTest
+Tests run: 25, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 42.726 sec
+Running org.uimafit.util.LocaleUtilTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.util.SimplePipelineTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Flushing results...
+Flushing results done
+Cobertura: Loaded information on 82 classes.
+Cobertura: Saved information on 82 classes.
+
+Results :
+
+Tests run: 164, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] 
+[INFO] <<< cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit <<<
+[INFO] 
+[INFO] --- cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit ---
+[INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
+Cobertura: Loaded information on 82 classes.
+Report time: 3650ms
+
+[INFO] Cobertura Report generation was successful.
+[INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
+Cobertura: Loaded information on 82 classes.
+Report time: 3110ms
+
+[INFO] Cobertura Report generation was successful.
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building uimaFIT Examples 1.5.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ uimafit-examples ---
+[INFO] 
+[INFO] >>> cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit-examples >>>
+[INFO] 
+[INFO] --- maven-enforcer-plugin:1.0:enforce (enforce-maven) @ uimafit-examples ---
+[INFO] 
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ uimafit-examples ---
+[debug] execute contextualize
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 19 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ uimafit-examples ---
+[INFO] Compiling 44 source files to C:\Java\hudson\jobs\uimafit\workspace\uimaFIT-examples\target\classes
+[INFO] 
+[INFO] --- cobertura-maven-plugin:2.5.2:instrument (default-cli) @ uimafit-examples ---
+[INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
+Instrumenting 51 files to C:\Java\hudson\jobs\uimafit\workspace\uimaFIT-examples\target\generated-classes\cobertura
+Cobertura: Saved information on 51 classes.
+Instrument time: 793ms
+
+[INFO] Instrumentation was successful.
+[INFO] NOT adding cobertura ser file to attached artifacts list.
+[INFO] 
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ uimafit-examples ---
+[debug] execute contextualize
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 0 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ uimafit-examples ---
+[INFO] Compiling 5 source files to C:\Java\hudson\jobs\uimafit\workspace\uimaFIT-examples\target\test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.12:test (default-test) @ uimafit-examples ---
+[INFO] Surefire report directory: C:\Java\hudson\jobs\uimafit\workspace\uimaFIT-examples\target\surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.uimafit.examples.LicenseTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.154 sec
+Running org.uimafit.examples.tutorial.ex1.RoomNumberAnnotator1Test
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.023 sec
+Running org.uimafit.examples.tutorial.ex1.RoomNumberAnnotator2Test
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.001 sec
+Running org.uimafit.examples.xmi.XmiTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 sec
+Flushing results...
+Flushing results done
+Cobertura: Loaded information on 51 classes.
+Cobertura: Saved information on 51 classes.
+
+Results :
+
+Tests run: 8, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] 
+[INFO] <<< cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit-examples <<<
+[INFO] 
+[INFO] --- cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit-examples ---
+[INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
+Cobertura: Loaded information on 51 classes.
+Report time: 1398ms
+
+[INFO] Cobertura Report generation was successful.
+[INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
+Cobertura: Loaded information on 51 classes.
+Report time: 549ms
+
+[INFO] Cobertura Report generation was successful.
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building uimaFIT - Spring integration 1.5.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.4.1:clean (default-clean) @ uimafit-spring ---
+[INFO] 
+[INFO] >>> cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit-spring >>>
+[INFO] 
+[INFO] --- maven-enforcer-plugin:1.0:enforce (enforce-maven) @ uimafit-spring ---
+[INFO] 
+[INFO] --- maven-resources-plugin:2.5:resources (default-resources) @ uimafit-spring ---
+[debug] execute contextualize
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 0 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:compile (default-compile) @ uimafit-spring ---
+[INFO] Compiling 7 source files to C:\Java\hudson\jobs\uimafit\workspace\uimaFIT-spring\target\classes
+[INFO] 
+[INFO] --- cobertura-maven-plugin:2.5.2:instrument (default-cli) @ uimafit-spring ---
+[INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
+Instrumenting 7 files to C:\Java\hudson\jobs\uimafit\workspace\uimaFIT-spring\target\generated-classes\cobertura
+Cobertura: Saved information on 7 classes.
+Instrument time: 297ms
+
+[INFO] Instrumentation was successful.
+[INFO] NOT adding cobertura ser file to attached artifacts list.
+[INFO] 
+[INFO] --- maven-resources-plugin:2.5:testResources (default-testResources) @ uimafit-spring ---
+[debug] execute contextualize
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 0 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:2.3.2:testCompile (default-testCompile) @ uimafit-spring ---
+[INFO] Compiling 3 source files to C:\Java\hudson\jobs\uimafit\workspace\uimaFIT-spring\target\test-classes
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.12:test (default-test) @ uimafit-spring ---
+[INFO] Surefire report directory: C:\Java\hudson\jobs\uimafit\workspace\uimaFIT-spring\target\surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running org.uimafit.spring.LicenseTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.071 sec
+Running org.uimafit.spring.SpringContextResourceManagerTest
+Jan 28, 2013 10:11:18 AM org.springframework.context.support.AbstractApplicationContext prepareRefresh
+INFO: Refreshing org.springframework.context.support.GenericApplicationContext@58bf7b3e: startup date [Mon Jan 28 10:11:18 MST 2013]; root of context hierarchy
+Jan 28, 2013 10:11:18 AM org.springframework.beans.factory.support.DefaultListableBeanFactory preInstantiateSingletons
+INFO: Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@38946002: defining beans [org.springframework.context.annotation.internalConfigurationAnnotationProcessor,org.springframework.context.annotation.internalAutowiredAnnotationProcessor,org.springframework.context.annotation.internalRequiredAnnotationProcessor,org.springframework.context.annotation.internalCommonAnnotationProcessor,springBean,org.springframework.context.annotation.ConfigurationClassPostProcessor$ImportAwareBeanPostProcessor#0]; root of factory hierarchy
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.937 sec
+Running org.uimafit.spring.UimaFactoryInjectionTest
+Jan 28, 2013 10:11:19 AM org.springframework.context.support.AbstractApplicationContext prepareRefresh
+INFO: Refreshing org.springframework.context.support.GenericApplicationContext@276fcbc0: startup date [Mon Jan 28 10:11:19 MST 2013]; root of context hierarchy
+Jan 28, 2013 10:11:19 AM org.springframework.beans.factory.support.DefaultListableBeanFactory preInstantiateSingletons
+INFO: Pre-instantiating singletons in org.springframework.beans.factory.support.DefaultListableBeanFactory@4842341d: defining beans [org.springframework.context.annotation.internalConfigurationAnnotationProcessor,org.springframework.context.annotation.internalAutowiredAnnotationProcessor,org.springframework.context.annotation.internalRequiredAnnotationProcessor,org.springframework.context.annotation.internalCommonAnnotationProcessor,otherBean,analysisEngineFactory,casConsumerFactory,casInitializerFactory,collectionReaderFactory,customResourceFactory,org.springframework.context.annotation.ConfigurationClassPostProcessor$ImportAwareBeanPostProcessor#0]; root of factory hierarchy
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.066 sec
+Flushing results...
+Flushing results done
+Cobertura: Loaded information on 7 classes.
+Cobertura: Saved information on 7 classes.
 
 Results :
 
 Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
 
-Flushing results...
-Flushing results done
-Cobertura: Loaded information on 1 classes.
-Cobertura: Saved information on 1 classes.
 [INFO] 
-[INFO] <<< cobertura-maven-plugin:2.5.1:cobertura (default-cli) @ fedex-demo <<<
+[INFO] <<< cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit-spring <<<
 [INFO] 
-[INFO] --- cobertura-maven-plugin:2.5.1:cobertura (default-cli) @ fedex-demo ---
+[INFO] --- cobertura-maven-plugin:2.5.2:cobertura (default-cli) @ uimafit-spring ---
 [INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
-Cobertura: Loaded information on 1 classes.
-Report time: 1078ms
+Cobertura: Loaded information on 7 classes.
+Report time: 720ms
 
 [INFO] Cobertura Report generation was successful.
 [INFO] Cobertura 1.9.4.1 - GNU GPL License (NO WARRANTY) - See COPYRIGHT file
-Cobertura: Loaded information on 1 classes.
-Report time: 312ms
+Cobertura: Loaded information on 7 classes.
+Report time: 202ms
 
 [INFO] Cobertura Report generation was successful.
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] uimaFIT Parent .................................... SUCCESS [7.802s]
+[INFO] uimaFIT ........................................... SUCCESS [1:34.664s]
+[INFO] uimaFIT Examples .................................. SUCCESS [9.921s]
+[INFO] uimaFIT - Spring integration ...................... SUCCESS [5.537s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time: 50.756s
-[INFO] Finished at: Fri Oct 12 13:30:59 CEST 2012
-[INFO] Final Memory: 21M/61M
+[INFO] Total time: 2:12.924s
+[INFO] Finished at: Mon Jan 28 10:11:20 MST 2013
+[INFO] Final Memory: 46M/116M
 [INFO] ------------------------------------------------------------------------
 [DEBUG] Closing connection to remote
+Flushing results...
+Flushing results done
+Cobertura: Loaded information on 7 classes.
+Cobertura: Saved information on 9 classes.
 [DEBUG] Waiting for process to finish
 [DEBUG] Result: 0
 Recording test results
 Publishing Cobertura coverage report...
 Publishing Cobertura coverage results...
-[DEBUG] Skipping watched dependency update; build not configured with trigger: FedEx Ship Service #17
+[DEBUG] Skipping watched dependency update; build not configured with trigger: uimafit #2
 Finished: SUCCESS
