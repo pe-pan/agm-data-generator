@@ -84,7 +84,7 @@ public class EntityTools {
         }
     }
 
-    public static String toUrlParameters(Entity entity) {
+    public static String toUrlParameters(Entity entity) {        //todo similar to RestClient#serializeParameters(); remove code duplicate
         StringBuilder urlParameters = new StringBuilder("?");
         List<Field> fields = entity.getFields().getField();
         for (Field field : fields) {

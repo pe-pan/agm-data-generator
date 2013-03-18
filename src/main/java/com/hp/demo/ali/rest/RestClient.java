@@ -1,5 +1,7 @@
 package com.hp.demo.ali.rest;
 
+import com.hp.demo.ali.entity.Entity;
+import com.hp.demo.ali.tools.EntityTools;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -80,6 +82,10 @@ public class RestClient {
         return doRequest(urlAddress, formData, method, contentType, null);
     }
 
+    public synchronized HttpResponse doRequest(String urlAddress, Entity entity, Method method, ContentType contentType) {
+        return doRequest(urlAddress, EntityTools.toUrlParameters(entity), method, contentType, null);
+    }
+
     /**
      * Posts given data to the given address and collects (re-send) cookies.
      * Also handles redirects; only first time it does POST, then it does GET.
@@ -106,14 +112,20 @@ public class RestClient {
                 log.debug("Doing "+methodName);
                 conn.setRequestMethod(methodName);
                 switch (contentType) {
-                    case JSON : {
-                        log.debug("JSON documents");
+                    case JSON_JSON: {
+                        log.debug("JSON_JSON documents");
                         conn.setRequestProperty("Content-type", "application/json;type=collection");
                         conn.setRequestProperty("Accept", "application/json");
                         break;
                     }
-                    case XML : {
-                        log.debug("XML documents");
+                    case FORM_JSON: {      //todo because of generating requirements using apmuiservices
+                        log.debug("FORM_JSON documents");
+                        conn.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+                        conn.setRequestProperty("Accept", "application/json");
+                        break;
+                    }
+                    case XML_XML: {
+                        log.debug("XML_XML documents");
                         conn.setRequestProperty("Content-type", "application/xml; charset=UTF-8");
                         conn.setRequestProperty("Accept", "application/xml");
                         break;
@@ -217,10 +229,10 @@ public class RestClient {
                         append(key).append('=').
                         append(URLEncoder.encode(value, "UTF-8"));
             } catch (UnsupportedEncodingException e) {
-                throw new IllegalStateException(e);     // remove the starting '&' character
+                throw new IllegalStateException(e);
             }
         }
-        return returnValue.substring(1);
+        return returnValue.substring(1);                // remove the starting '&' character
     }
 
     public HttpResponse doRequest(String urlAddress, String[][] formData, Method method, ContentType contentType) {
@@ -232,7 +244,7 @@ public class RestClient {
     }
 
     public HttpResponse doPost(String url, String data) {
-        return doRequest(url, data, Method.POST, ContentType.XML);
+        return doRequest(url, data, Method.POST, ContentType.XML_XML);
     }
 
     public HttpResponse doPost(String url, String[][] data) {
@@ -244,11 +256,11 @@ public class RestClient {
     }
 
     public HttpResponse doPut(String url, String data) {
-        return doRequest(url, data, Method.PUT, ContentType.JSON);
+        return doRequest(url, data, Method.PUT, ContentType.JSON_JSON);
     }
 
     public HttpResponse doPut(String url, String[][] data) {
-        return doRequest(url, serializeParameters(data), Method.PUT, ContentType.JSON);
+        return doRequest(url, serializeParameters(data), Method.PUT, ContentType.JSON_JSON);
     }
 
     public HttpResponse doDelete(String url) {

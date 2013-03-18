@@ -5,6 +5,7 @@ package com.hp.demo.ali.rest;
  */
 public enum ContentType {
     NONE,
-    XML,
-    JSON
+    XML_XML,
+    JSON_JSON,
+    FORM_JSON
 }

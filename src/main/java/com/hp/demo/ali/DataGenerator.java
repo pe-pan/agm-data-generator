@@ -10,6 +10,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -256,7 +259,7 @@ public class DataGenerator {
                     }
                 }
             }
-            String agmId;
+            String agmId = null;
             if ("release-backlog-item".equals(sheetName)) {
                 StringBuilder data = new StringBuilder();
                 List<Field> fields = excelEntity.getFields().getField();
@@ -276,7 +279,7 @@ public class DataGenerator {
                         append("\"}]}], \"Type\":\"release-backlog-item\"}], \"TotalResults\":1}");
                 client.doPut(settings.getRestUrl() + "release-backlog-items", data.toString());
             } else if ("apmuiservice".equals(sheetName)) {
-                RestClient.HttpResponse response = client.doRequest(agmAddress + EntityTools.toUrlParameters(excelEntity), (String) null, Method.POST, ContentType.JSON);
+                RestClient.HttpResponse response = client.doRequest(agmAddress + EntityTools.toUrlParameters(excelEntity), (String) null, Method.POST, ContentType.JSON_JSON);
                 String returnValue = response.getResponse();
                 int startIndex = returnValue.indexOf("release-backlog-item_")+"release-backlog-item_".length();
                 int lastIndex = returnValue.indexOf("\"", startIndex);
@@ -305,17 +308,69 @@ public class DataGenerator {
                 }
                 String data = EntityTools.toXml(excelEntity);
                 if (sheetName.equals("release-backlog-item")) {
+                        // todo an evil hack ; remove it -> handlers can resolve it
                     client.doPut(agmAddress, data);
+                } else if (sheetName.equals("requirement")) {
+                        // todo an evil hack ; remove it -> handlers can resolve it
+                    RestClient.HttpResponse response = client.doRequest(settings.getRestUrl()+"apmuiservices/additemservice/createrequirementinrelease", excelEntity, Method.POST, ContentType.FORM_JSON);
+                    try {
+                        JSONObject returnValue = new JSONObject(response.getResponse());
+                        JSONArray entities = returnValue.getJSONArray("entities");
+                        assert entities.length() == 2;
+
+                        JSONArray requirementFields;
+                        JSONArray backlogItemFields;
+                        if ("requirement".equals(entities.getJSONObject(1).getString("Type"))) {
+                            requirementFields = entities.getJSONObject(1).getJSONArray("Fields");
+                            backlogItemFields = entities.getJSONObject(0).getJSONArray("Fields");
+                        } else {
+                            requirementFields = entities.getJSONObject(0).getJSONArray("Fields");
+                            backlogItemFields = entities.getJSONObject(1).getJSONArray("Fields");
+                        }
+
+                        //handle requirement
+                        for (int i = 0; i < requirementFields.length(); i++) {
+                            if ("id".equals(requirementFields.getJSONObject(i).getString("Name"))) {
+                                agmId = requirementFields.getJSONObject(i).getJSONArray("values").getJSONObject(0).getString("value");
+                                log.debug("Requirement ID: "+agmId);
+                                break;
+                            }
+                        }
+                        if (agmId == null) {
+                            log.error("Requirement ID not returned!");
+                            throw new IllegalStateException("Requirement ID not returned! (in Excel: "+excelId+")");
+                        }
+                        idTranslationTable.put(sheetName+"#"+excelId, agmId);
+                        writeLogLine(sheetName, agmId);
+
+                        if (firstReqId == 0) {   // remember req IDs
+                            firstReqId = Integer.parseInt(agmId);
+                            settings.setFirstRequirementNumber(firstReqId);
+                            log.info("First requirement ID: "+firstReqId);
+                        }
+
+                        // handle backlog item
+                        String backlogItemId = null;
+                        for (int i = 0; i < backlogItemFields.length(); i++) {
+                            if ("id".equals(backlogItemFields.getJSONObject(i).getString("Name"))) {
+                                backlogItemId = backlogItemFields.getJSONObject(i).getJSONArray("values").getJSONObject(0).getString("value");
+                                log.debug("Backlog item ID: "+backlogItemId );
+                                break;
+                            }
+                        }
+                        if (backlogItemId == null) {
+                            log.error("Backlog item ID not returned!");
+                            throw new IllegalStateException("Backlog item ID not returned! (in Excel: "+excelId+")");
+                        }
+                        idTranslationTable.put("apmuiservice#"+sheetName+"#"+excelId, backlogItemId );
+
+                    } catch (JSONException e) {
+                        throw new IllegalStateException(e);
+                    }
                 } else {
                     RestClient.HttpResponse response = client.doPost(agmAddress, data);
                     Entity agmEntity = EntityTools.fromXml(response.getResponse());
                     agmId = EntityTools.getFieldValue(agmEntity, "id");
-                    // todo an evil hack ; remove it -> handlers can resolve it
-                    if (sheetName.equals("requirement") && firstReqId == 0) {   // remember req IDs
-                        firstReqId = Integer.parseInt(agmId);
-                        settings.setFirstRequirementNumber(firstReqId);
-                        log.info("First requirement ID: "+firstReqId);
-                    }
                     if (sheetName.equals("defect") && firstDefId == 0) {        // remember def IDs
                         firstDefId = Integer.parseInt(agmId);
                         settings.setFirstDefectNumber(firstDefId);
@@ -324,6 +379,7 @@ public class DataGenerator {
                     idTranslationTable.put(sheetName+"#"+excelId, agmId);
                     writeLogLine(sheetName, agmId);
                     if (sheetName.equals("release")) {
+                        // todo an evil hack ; remove it -> handlers can resolve it
                         learnSprints(agmId);
                     }
                 }
