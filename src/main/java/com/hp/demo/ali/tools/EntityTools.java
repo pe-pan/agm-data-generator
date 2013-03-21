@@ -10,6 +10,9 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,6 +41,15 @@ public class EntityTools {
     public static long getFieldLongValue(Entity entity, String fieldName) {
         Field field = getField(entity, fieldName);
         return field == null ? 0 : Long.parseLong(field.getValue().getValue());
+    }
+
+    public static Date getFieldDateValue(Entity entity, String fieldName, SimpleDateFormat sdf) {
+        Field field = getField(entity, fieldName);
+        try {
+            return field == null ? null : sdf.parse(field.getValue().getValue());
+        } catch (ParseException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     public static Field getField(Entity entity, String fieldName) {

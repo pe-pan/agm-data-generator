@@ -217,6 +217,7 @@ public class DataGenerator {
         }
     }
 
+    private static List<Entity> sprintList = null;  //team-member must be created after release
     private static void generateEntity(ExcelReader reader, String sheetName, String agmAddress) {
         Sheet sheet = reader.getSheet(sheetName);
         EntityIterator iterator = new EntityIterator(sheet);
@@ -307,10 +308,11 @@ public class DataGenerator {
                    buildServerName = EntityTools.getField(excelEntity, "name").getValue().getValue();
                 }
                 String data = EntityTools.toXml(excelEntity);
-                if (sheetName.equals("release-backlog-item")) {
+//                if (sheetName.equals("release-backlog-item")) {
                         // todo an evil hack ; remove it -> handlers can resolve it
-                    client.doPut(agmAddress, data);
-                } else if (sheetName.equals("requirement")) {
+//                    client.doPut(agmAddress, data);
+//                } else
+            if (sheetName.equals("requirement")) {
                         // todo an evil hack ; remove it -> handlers can resolve it
                     RestClient.HttpResponse response = client.doRequest(settings.getRestUrl()+"apmuiservices/additemservice/createrequirementinrelease", excelEntity, Method.POST, ContentType.FORM_JSON);
                     try {
@@ -380,10 +382,14 @@ public class DataGenerator {
                     writeLogLine(sheetName, agmId);
                     if (sheetName.equals("release")) {
                         // todo an evil hack ; remove it -> handlers can resolve it
-                        learnSprints(agmId);
+                        sprintList = getSprints(agmId);
+                        learnSprints(sprintList);
                     }
                 }
             }
+        }
+        if (sheetName.equals("team-member")) {  // once team-members are created, initialize sprints
+            initializeSprints(sprintList);
         }
     }
 
@@ -461,8 +467,8 @@ public class DataGenerator {
         //todo check response code
     }
 
-    public static void learnSprints(String releaseId) {
-        log.info("Learning created sprints...");
+    private static List<Entity> getSprints (String releaseId) {
+        log.debug("Getting sprints of release " + releaseId + " ...");
         RestClient.HttpResponse response = client.doGet(settings.getRestUrl() + "release-cycles?query={parent-id[" + releaseId + "]}&order-by={start-date[ASC]}&page-size=2000&start-index=1");
         String xmlEntities = response.getResponse().substring("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>".length());
         Entities sprintEntities;
@@ -474,12 +480,60 @@ public class DataGenerator {
         } catch (JAXBException e) {
             throw new IllegalStateException(e);
         }
-        List<Entity> sprintList = sprintEntities.getEntity();
+        return sprintEntities.getEntity();
+    }
+
+    public static void learnSprints(List<Entity> sprintList) {
+        log.info("Learning created sprints...");
         int i = 1;
         for (Entity sprint : sprintList) {
             String id = EntityTools.getFieldValue(sprint, "id");
             idTranslationTable.put("sprint#"+i++, id);
             log.debug("Learning sprint id: "+id);
+        }
+    }
+
+    public static void initializeSprints(List<Entity> sprintList) {
+        log.debug("Initializing sprints...");
+        // moving sprints from past to current and back will cause that All existing teams will be assigned to such sprints
+        // such past sprints can be then assigned user stories and defect
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        for (Entity sprint : sprintList) {
+            String id = EntityTools.getFieldValue(sprint, "id");
+            log.debug("Initializing sprint id: "+id);
+
+            String tense = EntityTools.getFieldValue(sprint, "tense");
+            assert tense != null;
+            if ("PAST".equals(tense)) {
+                log.debug("Moving the sprint "+id+" to current and back again (to reset assigned teams)");
+                long now = System.currentTimeMillis();
+                long startDate = EntityTools.getFieldDateValue(sprint, "start-date", sdf).getTime();
+                long endDate = EntityTools.getFieldDateValue(sprint, "end-date", sdf).getTime();
+                long diff = now - startDate;
+
+                assert diff > 0;
+                StringBuilder data = new StringBuilder();
+                data.
+                        append("{\"entities\":[{\"Fields\":[{\"Name\":\"id\", \"values\":[{\"value\":\"").
+                        append(id).
+                        append("\"}]},{\"Name\":\"start-date\", \"values\":[{\"value\":\"").
+                        append(sdf.format(new Date(startDate + diff))).
+                        append("\"}]},{\"Name\":\"end-date\", \"values\":[{\"value\":\"").
+                        append(sdf.format(new Date(endDate + diff))).
+                        append("\"}]}], \"Type\":\"release-cycle\"}], \"TotalResults\":1}");
+                client.doPut(settings.getRestUrl() + "release-cycles", data.toString());
+
+                data.setLength(0);
+                data.
+                        append("{\"entities\":[{\"Fields\":[{\"Name\":\"id\", \"values\":[{\"value\":\"").
+                        append(id).
+                        append("\"}]},{\"Name\":\"start-date\", \"values\":[{\"value\":\"").
+                        append(sdf.format(new Date(startDate))).
+                        append("\"}]},{\"Name\":\"end-date\", \"values\":[{\"value\":\"").
+                        append(sdf.format(new Date(endDate))).
+                        append("\"}]}], \"Type\":\"release-cycle\"}], \"TotalResults\":1}");
+                client.doPut(settings.getRestUrl() + "release-cycles", data.toString());
+            }
         }
     }
 
@@ -554,9 +608,10 @@ public class DataGenerator {
     }
 
     public static DevBridgeDownloader downloadDevBridge() {
-        DevBridgeDownloader downloader = new DevBridgeDownloader(settings, client);
-        client.doPost(settings.getRestUrl()+"scm/dev-bridge/bundle", null, downloader);  // /scm/dev-bridge - downloads only war file!
-        return downloader;
+//        DevBridgeDownloader downloader = new DevBridgeDownloader(settings, client);
+//        client.doPost(settings.getRestUrl()+"scm/dev-bridge/bundle", null, downloader);  // /scm/dev-bridge - downloads only war file!
+//        return downloader;
+    return null;
     }
 
     public static final String DEV_BRIDGE_ZIP_ROOT = "\\DevBridge\\";
