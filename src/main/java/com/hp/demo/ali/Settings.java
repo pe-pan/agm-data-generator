@@ -61,7 +61,7 @@ public class Settings {
         buildTemplateFolder = SheetTools.getStringValue(settings, 16, 2);
         try {
             long days = SheetTools.getLongValue(settings, 17, 2);
-            firstBuildDate = new Date(new Date().getTime() + days*24*60*60*1000);
+            firstBuildDate = new Date(System.currentTimeMillis() + days*24*60*60*1000);
             log.debug("Setting first build date to: "+firstBuildDate.toString());
         } catch (NumberFormatException e) {
             log.debug("First build date is not a relative number to todays'; trying if it's absolute date");

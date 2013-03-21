@@ -46,7 +46,7 @@ public class DataGenerator {
             System.exit(-1);
         }
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        long startTime = new Date().getTime();
+        long startTime = System.currentTimeMillis();
         log.info("Starting at: "+sdf.format(new Date(startTime)));
         try {
             ExcelReader reader = new ExcelReader(args[0]);
@@ -122,7 +122,7 @@ public class DataGenerator {
                 synchronizeAliDevBridge();
             }
         } finally {
-            long endTime = new Date().getTime();
+            long endTime = System.currentTimeMillis();
             log.info("Finished at: "+sdf.format(new Date(endTime)));
             long total = endTime - startTime;
 

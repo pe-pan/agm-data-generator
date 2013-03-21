@@ -73,9 +73,9 @@ public class RepositoryMender {
 
     public void mendRepository(Date releaseStart, int firstDefect, int lastDefect, int firstRequirement, int lastRequirement) {
         log.debug("Melding repository...");
-        Date today = new Date();
+        long today = System.currentTimeMillis();
 
-        if (releaseStart.getTime() >= today.getTime() || lastDefect < firstDefect || lastRequirement < firstRequirement) {
+        if (releaseStart.getTime() >= today || lastDefect < firstDefect || lastRequirement < firstRequirement) {
             throw new IllegalArgumentException("Release start is in future or defect/requirement ids are wrongly set: "+ svnDateFormat.format(releaseStart));
         }
 
@@ -87,7 +87,7 @@ public class RepositoryMender {
         }
         log.debug("Mending release starting at: "+ svnDateFormat.format(releaseStart)+"; till the revision: "+lastRevision);
 
-        long incrementDate = (today.getTime() - releaseStart.getTime()) / lastRevision; // todo commits will be spread uniformly; create a better algorithm
+        long incrementDate = (today - releaseStart.getTime()) / lastRevision; // todo commits will be spread uniformly; create a better algorithm
 
         int numberOfDefects = lastDefect - firstDefect;
         int numberOfRequirements = lastRequirement - firstRequirement;
