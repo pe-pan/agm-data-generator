@@ -51,7 +51,8 @@ public class DataGenerator {
         try {
             ExcelReader reader = new ExcelReader(args[0]);
             readUsers(reader);
-            settings = new Settings(reader.getSheet("Settings"));
+            Settings.initSettings(reader.getSheet("Settings"));
+            settings = Settings.getSettings();
             if (args.length == 3) {
                 User admin = User.getUser(settings.getAdmin());
                 admin.setLogin(args[1]);

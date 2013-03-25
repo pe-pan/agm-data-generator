@@ -42,7 +42,7 @@ public class Settings {
     private String domain;
     private String project;
 
-    public Settings(Sheet settings) {
+    private Settings(Sheet settings) {
         log.info("Reading settings...");
         generateProject = "yes".equals(SheetTools.getStringValue(settings, 2, 2));
         environment = SheetTools.getStringValue(settings, 3, 2);
@@ -231,5 +231,18 @@ public class Settings {
     public void setProject(String project) {
         log.debug("Setting project: "+project);
         this.project = project;
+    }
+
+    private static Settings settings = null;
+    public static void initSettings(Sheet settingsSheet) {
+        settings = new Settings(settingsSheet);
+    }
+
+    public static Settings getSettings() {
+        if (settings == null) {
+            log.error("Settings not initialized!");
+            throw new IllegalStateException("Settings not initialized!");
+        }
+        return settings;
     }
 }
