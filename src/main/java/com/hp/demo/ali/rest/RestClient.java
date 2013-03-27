@@ -132,18 +132,6 @@ public class RestClient {
                     }
                 }
                 conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.97 Safari/537.22");
-                if (urlAddress.endsWith("/scm/dev-bridge/deployment-url")) { //todo an evil hack; set INTERNAL_DATA header when setting ALI DEV Bridge URL
-                    String state = cookies.get("LWSSO_COOKIE_KEY");
-                    cookies.put("STATE", state);
-                    log.debug("Setting INTERNAL_DATA header: "+ state);
-                    conn.setRequestProperty("INTERNAL_DATA", state);
-                }
-                if (urlAddress.endsWith("/qcbin/rest/api/portal/users")) { //todo an evil hack; set INTERNAL_DATA header when setting ALI DEV Bridge URL
-                    String state = cookies.get("LWSSO_COOKIE_KEY");
-                    cookies.put("AGM_STATE", state);
-                    log.debug("Setting INTERNAL_DATA header: "+ state);
-                    conn.setRequestProperty("INTERNAL_DATA", state);
-                }
                 log.debug("Setting Referer into: "+oldLocation);
                 conn.setRequestProperty("Referer", oldLocation);      // todo an evil hack; this is because of downloading DevBridge... so they know the URL where DevBridge will be pointing at
 

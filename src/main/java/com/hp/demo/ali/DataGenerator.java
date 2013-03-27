@@ -1,27 +1,37 @@
 package com.hp.demo.ali;
 
-import com.hp.demo.ali.entity.*;
+import com.hp.demo.ali.rest.AgmClient;
+import com.hp.demo.ali.entity.Entity;
+import com.hp.demo.ali.entity.Field;
+import com.hp.demo.ali.entity.User;
+import com.hp.demo.ali.entity.Value;
 import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
-import com.hp.demo.ali.rest.*;
+import com.hp.demo.ali.rest.DevBridgeDownloader;
+import com.hp.demo.ali.rest.RestClient;
+import com.hp.demo.ali.rest.RestTools;
 import com.hp.demo.ali.tools.EntityTools;
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.hp.almjclient.connection.ServiceResourceAdapter;
+import org.hp.almjclient.exceptions.ALMRestException;
+import org.hp.almjclient.exceptions.EntityNotFoundException;
+import org.hp.almjclient.exceptions.FieldNotFoundException;
+import org.hp.almjclient.exceptions.RestClientException;
+import org.hp.almjclient.model.marshallers.Entities;
+import org.hp.almjclient.model.marshallers.favorite.Filter;
+import org.hp.almjclient.services.ConnectionService;
+import org.hp.almjclient.services.EntityCRUDService;
+import org.hp.almjclient.services.impl.ConnectionManager;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by panuska on 10/12/12.
@@ -31,11 +41,13 @@ public class DataGenerator {
     private static Logger log = Logger.getLogger(RestClient.class.getName());
 
     private static Settings settings;
-    private static RestClient client = new RestClient();
+    private static AgmClient agmClient = AgmClient.getAgmClient();
 
+    private static org.hp.almjclient.services.impl.ProjectServicesFactory factory;
     private static BuildGenerator buildGenerator;
 
     public static String buildServerName = "Hudson"; //todo should be set to null
+    private static final int CONNECTION_TIMEOUT = 600000;
 
     public static void main(String[] args) throws JAXBException, IOException {
         if (args.length != 1 && args.length != 3) {
@@ -60,6 +72,12 @@ public class DataGenerator {
             }
 
             resolveTenantUrl();
+            final ConnectionService connection = ConnectionManager.getConnection(CONNECTION_TIMEOUT, null, null);
+            connection.setTenantId(Integer.parseInt(settings.getTenantId()));
+            User admin = User.getUser(settings.getAdmin());
+            connection.connect(settings.getRestUrl().substring(0, 42), admin.getLogin(), admin.getPassword());
+            factory = connection.getProjectServicesFactory(settings.getDomain(), settings.getProject());
+
             DevBridgeDownloader downloader = null;
             if (settings.isGenerateProject()) {
                 log.debug("REST URL: " + settings.getRestUrl());
@@ -75,7 +93,7 @@ public class DataGenerator {
                     if (!input.equals("yes")) {
                         System.exit(-1);
                     }
-                    downloader = downloadDevBridge();
+                    downloader = agmClient.downloadDevBridge();
                     openLog();
                     String previousEntity = "";
                     for (String line = readLogLine(); line != null; line = readLogLine()) {
@@ -87,15 +105,17 @@ public class DataGenerator {
                             log.info("Deleting entity: "+entityName);
                             previousEntity = entityName;
                         }
+                        EntityCRUDService service = factory.getEntityCRUDService(entityName);
                         try {
-                            client.doDelete(settings.getRestUrl() + entityName + "s/" + agmId);
-                        } catch (IllegalStateException e) {
+                            service.delete(Integer.parseInt(agmId));
+                        } catch (EntityNotFoundException e) {
                             log.error("Cannot delete "+entityName+" with ID: "+agmId);
                         }
+                        //todo how to find out if the entity was really deleted?
                     }
                 } else {
                     log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
-                    downloader = downloadDevBridge();
+                    downloader = agmClient.downloadDevBridge();
                 }
                 if (settings.isAddUsers()) { // todo move this if out of [ if (settings.isGenerateProject()) ] condition
                     addUsers();
@@ -122,6 +142,10 @@ public class DataGenerator {
 
                 synchronizeAliDevBridge();
             }
+        } catch (RestClientException e) {
+            throw new IllegalStateException(e);
+        } catch (ALMRestException e) {
+            throw new IllegalStateException(e);
         } finally {
             long endTime = System.currentTimeMillis();
             log.info("Finished at: "+sdf.format(new Date(endTime)));
@@ -136,13 +160,7 @@ public class DataGenerator {
         List<Sheet> entitySheets = reader.getAllEntitySheets();
         for (Sheet sheet : entitySheets) {
             String entityName = sheet.getSheetName();
-            if ("apmuiservice".equals(entityName)) { //todo remove the string constant
-                log.info("Moving backlog items to the created release...");
-                generateEntity(reader, entityName, settings.getRestUrl()+entityName+"s/assignmentservice/planning");
-            } else {
-                log.info("Generating entity: "+entityName);
-                generateEntity(reader, entityName, settings.getRestUrl()+entityName+"s?TENANTID="+settings.getTenantId());
-            }
+            generateEntity(reader, entityName);
         }
         log.debug(idTranslationTable.toString());
     }
@@ -218,8 +236,11 @@ public class DataGenerator {
         }
     }
 
-    private static List<Entity> sprintList = null;  //team-member must be created after release
-    private static void generateEntity(ExcelReader reader, String sheetName, String agmAddress) {
+    private static Entities sprintList = null;  //team-member must be created after release
+    private static Map<String, String> featureMap = new HashMap<String, String>();
+
+    private static void generateEntity(ExcelReader reader, String sheetName) {
+        log.info("Generating entity: "+sheetName);
         Sheet sheet = reader.getSheet(sheetName);
         EntityIterator iterator = new EntityIterator(sheet);
         List<String> referenceColumns = iterator.getReferenceColumns();
@@ -230,167 +251,135 @@ public class DataGenerator {
         /**
          * Translates the IDs from excel to the ones used in AGM.
          */
-        while (iterator.hasNext()) {
-            Entity excelEntity = iterator.next();
-            // remember ID
-            Field idField = EntityTools.removeIdField(excelEntity);
-            String excelId = idField.getValue().getValue();
-            String originalEntityId = null;
-            if ("apmuiservice".equals(sheetName)) {
-                originalEntityId = EntityTools.getFieldValue(excelEntity, "id");
-            }
+        try {
+            while (iterator.hasNext()) {
+                Entity excelEntity = iterator.next();
+                excelEntity.setType(sheetName);
+                // remember ID
+                Field idField = EntityTools.removeIdField(excelEntity);
+                String excelId = idField.getValue().getValue();
 
-            // replace with references
-            for (String referenceId : referenceColumns) {
-                Field field = EntityTools.getField(excelEntity, referenceId);
-                if (field != null) { // skip translation if no id set (e.g. for root requirements)
-                    Value value = field.getValue();
-                    String excelValue = value.getValue();
-                    String newValue;
-                    if (excelValue.startsWith("Users#")) { // references to users are handled differently
-                        //todo make it configurable
-                        newValue = User.getUser(excelValue.substring("Users#".length())).getLogin();
-                    } else {
-                        newValue = idTranslationTable.get(excelValue);
-                    }
-                    if (newValue == null) {
-                        log.error("Cannot translate as the value not found in table: "+excelValue);
-                        // leave the original value
-                    } else {
-                        value.setValue(newValue); // set new value
-                    }
-                }
-            }
-            String agmId = null;
-            if ("release-backlog-item".equals(sheetName)) {
-                StringBuilder data = new StringBuilder();
-                List<Field> fields = excelEntity.getFields().getField();
-                String backlogId = fields.get(0).getValue().getValue();
-                String sprintId = fields.get(1).getValue().getValue();
-                String teamId = fields.get(2).getValue().getValue();
-                String owner = fields.get(3).getValue().getValue();
-                data.
-                        append("{\"entities\":[{\"Fields\":[{\"Name\":\"id\", \"values\":[{\"value\":\"").
-                        append(backlogId).
-                        append("\"}]},{\"Name\":\"sprint-id\", \"values\":[{\"value\":\"").
-                        append(sprintId).
-                        append("\"}]},{\"Name\":\"team-id\", \"values\":[{\"value\":\"").
-                        append(teamId).
-                        append("\"}]},{\"Name\":\"owner\", \"values\":[{\"value\":\"").
-                        append(owner).
-                        append("\"}]}], \"Type\":\"release-backlog-item\"}], \"TotalResults\":1}");
-                client.doPut(settings.getRestUrl() + "release-backlog-items", data.toString());
-            } else if ("apmuiservice".equals(sheetName)) {
-                RestClient.HttpResponse response = client.doRequest(agmAddress + EntityTools.toUrlParameters(excelEntity), (String) null, Method.POST, ContentType.JSON_JSON);
-                String returnValue = response.getResponse();
-                int startIndex = returnValue.indexOf("release-backlog-item_")+"release-backlog-item_".length();
-                int lastIndex = returnValue.indexOf("\"", startIndex);
-                agmId = returnValue.substring(startIndex, lastIndex);
-                String key= sheetName+"#"+originalEntityId;
-                String value = agmId;
-                log.debug("Storing: "+key+"="+value);
-                idTranslationTable.put(key, value);
-            } else {
-                if (sheetName.equals("release")) {
-                // todo an evil hack ; remove it -> handlers can resolve it
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    Field startDateField = EntityTools.getField(excelEntity, "start-date");
-                    Field endDateField = EntityTools.getField(excelEntity, "end-date");
-                    Date startDate = new Date(settings.getFirstBuildDate().getTime() + (Long.parseLong(startDateField.getValue().getValue()) * 24*60*60*1000));
-                    Date endDate = new Date(startDate.getTime() + (Long.parseLong(endDateField.getValue().getValue()) * 24*60*60*1000));
-
-                    startDateField.getValue().setValue(sdf.format(startDate));
-                    log.debug("Setting start of the release to: "+sdf.format(startDate));
-                    endDateField.getValue().setValue(sdf.format(endDate));
-                    log.debug("Setting end of the release to: "+sdf.format(endDate));
-                }
-                if (sheetName.equals("build-server")) {
-                    //todo an evil hack; remove it -> handles can resolve it
-                   buildServerName = EntityTools.getField(excelEntity, "name").getValue().getValue();
-                }
-                String data = EntityTools.toXml(excelEntity);
-//                if (sheetName.equals("release-backlog-item")) {
-                        // todo an evil hack ; remove it -> handlers can resolve it
-//                    client.doPut(agmAddress, data);
-//                } else
-            if (sheetName.equals("requirement")) {
-                        // todo an evil hack ; remove it -> handlers can resolve it
-                    RestClient.HttpResponse response = client.doRequest(settings.getRestUrl()+"apmuiservices/additemservice/createrequirementinrelease", excelEntity, Method.POST, ContentType.FORM_JSON);
-                    try {
-                        JSONObject returnValue = new JSONObject(response.getResponse());
-                        JSONArray entities = returnValue.getJSONArray("entities");
-                        assert entities.length() == 2;
-
-                        JSONArray requirementFields;
-                        JSONArray backlogItemFields;
-                        if ("requirement".equals(entities.getJSONObject(1).getString("Type"))) {
-                            requirementFields = entities.getJSONObject(1).getJSONArray("Fields");
-                            backlogItemFields = entities.getJSONObject(0).getJSONArray("Fields");
+                // replace with references
+                for (String referenceId : referenceColumns) {
+                    Field field = EntityTools.getField(excelEntity, referenceId);
+                    if (field != null) { // skip translation if no id set (e.g. for root requirements)
+                        Value value = field.getValue();
+                        String excelValue = value.getValue();
+                        String newValue;
+                        if (excelValue.startsWith("Users#")) { // references to users are handled differently
+                            //todo make it configurable
+                            newValue = User.getUser(excelValue.substring("Users#".length())).getLogin();
                         } else {
-                            requirementFields = entities.getJSONObject(0).getJSONArray("Fields");
-                            backlogItemFields = entities.getJSONObject(1).getJSONArray("Fields");
+                            newValue = idTranslationTable.get(excelValue);
                         }
+                        if (newValue == null) {
+                            log.error("Cannot translate as the value not found in table: "+excelValue);
+                            // leave the original value
+                        } else {
+                            value.setValue(newValue); // set new value
+                        }
+                    }
+                }
+                String agmId = null;
+                if ("release-backlog-item".equals(sheetName)) {
+                    EntityCRUDService CRUDservice = factory.getEntityCRUDService("release-backlog-item");
+                    List<Field> fields = excelEntity.getFields().getField();
+                    Map<String, Object> fieldValues = new HashMap<String, Object>(5);
+                    for (Field field : fields) {
+                        fieldValues.put(field.getName(), field.getValue().getValue());
+                    }
+                    org.hp.almjclient.model.marshallers.Entity agmEntity = new org.hp.almjclient.model.marshallers.Entity("release-backlog-item", fieldValues);
+                    CRUDservice.update(agmEntity);
+                } else {
+                    if (sheetName.equals("release")) {
+                    // todo an evil hack ; remove it -> handlers can resolve it
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        Field startDateField = EntityTools.getField(excelEntity, "start-date");
+                        Field endDateField = EntityTools.getField(excelEntity, "end-date");
+                        Date startDate = new Date(settings.getFirstBuildDate().getTime() + (Long.parseLong(startDateField.getValue().getValue()) * 24*60*60*1000));
+                        Date endDate = new Date(startDate.getTime() + (Long.parseLong(endDateField.getValue().getValue()) * 24*60*60*1000));
 
-                        //handle requirement
-                        for (int i = 0; i < requirementFields.length(); i++) {
-                            if ("id".equals(requirementFields.getJSONObject(i).getString("Name"))) {
-                                agmId = requirementFields.getJSONObject(i).getJSONArray("values").getJSONObject(0).getString("value");
-                                log.debug("Requirement ID: "+agmId);
-                                break;
+                        startDateField.getValue().setValue(sdf.format(startDate));
+                        log.debug("Setting start of the release to: "+sdf.format(startDate));
+                        endDateField.getValue().setValue(sdf.format(endDate));
+                        log.debug("Setting end of the release to: "+sdf.format(endDate));
+                    }
+                    if (sheetName.equals("build-server")) {
+                        //todo an evil hack; remove it -> handles can resolve it
+                       buildServerName = EntityTools.getField(excelEntity, "name").getValue().getValue();
+                    }
+                    if (sheetName.equals("requirement")) {
+                                // todo an evil hack ; remove it -> handlers can resolve it
+                        EntityCRUDService CRUDservice = factory.getEntityCRUDService("requirement");
+                        org.hp.almjclient.model.marshallers.Entity response = CRUDservice.create(EntityTools.convertEntity(excelEntity));
+                        agmId = response.getId().toString();
+
+                        Filter filter = new Filter("release-backlog-item");
+                        filter.addQueryClause("entity-id", agmId);
+                        CRUDservice = factory.getEntityCRUDService("release-backlog-item");
+                        org.hp.almjclient.model.marshallers.Entities entities = CRUDservice.readCollection(filter);
+                        org.hp.almjclient.model.marshallers.Entity backlogItem = entities.getEntityList().get(0);
+                        String backlogItemId = backlogItem.getId().toString();
+                        int typeId = EntityTools.getFieldIntValue(excelEntity, "type-id");
+                        if (typeId == 71) { // feature
+                            String themeId = EntityTools.getFieldValue(excelEntity, "parent-id");
+                            if (themeId != null) {
+                                featureMap.put(agmId, themeId);                                            // remember theme ID
                             }
-                        }
-                        if (agmId == null) {
-                            log.error("Requirement ID not returned!");
-                            throw new IllegalStateException("Requirement ID not returned! (in Excel: "+excelId+")");
+                            backlogItem.setFieldValue("theme-id", themeId);
+                            CRUDservice.update(backlogItem);                                           // update backlog item
+                        } else if (typeId == 70) { // user story
+                            String featureId = EntityTools.getFieldValue(excelEntity, "parent-id");
+                            String themeId = featureMap.get(featureId);                                // get theme ID
+                            backlogItem.setFieldValue("feature-id", featureId);
+                            backlogItem.setFieldValue("theme-id", themeId);
+                            CRUDservice.update(backlogItem);                                           // update backlog item
                         }
                         idTranslationTable.put(sheetName+"#"+excelId, agmId);
                         writeLogLine(sheetName, agmId);
-
                         if (firstReqId == 0) {   // remember req IDs
                             firstReqId = Integer.parseInt(agmId);
                             settings.setFirstRequirementNumber(firstReqId);
                             log.info("First requirement ID: "+firstReqId);
                         }
+                        idTranslationTable.put("apmuiservice#"+sheetName+"#"+excelId, backlogItemId );
+                    } else {
+                        EntityCRUDService CRUDservice = factory.getEntityCRUDService(sheetName);
+                        org.hp.almjclient.model.marshallers.Entity response = CRUDservice.create(EntityTools.convertEntity(excelEntity));
+                        agmId = response.getId().toString();
+                        if (sheetName.equals("defect")) {
+                            Filter filter = new Filter("release-backlog-item");
+                            filter.addQueryClause("entity-id", agmId);
+                            CRUDservice = factory.getEntityCRUDService("release-backlog-item");
+                            org.hp.almjclient.model.marshallers.Entities entities = CRUDservice.readCollection(filter);
+                            org.hp.almjclient.model.marshallers.Entity backlogItem = entities.getEntityList().get(0);
+                            String backlogItemId = backlogItem.getId().toString();
+                            idTranslationTable.put("apmuiservice#"+sheetName+"#"+excelId, backlogItemId );
 
-                        // handle backlog item
-                        String backlogItemId = null;
-                        for (int i = 0; i < backlogItemFields.length(); i++) {
-                            if ("id".equals(backlogItemFields.getJSONObject(i).getString("Name"))) {
-                                backlogItemId = backlogItemFields.getJSONObject(i).getJSONArray("values").getJSONObject(0).getString("value");
-                                log.debug("Backlog item ID: "+backlogItemId );
-                                break;
+                            if (firstDefId == 0) {
+                                // remember def IDs
+                                firstDefId = Integer.parseInt(agmId);
+                                settings.setFirstDefectNumber(firstDefId);
+                                log.info("First defect ID: "+firstDefId);
                             }
                         }
-                        if (backlogItemId == null) {
-                            log.error("Backlog item ID not returned!");
-                            throw new IllegalStateException("Backlog item ID not returned! (in Excel: "+excelId+")");
+                        idTranslationTable.put(sheetName+"#"+excelId, agmId);
+                        writeLogLine(sheetName, agmId);
+                        if (sheetName.equals("release")) {
+                            // todo an evil hack ; remove it -> handlers can resolve it
+                            sprintList = getSprints(agmId);
+                            learnSprints(sprintList);
                         }
-                        idTranslationTable.put("apmuiservice#"+sheetName+"#"+excelId, backlogItemId );
-
-                    } catch (JSONException e) {
-                        throw new IllegalStateException(e);
-                    }
-                } else {
-                    RestClient.HttpResponse response = client.doPost(agmAddress, data);
-                    Entity agmEntity = EntityTools.fromXml(response.getResponse());
-                    agmId = EntityTools.getFieldValue(agmEntity, "id");
-                    if (sheetName.equals("defect") && firstDefId == 0) {        // remember def IDs
-                        firstDefId = Integer.parseInt(agmId);
-                        settings.setFirstDefectNumber(firstDefId);
-                        log.info("First defect ID: "+firstDefId);
-                    }
-                    idTranslationTable.put(sheetName+"#"+excelId, agmId);
-                    writeLogLine(sheetName, agmId);
-                    if (sheetName.equals("release")) {
-                        // todo an evil hack ; remove it -> handlers can resolve it
-                        sprintList = getSprints(agmId);
-                        learnSprints(sprintList);
                     }
                 }
             }
-        }
-        if (sheetName.equals("team-member")) {  // once team-members are created, initialize sprints
-            initializeSprints(sprintList);
+            if (sheetName.equals("team-member")) {  // once team-members are created, initialize sprints
+                initializeSprints(sprintList);
+            }
+        } catch (RestClientException e) {
+            throw new IllegalStateException(e);
+        } catch (ALMRestException e) {
+            throw new IllegalStateException(e);
         }
     }
 
@@ -398,47 +387,31 @@ public class DataGenerator {
         log.info("Resolving Tenant ID, domain and project name...");
         User admin = User.getUser(settings.getAdmin());
 
-        RestClient.HttpResponse response;
+        String loginUrl;
         try {
-            String loginUrl = settings.getLoginUrl().replace("https://", "http://");
-            response = client.doGet(loginUrl);
-            loginUrl = response.getLocation().length() > 0 ? response.getLocation() : settings.getLoginUrl();
-            String loginContext = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/form[@id='loginForm']/@action");
-            settings.setLoginUrl(RestTools.getProtocolHost(loginUrl)+loginContext);
+            loginUrl = agmClient.resolveLoginUrl(settings.getLoginUrl());
         } catch (IllegalStateException e) {
             log.debug(e);
             log.error("Incorrect credentials or URL: " + admin.getLogin() + " / " + admin.getPassword());
             System.exit(-1);
+            throw e;         //will never be executed
         }
-        final String[][] data = {
-                { "username", admin.getLogin() },
-                { "password", admin.getPassword() }
-        };
-        response = client.doPost(settings.getLoginUrl(), data);
-        log.debug("Logged in to: " + settings.getLoginUrl());
-        String agmUrl = null;
-        String portalUrl = null;
+        settings.setLoginUrl(loginUrl);
+        String[] tenantProperties;
         try {
-            agmUrl = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
-            portalUrl = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[2]/@href");
+            tenantProperties = agmClient.login(loginUrl, admin);
         } catch (IllegalStateException e) {
             log.debug(e);
             log.error("Incorrect credentials or URL: " + admin.getLogin() + " / " + admin.getPassword());
             System.exit(-1);
+            throw e;        //will never be executed
         }
-        response = client.doGet(agmUrl);
-
-        Pattern p = Pattern.compile("^https?://([^/]+)/agm/webui/alm/([^/]+)/([^/]+)/apm/[^/]+/\\?TENANTID=(.+)$");
-        Matcher m = p.matcher(response.getLocation());
-        m.matches();
-        settings.setHost(m.group(1));
-        settings.setDomain(m.group(2));
-        settings.setProject(m.group(3));
-        settings.setTenantId(m.group(4));
-
-        settings.setRestUrl("https://" + settings.getHost() + "/qcbin/rest/domains/" + settings.getDomain() + "/projects/" + settings.getProject() + "/");
-        settings.setPortalUrl(RestTools.getProtocolHost(portalUrl));
-        log.debug("Portal URL: " + portalUrl);
+        settings.setHost(tenantProperties[0]);
+        settings.setDomain(tenantProperties[1]);
+        settings.setProject(tenantProperties[2]);
+        settings.setTenantId(tenantProperties[3]);
+        settings.setRestUrl(tenantProperties[4]);
+        settings.setPortalUrl(tenantProperties[5]);
     }
 
     public static void synchronizeAliDevBridge() {
@@ -462,78 +435,77 @@ public class DataGenerator {
 
     public static void configureAliDevBridge() {
         log.info("Configuring ALI Dev Bridge...");
-        final String[][] data = { { "bridge_url", settings.getAliDevBridgeUrl() } };
 
-        RestClient.HttpResponse response = client.doRequest(settings.getRestUrl() + "scm/dev-bridge/deployment-url", data, Method.POST, ContentType.NONE);
+        ServiceResourceAdapter adapter = factory.getServiceResourceAdapter();
+        try {
+            Map<String, String> headers = new HashMap<String, String>(1);
+            headers.put("INTERNAL_DATA", "20101021");
+            adapter.addSessionCookie("STATE="+"20101021");
+            adapter.postWithHeaders(String.class, settings.getRestUrl() + "scm/dev-bridge/deployment-url", "bridge_url=" + settings.getAliDevBridgeUrl(), headers, ServiceResourceAdapter.ContentType.NONE);
+        } catch (RestClientException e) {
+            throw new IllegalStateException(e);
+        } catch (ALMRestException e) {
+            throw new IllegalStateException(e);
+        }
         //todo check response code
     }
 
-    private static List<Entity> getSprints (String releaseId) {
+    private static Entities getSprints(String releaseId) throws ALMRestException, RestClientException {
         log.debug("Getting sprints of release " + releaseId + " ...");
-        RestClient.HttpResponse response = client.doGet(settings.getRestUrl() + "release-cycles?query={parent-id[" + releaseId + "]}&order-by={start-date[ASC]}&page-size=2000&start-index=1");
-        String xmlEntities = response.getResponse().substring("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>".length());
-        Entities sprintEntities;
-        try {
-            final JAXBContext context = JAXBContext.newInstance(Entities.class);
-            ByteArrayInputStream input = new ByteArrayInputStream(xmlEntities.getBytes());
-            Unmarshaller u = context.createUnmarshaller();
-            sprintEntities = (Entities) u.unmarshal(input);
-        } catch (JAXBException e) {
-            throw new IllegalStateException(e);
-        }
-        return sprintEntities.getEntity();
+        EntityCRUDService CRUDservice = factory.getEntityCRUDService("release-cycle");
+        Filter filter = new Filter("release-cycle");
+        filter.addQueryClause("parent-id", releaseId);
+        org.hp.almjclient.model.marshallers.Entities entities;
+        entities = CRUDservice.readCollection(filter);
+        return entities;
     }
 
-    public static void learnSprints(List<Entity> sprintList) {
+    public static void learnSprints(Entities sprintList) throws FieldNotFoundException {
         log.info("Learning created sprints...");
         int i = 1;
-        for (Entity sprint : sprintList) {
-            String id = EntityTools.getFieldValue(sprint, "id");
+        for (org.hp.almjclient.model.marshallers.Entity sprint : sprintList.getEntityList()) {
+            String id = sprint.getId().toString();
             idTranslationTable.put("sprint#"+i++, id);
             log.debug("Learning sprint id: "+id);
         }
     }
 
-    public static void initializeSprints(List<Entity> sprintList) {
-        log.debug("Initializing sprints...");
+    public static void initializeSprints(Entities entities) throws RestClientException, ALMRestException {
+        log.info("Initializing historical sprints...");
         // moving sprints from past to current and back will cause that All existing teams will be assigned to such sprints
         // such past sprints can be then assigned user stories and defect
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        for (Entity sprint : sprintList) {
-            String id = EntityTools.getFieldValue(sprint, "id");
+        for (org.hp.almjclient.model.marshallers.Entity sprint : entities.getEntityList()) {
+            String id = sprint.getId().toString();
             log.debug("Initializing sprint id: "+id);
 
-            String tense = EntityTools.getFieldValue(sprint, "tense");
+            String tense = sprint.getFieldValue("tense").getValue();
             assert tense != null;
             if ("PAST".equals(tense)) {
                 log.debug("Moving the sprint "+id+" to current and back again (to reset assigned teams)");
                 long now = System.currentTimeMillis();
-                long startDate = EntityTools.getFieldDateValue(sprint, "start-date", sdf).getTime();
-                long endDate = EntityTools.getFieldDateValue(sprint, "end-date", sdf).getTime();
+                long startDate;
+                long endDate;
+                try {
+                    startDate = sdf.parse(sprint.getFieldValue("start-date").getValue()).getTime();
+                    endDate = sdf.parse(sprint.getFieldValue("end-date").getValue()).getTime();
+                } catch (ParseException e) {
+                    throw new IllegalStateException(e);
+                }
                 long diff = now - startDate;
 
                 assert diff > 0;
-                StringBuilder data = new StringBuilder();
-                data.
-                        append("{\"entities\":[{\"Fields\":[{\"Name\":\"id\", \"values\":[{\"value\":\"").
-                        append(id).
-                        append("\"}]},{\"Name\":\"start-date\", \"values\":[{\"value\":\"").
-                        append(sdf.format(new Date(startDate + diff))).
-                        append("\"}]},{\"Name\":\"end-date\", \"values\":[{\"value\":\"").
-                        append(sdf.format(new Date(endDate + diff))).
-                        append("\"}]}], \"Type\":\"release-cycle\"}], \"TotalResults\":1}");
-                client.doPut(settings.getRestUrl() + "release-cycles", data.toString());
+                EntityCRUDService CRUDservice = factory.getEntityCRUDService("release-cycle");
+                Map<String, Object> fields = new HashMap<String, Object>(3);
+                fields.put("id", sprint.getId());
+                fields.put("start-date", sdf.format(new Date(startDate + diff)));
+                fields.put("end-date", sdf.format(new Date(endDate + diff)));
+                org.hp.almjclient.model.marshallers.Entity updatedSprint = new org.hp.almjclient.model.marshallers.Entity("release-cycle", fields);
+                CRUDservice.update(updatedSprint);
 
-                data.setLength(0);
-                data.
-                        append("{\"entities\":[{\"Fields\":[{\"Name\":\"id\", \"values\":[{\"value\":\"").
-                        append(id).
-                        append("\"}]},{\"Name\":\"start-date\", \"values\":[{\"value\":\"").
-                        append(sdf.format(new Date(startDate))).
-                        append("\"}]},{\"Name\":\"end-date\", \"values\":[{\"value\":\"").
-                        append(sdf.format(new Date(endDate))).
-                        append("\"}]}], \"Type\":\"release-cycle\"}], \"TotalResults\":1}");
-                client.doPut(settings.getRestUrl() + "release-cycles", data.toString());
+                updatedSprint.setFieldValue("start-date", sdf.format(new Date(startDate)));
+                updatedSprint.setFieldValue("end-date", sdf.format(new Date(endDate)));
+                CRUDservice.update(updatedSprint);
             }
         }
     }
@@ -601,18 +573,17 @@ public class DataGenerator {
                         "\", \"phone\":\"1\", \"email\":\""+user.getLogin()+
                         "\", \"timezone\":\"Europe/Prague\"}]}";
                 //todo there should be a simpler way to learn the URL than using getProtocolHost method
-                client.doPut(RestTools.getProtocolHost(settings.getRestUrl())+"/qcbin/rest/api/portal/users", formData);
-            } catch (IllegalStateException e) {
+                ServiceResourceAdapter adapter = factory.getServiceResourceAdapter();
+                Map<String, String> headers = new HashMap<String, String>(1);
+                headers.put("INTERNAL_DATA", "20120922");
+                adapter.addSessionCookie("STATE="+"20120922");
+                adapter.putWithHeaders(String.class, RestTools.getProtocolHost(settings.getRestUrl())+"/qcbin/rest/api/portal/users", formData, headers, ServiceResourceAdapter.ContentType.JSON);
+            } catch (ALMRestException e) {
+                log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
+            } catch (RestClientException e) {
                 log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
             }
         }
-    }
-
-    public static DevBridgeDownloader downloadDevBridge() {
-//        DevBridgeDownloader downloader = new DevBridgeDownloader(settings, client);
-//        client.doPost(settings.getRestUrl()+"scm/dev-bridge/bundle", null, downloader);  // /scm/dev-bridge - downloads only war file!
-//        return downloader;
-    return null;
     }
 
     public static final String DEV_BRIDGE_ZIP_ROOT = "\\DevBridge\\";

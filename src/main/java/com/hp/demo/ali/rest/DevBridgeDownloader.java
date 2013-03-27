@@ -16,13 +16,11 @@ public class DevBridgeDownloader implements AsyncHandler {
     private static Logger log = Logger.getLogger(DevBridgeDownloader.class.getName());
     private HttpURLConnection conn;
 
-    private final Settings settings;
     private final RestClient client; // to synchronize closing the connection
     private boolean downloaded = false;
     private String fileName = null;
 
-    public DevBridgeDownloader(Settings settings, RestClient client) {
-        this.settings = settings;
+    public DevBridgeDownloader(RestClient client) {
         this.client = client;
     }
 
