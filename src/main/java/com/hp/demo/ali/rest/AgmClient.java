@@ -69,10 +69,10 @@ public class AgmClient {
         tenantProperties[2] = m.group(3);   // project
         tenantProperties[3] = m.group(4);   // tenant ID
 
-        tenantProperties[4] = "https://" + tenantProperties[0] + "/qcbin/rest/domains/" + tenantProperties[1] + "/projects/" + tenantProperties[2] + "/";
+        tenantProperties[4] = "https://" + tenantProperties[0] + "/qcbin";
         tenantProperties[5] = RestTools.getProtocolHost(portalUrl);   // portal URL
 
-        restUrl = tenantProperties[4];
+        restUrl = tenantProperties[4] + "/rest/domains/" + tenantProperties[1] + "/projects/" + tenantProperties[2] + "/";
         return tenantProperties;
     }
 

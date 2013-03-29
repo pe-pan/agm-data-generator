@@ -75,7 +75,7 @@ public class DataGenerator {
             final ConnectionService connection = ConnectionManager.getConnection(CONNECTION_TIMEOUT, null, null);
             connection.setTenantId(Integer.parseInt(settings.getTenantId()));
             User admin = User.getUser(settings.getAdmin());
-            connection.connect(settings.getRestUrl().substring(0, 42), admin.getLogin(), admin.getPassword());
+            connection.connect(settings.getRestUrl(), admin.getLogin(), admin.getPassword());
             factory = connection.getProjectServicesFactory(settings.getDomain(), settings.getProject());
 
             DevBridgeDownloader downloader = null;
@@ -441,7 +441,7 @@ public class DataGenerator {
             Map<String, String> headers = new HashMap<String, String>(1);
             headers.put("INTERNAL_DATA", "20101021");
             adapter.addSessionCookie("STATE="+"20101021");
-            adapter.postWithHeaders(String.class, settings.getRestUrl() + "scm/dev-bridge/deployment-url", "bridge_url=" + settings.getAliDevBridgeUrl(), headers, ServiceResourceAdapter.ContentType.NONE);
+            adapter.postWithHeaders(String.class, factory.getProjectRestMetaData().getCollectionBaseUrl() + "scm/dev-bridge/deployment-url", "bridge_url=" + settings.getAliDevBridgeUrl(), headers, ServiceResourceAdapter.ContentType.NONE);
         } catch (RestClientException e) {
             throw new IllegalStateException(e);
         } catch (ALMRestException e) {
@@ -572,12 +572,11 @@ public class DataGenerator {
                         "\", \"lastName\":\""+user.getLastName()+
                         "\", \"phone\":\"1\", \"email\":\""+user.getLogin()+
                         "\", \"timezone\":\"Europe/Prague\"}]}";
-                //todo there should be a simpler way to learn the URL than using getProtocolHost method
                 ServiceResourceAdapter adapter = factory.getServiceResourceAdapter();
                 Map<String, String> headers = new HashMap<String, String>(1);
                 headers.put("INTERNAL_DATA", "20120922");
                 adapter.addSessionCookie("STATE="+"20120922");
-                adapter.putWithHeaders(String.class, RestTools.getProtocolHost(settings.getRestUrl())+"/qcbin/rest/api/portal/users", formData, headers, ServiceResourceAdapter.ContentType.JSON);
+                adapter.putWithHeaders(String.class, settings.getRestUrl()+"/rest/api/portal/users", formData, headers, ServiceResourceAdapter.ContentType.JSON);
             } catch (ALMRestException e) {
                 log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
             } catch (RestClientException e) {
