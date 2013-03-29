@@ -150,7 +150,7 @@ public class RepositoryMender {
                 repository.setRevisionPropertyValue(i, "svn:log", svnMessage);
                 repository.setRevisionPropertyValue(i, "svn:date", svnDate);
             } catch (SVNException e) {
-                new IllegalStateException(e);
+                throw new IllegalStateException(e);
             }
         }
     }
