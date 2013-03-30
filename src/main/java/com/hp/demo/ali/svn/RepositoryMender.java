@@ -48,7 +48,7 @@ public class RepositoryMender {
 
     public void mendRepository(Sheet sheet) {
         log.debug("Working on: "+sheet.getSheetName());
-        EntityIterator iterator = new EntityIterator(sheet);
+        EntityIterator<Entity> iterator = new EntityIterator<Entity>(sheet);
         while (iterator.hasNext()) {
             Entity entity =  iterator.next();
 

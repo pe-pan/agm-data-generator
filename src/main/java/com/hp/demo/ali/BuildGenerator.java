@@ -67,7 +67,7 @@ public class BuildGenerator {
 
     public void generate(Sheet sheet, List<Long> skipRevisions) {
         log.info("Generating builds...");
-        EntityIterator iterator = new EntityIterator(sheet);
+        EntityIterator<Entity> iterator = new EntityIterator<Entity>(sheet);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-'00'");
         try {
             while (iterator.hasNext()) {

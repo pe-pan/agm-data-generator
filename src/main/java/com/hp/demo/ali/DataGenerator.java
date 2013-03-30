@@ -1,10 +1,8 @@
 package com.hp.demo.ali;
 
+import com.hp.demo.ali.excel.AgmEntityIterator;
 import com.hp.demo.ali.rest.AgmClient;
-import com.hp.demo.ali.entity.Entity;
-import com.hp.demo.ali.entity.Field;
 import com.hp.demo.ali.entity.User;
-import com.hp.demo.ali.entity.Value;
 import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.DevBridgeDownloader;
@@ -22,6 +20,7 @@ import org.hp.almjclient.exceptions.EntityNotFoundException;
 import org.hp.almjclient.exceptions.FieldNotFoundException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entities;
+import org.hp.almjclient.model.marshallers.Entity;
 import org.hp.almjclient.model.marshallers.favorite.Filter;
 import org.hp.almjclient.services.ConnectionService;
 import org.hp.almjclient.services.EntityCRUDService;
@@ -111,7 +110,6 @@ public class DataGenerator {
                         } catch (EntityNotFoundException e) {
                             log.error("Cannot delete "+entityName+" with ID: "+agmId);
                         }
-                        //todo how to find out if the entity was really deleted?
                     }
                 } else {
                     log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
@@ -162,15 +160,15 @@ public class DataGenerator {
             String entityName = sheet.getSheetName();
             generateEntity(reader, entityName);
         }
-        log.debug(idTranslationTable.toString());
+        AgmEntityIterator.logReferences();
     }
 
     private static Sheet readUsers(ExcelReader reader) {
         log.info("Reading list of users...");
         Sheet users = reader.getSheet("Users");
-        EntityIterator iterator = new EntityIterator(users);
+        EntityIterator<com.hp.demo.ali.entity.Entity> iterator = new EntityIterator<com.hp.demo.ali.entity.Entity>(users);
         while (iterator.hasNext()) {
-            Entity userEntity = iterator.next();
+            com.hp.demo.ali.entity.Entity userEntity = iterator.next();
             String id = EntityTools.getFieldValue(userEntity, "id");
             String login = EntityTools.getFieldValue(userEntity, "login");
             String password = EntityTools.getFieldValue(userEntity, "password");
@@ -183,17 +181,16 @@ public class DataGenerator {
     }
 
     static List<Long> readSkippedRevisions(Sheet sheet) {
-        EntityIterator iterator = new EntityIterator(sheet);
+        EntityIterator<com.hp.demo.ali.entity.Entity> iterator = new EntityIterator<com.hp.demo.ali.entity.Entity>(sheet);
         List<Long> revisions = new LinkedList<Long>();
         while (iterator.hasNext()) {
-            Entity entity =  iterator.next();
+            com.hp.demo.ali.entity.Entity entity =  iterator.next();
             long revision = EntityTools.getFieldLongValue(entity, "revisions to skip");
             revisions.add(revision);
         }
         return revisions;
     }
 
-    private static Map<String, String> idTranslationTable = new HashMap<String, String>();
     static File jobLog = null;
 
     public static void writeLogLine(String entityName, String entityId) {
@@ -242,8 +239,7 @@ public class DataGenerator {
     private static void generateEntity(ExcelReader reader, String sheetName) {
         log.info("Generating entity: "+sheetName);
         Sheet sheet = reader.getSheet(sheetName);
-        EntityIterator iterator = new EntityIterator(sheet);
-        List<String> referenceColumns = iterator.getReferenceColumns();
+        AgmEntityIterator<Entity> iterator = new AgmEntityIterator<Entity>(sheet);
 
         int firstReqId = 0;
         int firstDefId = 0;
@@ -254,122 +250,83 @@ public class DataGenerator {
         try {
             while (iterator.hasNext()) {
                 Entity excelEntity = iterator.next();
-                excelEntity.setType(sheetName);
-                // remember ID
-                Field idField = EntityTools.removeIdField(excelEntity);
-                String excelId = idField.getValue().getValue();
-
-                // replace with references
-                for (String referenceId : referenceColumns) {
-                    Field field = EntityTools.getField(excelEntity, referenceId);
-                    if (field != null) { // skip translation if no id set (e.g. for root requirements)
-                        Value value = field.getValue();
-                        String excelValue = value.getValue();
-                        String newValue;
-                        if (excelValue.startsWith("Users#")) { // references to users are handled differently
-                            //todo make it configurable
-                            newValue = User.getUser(excelValue.substring("Users#".length())).getLogin();
-                        } else {
-                            newValue = idTranslationTable.get(excelValue);
-                        }
-                        if (newValue == null) {
-                            log.error("Cannot translate as the value not found in table: "+excelValue);
-                            // leave the original value
-                        } else {
-                            value.setValue(newValue); // set new value
-                        }
-                    }
-                }
                 String agmId = null;
                 if ("release-backlog-item".equals(sheetName)) {
                     EntityCRUDService CRUDservice = factory.getEntityCRUDService("release-backlog-item");
-                    List<Field> fields = excelEntity.getFields().getField();
-                    Map<String, Object> fieldValues = new HashMap<String, Object>(5);
-                    for (Field field : fields) {
-                        fieldValues.put(field.getName(), field.getValue().getValue());
-                    }
-                    org.hp.almjclient.model.marshallers.Entity agmEntity = new org.hp.almjclient.model.marshallers.Entity("release-backlog-item", fieldValues);
-                    CRUDservice.update(agmEntity);
+                    CRUDservice.update(excelEntity);
                 } else {
                     if (sheetName.equals("release")) {
                     // todo an evil hack ; remove it -> handlers can resolve it
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                        Field startDateField = EntityTools.getField(excelEntity, "start-date");
-                        Field endDateField = EntityTools.getField(excelEntity, "end-date");
-                        Date startDate = new Date(settings.getFirstBuildDate().getTime() + (Long.parseLong(startDateField.getValue().getValue()) * 24*60*60*1000));
-                        Date endDate = new Date(startDate.getTime() + (Long.parseLong(endDateField.getValue().getValue()) * 24*60*60*1000));
 
-                        startDateField.getValue().setValue(sdf.format(startDate));
+                        Date startDate = new Date(settings.getFirstBuildDate().getTime() + (Long.parseLong(excelEntity.getFieldValue("start-date").getValue()) * 24*60*60*1000));
                         log.debug("Setting start of the release to: "+sdf.format(startDate));
-                        endDateField.getValue().setValue(sdf.format(endDate));
+                        excelEntity.setFieldValue("start-date", sdf.format(startDate));
+
+                        Date endDate = new Date(startDate.getTime() + (Long.parseLong(excelEntity.getFieldValue("end-date").getValue()) * 24*60*60*1000));
                         log.debug("Setting end of the release to: "+sdf.format(endDate));
+                        excelEntity.setFieldValue("end-date", sdf.format(endDate));
                     }
                     if (sheetName.equals("build-server")) {
                         //todo an evil hack; remove it -> handles can resolve it
-                       buildServerName = EntityTools.getField(excelEntity, "name").getValue().getValue();
+                       buildServerName = excelEntity.getFieldValue("name").getValue();
                     }
+
+                    EntityCRUDService CRUDservice = factory.getEntityCRUDService(sheetName);
+                    Entity response = CRUDservice.create(excelEntity);
+                    agmId = response.getId().toString();
+                    iterator.putReferencePrefix(sheetName + "#", agmId);
+                    writeLogLine(sheetName, agmId);
+
                     if (sheetName.equals("requirement")) {
-                                // todo an evil hack ; remove it -> handlers can resolve it
-                        EntityCRUDService CRUDservice = factory.getEntityCRUDService("requirement");
-                        org.hp.almjclient.model.marshallers.Entity response = CRUDservice.create(EntityTools.convertEntity(excelEntity));
-                        agmId = response.getId().toString();
+                      // todo an evil hack ; remove it -> handlers can resolve it
 
                         Filter filter = new Filter("release-backlog-item");
                         filter.addQueryClause("entity-id", agmId);
                         CRUDservice = factory.getEntityCRUDService("release-backlog-item");
-                        org.hp.almjclient.model.marshallers.Entities entities = CRUDservice.readCollection(filter);
-                        org.hp.almjclient.model.marshallers.Entity backlogItem = entities.getEntityList().get(0);
+                        Entities entities = CRUDservice.readCollection(filter);
+                        Entity backlogItem = entities.getEntityList().get(0);
                         String backlogItemId = backlogItem.getId().toString();
-                        int typeId = EntityTools.getFieldIntValue(excelEntity, "type-id");
-                        if (typeId == 71) { // feature
-                            String themeId = EntityTools.getFieldValue(excelEntity, "parent-id");
+                        String typeId = excelEntity.getFieldValue("type-id").getValue();
+                        if ("71".equals(typeId)) { // feature
+                            String themeId = excelEntity.getFieldValue("parent-id").getValue();
                             if (themeId != null) {
                                 featureMap.put(agmId, themeId);                                            // remember theme ID
                             }
                             backlogItem.setFieldValue("theme-id", themeId);
                             CRUDservice.update(backlogItem);                                           // update backlog item
-                        } else if (typeId == 70) { // user story
-                            String featureId = EntityTools.getFieldValue(excelEntity, "parent-id");
+                        } else if ("70".equals(typeId)) { // user story
+                            String featureId = excelEntity.getFieldValue("parent-id").getValue();
                             String themeId = featureMap.get(featureId);                                // get theme ID
                             backlogItem.setFieldValue("feature-id", featureId);
                             backlogItem.setFieldValue("theme-id", themeId);
                             CRUDservice.update(backlogItem);                                           // update backlog item
                         }
-                        idTranslationTable.put(sheetName+"#"+excelId, agmId);
-                        writeLogLine(sheetName, agmId);
                         if (firstReqId == 0) {   // remember req IDs
                             firstReqId = Integer.parseInt(agmId);
                             settings.setFirstRequirementNumber(firstReqId);
                             log.info("First requirement ID: "+firstReqId);
                         }
-                        idTranslationTable.put("apmuiservice#"+sheetName+"#"+excelId, backlogItemId );
-                    } else {
-                        EntityCRUDService CRUDservice = factory.getEntityCRUDService(sheetName);
-                        org.hp.almjclient.model.marshallers.Entity response = CRUDservice.create(EntityTools.convertEntity(excelEntity));
-                        agmId = response.getId().toString();
-                        if (sheetName.equals("defect")) {
-                            Filter filter = new Filter("release-backlog-item");
-                            filter.addQueryClause("entity-id", agmId);
-                            CRUDservice = factory.getEntityCRUDService("release-backlog-item");
-                            org.hp.almjclient.model.marshallers.Entities entities = CRUDservice.readCollection(filter);
-                            org.hp.almjclient.model.marshallers.Entity backlogItem = entities.getEntityList().get(0);
-                            String backlogItemId = backlogItem.getId().toString();
-                            idTranslationTable.put("apmuiservice#"+sheetName+"#"+excelId, backlogItemId );
+                        iterator.putReferencePrefix("apmuiservice#" + sheetName + "#", backlogItemId);
+                    } else if (sheetName.equals("defect")) {
+                        Filter filter = new Filter("release-backlog-item");
+                        filter.addQueryClause("entity-id", agmId);
+                        CRUDservice = factory.getEntityCRUDService("release-backlog-item");
+                        Entities entities = CRUDservice.readCollection(filter);
+                        Entity backlogItem = entities.getEntityList().get(0);
+                        String backlogItemId = backlogItem.getId().toString();
+                        iterator.putReferencePrefix("apmuiservice#" + sheetName + "#", backlogItemId);
 
-                            if (firstDefId == 0) {
-                                // remember def IDs
-                                firstDefId = Integer.parseInt(agmId);
-                                settings.setFirstDefectNumber(firstDefId);
-                                log.info("First defect ID: "+firstDefId);
-                            }
+                        if (firstDefId == 0) {
+                            // remember def IDs
+                            firstDefId = Integer.parseInt(agmId);
+                            settings.setFirstDefectNumber(firstDefId);
+                            log.info("First defect ID: "+firstDefId);
                         }
-                        idTranslationTable.put(sheetName+"#"+excelId, agmId);
-                        writeLogLine(sheetName, agmId);
-                        if (sheetName.equals("release")) {
-                            // todo an evil hack ; remove it -> handlers can resolve it
-                            sprintList = getSprints(agmId);
-                            learnSprints(sprintList);
-                        }
+                    } else if (sheetName.equals("release")) {
+                        // todo an evil hack ; remove it -> handlers can resolve it
+                        sprintList = getSprints(agmId);
+                        learnSprints(sprintList);
                     }
                 }
             }
@@ -455,7 +412,7 @@ public class DataGenerator {
         EntityCRUDService CRUDservice = factory.getEntityCRUDService("release-cycle");
         Filter filter = new Filter("release-cycle");
         filter.addQueryClause("parent-id", releaseId);
-        org.hp.almjclient.model.marshallers.Entities entities;
+        Entities entities;
         entities = CRUDservice.readCollection(filter);
         return entities;
     }
@@ -463,9 +420,9 @@ public class DataGenerator {
     public static void learnSprints(Entities sprintList) throws FieldNotFoundException {
         log.info("Learning created sprints...");
         int i = 1;
-        for (org.hp.almjclient.model.marshallers.Entity sprint : sprintList.getEntityList()) {
+        for (Entity sprint : sprintList.getEntityList()) {
             String id = sprint.getId().toString();
-            idTranslationTable.put("sprint#"+i++, id);
+            AgmEntityIterator.putReference("sprint#", i++, id);
             log.debug("Learning sprint id: "+id);
         }
     }
@@ -475,7 +432,7 @@ public class DataGenerator {
         // moving sprints from past to current and back will cause that All existing teams will be assigned to such sprints
         // such past sprints can be then assigned user stories and defect
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        for (org.hp.almjclient.model.marshallers.Entity sprint : entities.getEntityList()) {
+        for (Entity sprint : entities.getEntityList()) {
             String id = sprint.getId().toString();
             log.debug("Initializing sprint id: "+id);
 
@@ -500,7 +457,7 @@ public class DataGenerator {
                 fields.put("id", sprint.getId());
                 fields.put("start-date", sdf.format(new Date(startDate + diff)));
                 fields.put("end-date", sdf.format(new Date(endDate + diff)));
-                org.hp.almjclient.model.marshallers.Entity updatedSprint = new org.hp.almjclient.model.marshallers.Entity("release-cycle", fields);
+                Entity updatedSprint = new Entity("release-cycle", fields);
                 CRUDservice.update(updatedSprint);
 
                 updatedSprint.setFieldValue("start-date", sdf.format(new Date(startDate)));

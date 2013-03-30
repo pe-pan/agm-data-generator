@@ -1,5 +1,7 @@
 package com.hp.demo.ali.entity;
 
+import com.hp.demo.ali.excel.AgmEntityIterator;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +39,7 @@ public class User {
 
     public void setLogin(String login) {
         this.login = login;
+        AgmEntityIterator.putReference("Users#" + id, login);
     }
 
     public void setPassword(String password) {
@@ -55,6 +58,7 @@ public class User {
 
     public static void addUser(User user) {
         users.put(user.getId(), user);
+        AgmEntityIterator.putReference("Users#" + user.getId(), user.getLogin());
     }
 
     public static User getUser(String userId) {
