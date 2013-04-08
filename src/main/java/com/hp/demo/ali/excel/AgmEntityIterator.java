@@ -47,7 +47,7 @@ public class AgmEntityIterator<E> extends EntityIterator implements Iterable, It
                     String originalValue = value;
                     value = idTranslationTable.get(value);
                     if (value == null) {
-                        log.error("Cannot translate as the value not found in table: "+originalValue);
+                        log.error("Cannot translate as the value not found in table; column: "+fieldName+"; value: "+originalValue);
                         value = originalValue;
                         // leave the original value
                     }
