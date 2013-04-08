@@ -94,7 +94,9 @@ public class DataGenerator {
                     if (!input.equals("yes")) {
                         System.exit(-1);
                     }
-                    downloader = agmClient.downloadDevBridge();
+                    if (settings.isGenerateBuilds()) {
+                        downloader = agmClient.downloadDevBridge();
+                    }
                     openLog();
                     String previousEntity = "";
                     for (String line = readLogLine(); line != null; line = readLogLine()) {
@@ -115,7 +117,9 @@ public class DataGenerator {
                     }
                 } else {
                     log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
-                    downloader = agmClient.downloadDevBridge();
+                    if (settings.isGenerateBuilds()) {
+                        downloader = agmClient.downloadDevBridge();
+                    }
                 }
                 if (settings.isAddUsers()) { // todo move this if out of [ if (settings.isGenerateProject()) ] condition
                     addUsers();
