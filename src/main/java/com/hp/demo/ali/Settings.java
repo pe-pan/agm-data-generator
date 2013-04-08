@@ -41,6 +41,7 @@ public class Settings {
     private String Host;
     private String domain;
     private String project;
+    private boolean generateHistory;
 
     private Settings(Sheet settings) {
         log.info("Reading settings...");
@@ -76,6 +77,7 @@ public class Settings {
         devBridgeFolder = SheetTools.getStringValue(settings, 23, 2);
         svnAgentFolder = SheetTools.getStringValue(settings, 24, 2);
         addUsers = "yes".equals(SheetTools.getStringValue(settings, 25, 2));
+        generateHistory = "yes".equals(SheetTools.getStringValue(settings, 26, 2));
     }
 
     public boolean isGenerateProject() {
@@ -244,5 +246,9 @@ public class Settings {
             throw new IllegalStateException("Settings not initialized!");
         }
         return settings;
+    }
+
+    public boolean isGenerateHistory() {
+        return generateHistory;
     }
 }

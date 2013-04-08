@@ -45,7 +45,9 @@ public class DataGenerator {
     private static org.hp.almjclient.services.impl.ProjectServicesFactory factory;
     private static BuildGenerator buildGenerator;
 
-    public static String buildServerName = "Hudson"; //todo should be set to null
+    public static String buildServerName;
+    public static Date releaseStartDate;
+
     private static final int CONNECTION_TIMEOUT = 600000;
 
     public static void main(String[] args) throws JAXBException, IOException {
@@ -120,6 +122,10 @@ public class DataGenerator {
                 }
 
                 generateProject(reader);
+            }
+            if (settings.isGenerateHistory()) {
+                HistoryGenerator historyGenerator = new HistoryGenerator(reader.getSheet("Work"), factory); //todo History is a reserved name in Excel
+                historyGenerator.generate();
             }
             if (settings.isGenerateBuilds()) {
                 List<Long>skippedRevisions = readSkippedRevisions(reader.getSheet("Skip-Revisions"));
@@ -259,11 +265,11 @@ public class DataGenerator {
                     // todo an evil hack ; remove it -> handlers can resolve it
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-                        Date startDate = new Date(settings.getFirstBuildDate().getTime() + (Long.parseLong(excelEntity.getFieldValue("start-date").getValue()) * 24*60*60*1000));
-                        log.debug("Setting start of the release to: "+sdf.format(startDate));
-                        excelEntity.setFieldValue("start-date", sdf.format(startDate));
+                        releaseStartDate = new Date(settings.getFirstBuildDate().getTime() + (Long.parseLong(excelEntity.getFieldValue("start-date").getValue()) * 24*60*60*1000));
+                        log.debug("Setting start of the release to: "+sdf.format(releaseStartDate));
+                        excelEntity.setFieldValue("start-date", sdf.format(releaseStartDate));
 
-                        Date endDate = new Date(startDate.getTime() + (Long.parseLong(excelEntity.getFieldValue("end-date").getValue()) * 24*60*60*1000));
+                        Date endDate = new Date(releaseStartDate.getTime() + (Long.parseLong(excelEntity.getFieldValue("end-date").getValue()) * 24*60*60*1000));
                         log.debug("Setting end of the release to: "+sdf.format(endDate));
                         excelEntity.setFieldValue("end-date", sdf.format(endDate));
                     }
@@ -316,6 +322,19 @@ public class DataGenerator {
                         Entity backlogItem = entities.getEntityList().get(0);
                         String backlogItemId = backlogItem.getId().toString();
                         iterator.putReferencePrefix("apmuiservice#" + sheetName + "#", backlogItemId);
+
+                        filter = new Filter("project-task");                                 // delete the automatically created task
+                        filter.addQueryClause("release-backlog-item-id", backlogItemId);
+                        CRUDservice = factory.getEntityCRUDService("project-task");
+                        Entities tasks = CRUDservice.readCollection(filter);
+                        List<Integer> taskIds = new ArrayList<Integer>(tasks.getEntityList().size());
+                        for (Entity entity : tasks.getEntityList()) {
+                            taskIds.add(entity.getId());
+                        }
+                        log.debug("Deleting all the by default created tasks. In total: "+taskIds.size());
+                        if (taskIds.size() > 0) {
+                            CRUDservice.delete("project-task", taskIds, true);
+                        }
 
                         if (firstDefId == 0) {
                             // remember def IDs
