@@ -43,6 +43,9 @@ public class AgmEntityIterator<E> extends EntityIterator implements Iterable, It
             String value = row[i];
             if (!NULL.equals(value)) {
                 String fieldName = fieldNames[i];
+                if (fieldName.charAt(0) == '_') {
+                    continue;
+                }
                 if (referenceColumns.contains(fieldName)) {  // dereference the value first
                     String originalValue = value;
                     value = idTranslationTable.get(value);

@@ -1,7 +1,9 @@
 package com.hp.demo.ali.excel;
 
+import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -11,6 +13,7 @@ import java.util.*;
  * Created by panuska on 10/18/12.
  */
 public class RowIterator<E> implements Iterable, Iterator {
+    private static Logger log = Logger.getLogger(RowIterator.class.getName());
 
     private Iterator<Row> iterator;
     private static DataFormatter formatter = new DataFormatter(true);
@@ -57,6 +60,11 @@ public class RowIterator<E> implements Iterable, Iterator {
     @Override
     public String[] next() {
         Row row = iterator.next();
+
+        while(row.getSheet().getWorkbook().getFontAt(row.getCell(row.getFirstCellNum()).getCellStyle().getFontIndex()).getBoldweight() == Font.BOLDWEIGHT_BOLD) {
+            log.debug("At sheet "+row.getSheet().getSheetName()+" skipping row number "+row.getRowNum());
+            row = iterator.next();   // todo if the very last row is bold, this result in exception!
+        }
 
         // initialize buffer
         int size = row.getLastCellNum(); // the very first line in the sheet must be full (contains all values)
