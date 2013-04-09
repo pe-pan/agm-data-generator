@@ -380,6 +380,7 @@ public class DataGenerator {
         } catch (IllegalStateException e) {
             log.debug(e);
             log.error("Incorrect credentials or URL: " + admin.getLogin() + " / " + admin.getPassword());
+            log.error("At: " + settings.getLoginUrl());
             System.exit(-1);
             throw e;         //will never be executed
         }
@@ -390,6 +391,7 @@ public class DataGenerator {
         } catch (IllegalStateException e) {
             log.debug(e);
             log.error("Incorrect credentials or URL: " + admin.getLogin() + " / " + admin.getPassword());
+            log.error("At: " + settings.getLoginUrl());
             System.exit(-1);
             throw e;        //will never be executed
         }
@@ -566,6 +568,9 @@ public class DataGenerator {
                 adapter.putWithHeaders(String.class, settings.getRestUrl()+"/rest/api/portal/users", formData, headers, ServiceResourceAdapter.ContentType.JSON);
             } catch (ALMRestException e) {
                 log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
+                String responseHtml = e.getResponse().getEntity(String.class);
+                String reason = responseHtml.substring(responseHtml.indexOf("<h1>")+"<h1>".length(), responseHtml.indexOf("</h1>")); //todo parse the HTML better way
+                log.error(reason);
             } catch (RestClientException e) {
                 log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
             }
