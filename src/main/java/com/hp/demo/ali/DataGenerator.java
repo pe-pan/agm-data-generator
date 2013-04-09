@@ -51,8 +51,8 @@ public class DataGenerator {
     private static final int CONNECTION_TIMEOUT = 600000;
 
     public static void main(String[] args) throws JAXBException, IOException {
-        if (args.length != 1 && args.length != 3) {
-            System.out.println("Usage: java -jar data-generator.jar excel-configuration-file.xlsx [admin_user_name admin_password]");
+        if (args.length < 1 || args.length > 4) {
+            System.out.println("Usage: java -jar agm-data-generator-1.01.jar excel-configuration-file.xlsx [tenant_URL] [admin_user_name admin_password]");
             System.out.println("       admin_user_name and admin_password are optional");
             System.out.println("       they overwrite the settings from excel configuration file");
             System.out.println();
@@ -66,10 +66,17 @@ public class DataGenerator {
             readUsers(reader);
             Settings.initSettings(reader.getSheet("Settings"));
             settings = Settings.getSettings();
-            if (args.length == 3) {
+            if (args.length == 2) {
+                settings.setLoginUrl(args[1]);
+            } else if (args.length == 3) {
                 User admin = User.getUser(settings.getAdmin());
                 admin.setLogin(args[1]);
                 admin.setPassword(args[2]);
+            } else if (args.length == 4) {
+                settings.setLoginUrl(args[1]);
+                User admin = User.getUser(settings.getAdmin());
+                admin.setLogin(args[2]);
+                admin.setPassword(args[3]);
             }
 
             resolveTenantUrl();
