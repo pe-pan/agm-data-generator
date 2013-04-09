@@ -564,7 +564,7 @@ public class DataGenerator {
                 ServiceResourceAdapter adapter = factory.getServiceResourceAdapter();
                 Map<String, String> headers = new HashMap<String, String>(1);
                 headers.put("INTERNAL_DATA", "20120922");
-                adapter.addSessionCookie("STATE="+"20120922");
+                adapter.addSessionCookie("AGM_STATE="+"20120922");
                 adapter.putWithHeaders(String.class, settings.getRestUrl()+"/rest/api/portal/users", formData, headers, ServiceResourceAdapter.ContentType.JSON);
             } catch (ALMRestException e) {
                 log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
