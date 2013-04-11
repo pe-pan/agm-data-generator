@@ -35,6 +35,7 @@ public class HistoryGenerator {
         AgmEntityIterator<Entity> iterator = new AgmEntityIterator<Entity>(sheet);
         long oldDate = -1;
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yy");
+        long shift = 0;
         try {
             while (iterator.hasNext()) {
                 Entity entity = iterator.next();
@@ -79,13 +80,26 @@ public class HistoryGenerator {
                 }
                 ServiceResourceAdapter adapter = factory.getServiceResourceAdapter();
                 for (; oldDate < date; oldDate++) {
-                    Date aggrDate = new Date(DataGenerator.releaseStartDate.getTime()+oldDate * 24*60*60*1000);
+                    Date aggrDate = new Date(DataGenerator.releaseStartDate.getTime()+(oldDate+shift) * 24*60*60*1000);
+                    if (shift == 0 && aggrDate.getDay() == 6) {  // once I found Saturday, shift to over weekend
+                        log.debug("Weekend found; we are not usually working on weekends...");  //todo does the algorithm really works fine? (I doubt...)
+                        log.debug("Calculating aggregation for date: "+sdf.format(aggrDate));
+                        adapter.get(String.class, factory.getProjectRestMetaData().getCollectionBaseUrl()+"internal/services/calculateAggregation/"+sdf.format(aggrDate));
+
+                        shift++;
+                        aggrDate = new Date(DataGenerator.releaseStartDate.getTime()+(oldDate+shift) * 24*60*60*1000);
+                        log.debug("Calculating aggregation for date: "+sdf.format(aggrDate));
+                        adapter.get(String.class, factory.getProjectRestMetaData().getCollectionBaseUrl()+"internal/services/calculateAggregation/"+sdf.format(aggrDate));
+
+                        shift++;
+                        aggrDate = new Date(DataGenerator.releaseStartDate.getTime()+(oldDate+shift) * 24*60*60*1000);
+                    }
                     log.debug("Calculating aggregation for date: "+sdf.format(aggrDate));
                     adapter.get(String.class, factory.getProjectRestMetaData().getCollectionBaseUrl()+"internal/services/calculateAggregation/"+sdf.format(aggrDate));
                 }
             }
             ServiceResourceAdapter adapter = factory.getServiceResourceAdapter();
-            for (; DataGenerator.releaseStartDate.getTime()+oldDate * 24*60*60*1000 < System.currentTimeMillis(); oldDate++) {
+            for (; DataGenerator.releaseStartDate.getTime()+(oldDate+shift) * 24*60*60*1000 < System.currentTimeMillis(); oldDate++) {
                 Date aggrDate = new Date(DataGenerator.releaseStartDate.getTime()+oldDate * 24*60*60*1000);
                 log.debug("Calculating aggregation for date: "+sdf.format(aggrDate));
                 adapter.get(String.class, factory.getProjectRestMetaData().getCollectionBaseUrl()+"internal/services/calculateAggregation/"+sdf.format(aggrDate));
