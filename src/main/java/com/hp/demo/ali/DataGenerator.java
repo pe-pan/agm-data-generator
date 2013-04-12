@@ -271,6 +271,50 @@ public class DataGenerator {
                 if ("release-backlog-item".equals(sheetName)) {
                     EntityCRUDService CRUDservice = factory.getEntityCRUDService("release-backlog-item");
                     CRUDservice.update(excelEntity);
+                } else if (sheetName.equals("defect")) {
+                    EntityCRUDService CRUDservice = factory.getEntityCRUDService(sheetName);
+                    String featureId = excelEntity.getFieldValue("parent-id").getValue();      // set feature/theme the defect belongs to
+
+                    excelEntity.removeField("parent-id");
+
+                    Entity response = CRUDservice.create(excelEntity);
+                    agmId = response.getId().toString();
+                    iterator.putReferencePrefix(sheetName + "#", agmId);
+                    writeLogLine(sheetName, agmId);
+
+                    Filter filter = new Filter("release-backlog-item");
+                    filter.addQueryClause("entity-id", agmId);
+                    CRUDservice = factory.getEntityCRUDService("release-backlog-item");
+                    Entities entities = CRUDservice.readCollection(filter);
+                    Entity backlogItem = entities.getEntityList().get(0);
+                    String backlogItemId = backlogItem.getId().toString();
+
+                    String themeId = featureMap.get(featureId);                                // get theme ID
+                    backlogItem.setFieldValue("feature-id", featureId);
+                    backlogItem.setFieldValue("theme-id", themeId);
+                    CRUDservice.update(backlogItem);                                           // update backlog item
+
+                    iterator.putReferencePrefix("apmuiservice#" + sheetName + "#", backlogItemId);
+
+                    filter = new Filter("project-task");                                 // delete the automatically created task
+                    filter.addQueryClause("release-backlog-item-id", backlogItemId);
+                    CRUDservice = factory.getEntityCRUDService("project-task");
+                    Entities tasks = CRUDservice.readCollection(filter);
+                    List<Integer> taskIds = new ArrayList<Integer>(tasks.getEntityList().size());
+                    for (Entity entity : tasks.getEntityList()) {
+                        taskIds.add(entity.getId());
+                    }
+                    log.debug("Deleting all the by default created tasks. In total: "+taskIds.size());
+                    if (taskIds.size() > 0) {
+                        CRUDservice.delete("project-task", taskIds, true);
+                    }
+
+                    if (firstDefId == 0) {
+                        // remember def IDs
+                        firstDefId = Integer.parseInt(agmId);
+                        settings.setFirstDefectNumber(firstDefId);
+                        log.info("First defect ID: "+firstDefId);
+                    }
                 } else {
                     if (sheetName.equals("release")) {
                     // todo an evil hack ; remove it -> handlers can resolve it
@@ -325,34 +369,6 @@ public class DataGenerator {
                             log.info("First requirement ID: "+firstReqId);
                         }
                         iterator.putReferencePrefix("apmuiservice#" + sheetName + "#", backlogItemId);
-                    } else if (sheetName.equals("defect")) {
-                        Filter filter = new Filter("release-backlog-item");
-                        filter.addQueryClause("entity-id", agmId);
-                        CRUDservice = factory.getEntityCRUDService("release-backlog-item");
-                        Entities entities = CRUDservice.readCollection(filter);
-                        Entity backlogItem = entities.getEntityList().get(0);
-                        String backlogItemId = backlogItem.getId().toString();
-                        iterator.putReferencePrefix("apmuiservice#" + sheetName + "#", backlogItemId);
-
-                        filter = new Filter("project-task");                                 // delete the automatically created task
-                        filter.addQueryClause("release-backlog-item-id", backlogItemId);
-                        CRUDservice = factory.getEntityCRUDService("project-task");
-                        Entities tasks = CRUDservice.readCollection(filter);
-                        List<Integer> taskIds = new ArrayList<Integer>(tasks.getEntityList().size());
-                        for (Entity entity : tasks.getEntityList()) {
-                            taskIds.add(entity.getId());
-                        }
-                        log.debug("Deleting all the by default created tasks. In total: "+taskIds.size());
-                        if (taskIds.size() > 0) {
-                            CRUDservice.delete("project-task", taskIds, true);
-                        }
-
-                        if (firstDefId == 0) {
-                            // remember def IDs
-                            firstDefId = Integer.parseInt(agmId);
-                            settings.setFirstDefectNumber(firstDefId);
-                            log.info("First defect ID: "+firstDefId);
-                        }
                     } else if (sheetName.equals("release")) {
                         // todo an evil hack ; remove it -> handlers can resolve it
                         sprintList = getSprints(agmId);
