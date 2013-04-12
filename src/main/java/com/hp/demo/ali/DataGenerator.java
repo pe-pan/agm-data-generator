@@ -466,7 +466,7 @@ public class DataGenerator {
     }
 
     public static void learnSprints(Entities sprintList) throws FieldNotFoundException {
-        log.info("Learning created sprints...");
+        log.info("Learning created sprints ("+sprintList.getEntityList().size()+")...");
         int i = 1;
         for (Entity sprint : sprintList.getEntityList()) {
             String id = sprint.getId().toString();
