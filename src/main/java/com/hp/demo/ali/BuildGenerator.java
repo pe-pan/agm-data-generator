@@ -1,5 +1,6 @@
 package com.hp.demo.ali;
 
+import com.hp.demo.ali.agm.BuildServerHandler;
 import com.hp.demo.ali.entity.Entity;
 import com.hp.demo.ali.entity.User;
 import com.hp.demo.ali.excel.EntityIterator;
@@ -115,7 +116,7 @@ public class BuildGenerator {
                     .replace("<almProject></almProject>", "<almProject>"+settings.getProject()+"</almProject>")
                     .replace("<almUsername></almUsername>", "<almUsername>"+User.getUser(settings.getAdmin()).getLogin()+"</almUsername>")
                     .replace("<almPassword></almPassword>", "<almPassword>"+ Scrambler.scramble(User.getUser(settings.getAdmin()).getPassword())+"</almPassword>")
-                    .replace("<almBuildServer></almBuildServer>", "<almBuildServer>"+DataGenerator.buildServerName+"</almBuildServer>");
+                    .replace("<almBuildServer></almBuildServer>", "<almBuildServer>"+ BuildServerHandler.getBuildServerName()+"</almBuildServer>");
             FileUtils.writeStringToFile(new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"config.xml"), config);
 
             FileUtils.writeStringToFile(

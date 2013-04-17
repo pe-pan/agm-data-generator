@@ -1,5 +1,14 @@
 package com.hp.demo.ali;
 
+import com.hp.demo.ali.agm.PlanBacklogItemHandler;
+import com.hp.demo.ali.agm.BuildServerHandler;
+import com.hp.demo.ali.agm.DefectHandler;
+import com.hp.demo.ali.agm.EntityHandler;
+import com.hp.demo.ali.agm.ReleaseHandler;
+import com.hp.demo.ali.agm.RequirementHandler;
+import com.hp.demo.ali.agm.SheetHandler;
+import com.hp.demo.ali.agm.SheetHandlerRegistry;
+import com.hp.demo.ali.agm.SprintListInitializer;
 import com.hp.demo.ali.excel.AgmEntityIterator;
 import com.hp.demo.ali.rest.AgmClient;
 import com.hp.demo.ali.entity.User;
@@ -17,18 +26,15 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.hp.almjclient.connection.ServiceResourceAdapter;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.EntityNotFoundException;
-import org.hp.almjclient.exceptions.FieldNotFoundException;
 import org.hp.almjclient.exceptions.RestClientException;
-import org.hp.almjclient.model.marshallers.Entities;
 import org.hp.almjclient.model.marshallers.Entity;
-import org.hp.almjclient.model.marshallers.favorite.Filter;
 import org.hp.almjclient.services.ConnectionService;
 import org.hp.almjclient.services.EntityCRUDService;
 import org.hp.almjclient.services.impl.ConnectionManager;
+import org.hp.almjclient.services.impl.ProjectServicesFactory;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -42,11 +48,10 @@ public class DataGenerator {
     private static Settings settings;
     private static AgmClient agmClient = AgmClient.getAgmClient();
 
-    private static org.hp.almjclient.services.impl.ProjectServicesFactory factory;
-    private static BuildGenerator buildGenerator;
+    private static ProjectServicesFactory factory;
+    private static SheetHandlerRegistry registry;
 
-    public static String buildServerName;
-    public static Date releaseStartDate;
+    private static BuildGenerator buildGenerator;
 
     private static final int CONNECTION_TIMEOUT = 600000;
 
@@ -172,7 +177,21 @@ public class DataGenerator {
 
     private static void generateProject(ExcelReader reader) {
         log.info("Generating project data...");
+        registry = new SheetHandlerRegistry(factory);
+        SheetHandler generalHandler = new EntityHandler();
         List<Sheet> entitySheets = reader.getAllEntitySheets();
+        for (Sheet sheet : entitySheets) {
+            String entityName = sheet.getSheetName();
+            registry.registerHandler(entityName, generalHandler);
+        }
+        // these specialized handlers will overwrite the handlers above for these specific entities
+        registry.registerHandler("release", new ReleaseHandler());
+        registry.registerHandler("requirement", new RequirementHandler());
+        registry.registerHandler("defect", new DefectHandler());
+        registry.registerHandler("release-backlog-item", new PlanBacklogItemHandler());
+        registry.registerHandler("build-server", new BuildServerHandler());
+        registry.registerHandler("team-member", new SprintListInitializer()); //once team members are known, the sprints should get initialized
+
         for (Sheet sheet : entitySheets) {
             String entityName = sheet.getSheetName();
             generateEntity(reader, entityName);
@@ -250,140 +269,25 @@ public class DataGenerator {
         }
     }
 
-    private static Entities sprintList = null;  //team-member must be created after release
-    private static Map<String, String> featureMap = new HashMap<String, String>();
-
     private static void generateEntity(ExcelReader reader, String sheetName) {
-        log.info("Generating entity: "+sheetName);
         Sheet sheet = reader.getSheet(sheetName);
         AgmEntityIterator<Entity> iterator = new AgmEntityIterator<Entity>(sheet);
 
-        int firstReqId = 0;
-        int firstDefId = 0;
-
-        /**
-         * Translates the IDs from excel to the ones used in AGM.
-         */
-        try {
-            while (iterator.hasNext()) {
-                Entity excelEntity = iterator.next();
-                String agmId = null;
-                if ("release-backlog-item".equals(sheetName)) {
-                    EntityCRUDService CRUDservice = factory.getEntityCRUDService("release-backlog-item");
-                    CRUDservice.update(excelEntity);
-                } else if (sheetName.equals("defect")) {
-                    EntityCRUDService CRUDservice = factory.getEntityCRUDService(sheetName);
-                    String featureId = excelEntity.getFieldValue("parent-id").getValue();      // set feature/theme the defect belongs to
-
-                    excelEntity.removeField("parent-id");
-
-                    Entity response = CRUDservice.create(excelEntity);
-                    agmId = response.getId().toString();
-                    iterator.putReferencePrefix(sheetName + "#", agmId);
-                    writeLogLine(sheetName, agmId);
-
-                    Filter filter = new Filter("release-backlog-item");
-                    filter.addQueryClause("entity-id", agmId);
-                    CRUDservice = factory.getEntityCRUDService("release-backlog-item");
-                    Entities entities = CRUDservice.readCollection(filter);
-                    Entity backlogItem = entities.getEntityList().get(0);
-                    String backlogItemId = backlogItem.getId().toString();
-
-                    String themeId = featureMap.get(featureId);                                // get theme ID
-                    backlogItem.setFieldValue("feature-id", featureId);
-                    backlogItem.setFieldValue("theme-id", themeId);
-                    CRUDservice.update(backlogItem);                                           // update backlog item
-
-                    iterator.putReferencePrefix("apmuiservice#" + sheetName + "#", backlogItemId);
-
-                    filter = new Filter("project-task");                                 // delete the automatically created task
-                    filter.addQueryClause("release-backlog-item-id", backlogItemId);
-                    CRUDservice = factory.getEntityCRUDService("project-task");
-                    Entities tasks = CRUDservice.readCollection(filter);
-                    List<Integer> taskIds = new ArrayList<Integer>(tasks.getEntityList().size());
-                    for (Entity entity : tasks.getEntityList()) {
-                        taskIds.add(entity.getId());
-                    }
-                    log.debug("Deleting all the by default created tasks. In total: "+taskIds.size());
-                    if (taskIds.size() > 0) {
-                        CRUDservice.delete("project-task", taskIds, true);
-                    }
-
-                    if (firstDefId == 0) {
-                        // remember def IDs
-                        firstDefId = Integer.parseInt(agmId);
-                        settings.setFirstDefectNumber(firstDefId);
-                        log.info("First defect ID: "+firstDefId);
-                    }
-                } else {
-                    if (sheetName.equals("release")) {
-                    // todo an evil hack ; remove it -> handlers can resolve it
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-                        releaseStartDate = new Date(settings.getFirstBuildDate().getTime() + (Long.parseLong(excelEntity.getFieldValue("start-date").getValue()) * 24*60*60*1000));
-                        log.debug("Setting start of the release to: "+sdf.format(releaseStartDate));
-                        excelEntity.setFieldValue("start-date", sdf.format(releaseStartDate));
-
-                        Date endDate = new Date(releaseStartDate.getTime() + (Long.parseLong(excelEntity.getFieldValue("end-date").getValue()) * 24*60*60*1000));
-                        log.debug("Setting end of the release to: "+sdf.format(endDate));
-                        excelEntity.setFieldValue("end-date", sdf.format(endDate));
-                    }
-                    if (sheetName.equals("build-server")) {
-                        //todo an evil hack; remove it -> handles can resolve it
-                       buildServerName = excelEntity.getFieldValue("name").getValue();
-                    }
-
-                    EntityCRUDService CRUDservice = factory.getEntityCRUDService(sheetName);
-                    Entity response = CRUDservice.create(excelEntity);
-                    agmId = response.getId().toString();
-                    iterator.putReferencePrefix(sheetName + "#", agmId);
-                    writeLogLine(sheetName, agmId);
-
-                    if (sheetName.equals("requirement")) {
-                      // todo an evil hack ; remove it -> handlers can resolve it
-
-                        Filter filter = new Filter("release-backlog-item");
-                        filter.addQueryClause("entity-id", agmId);
-                        CRUDservice = factory.getEntityCRUDService("release-backlog-item");
-                        Entities entities = CRUDservice.readCollection(filter);
-                        Entity backlogItem = entities.getEntityList().get(0);
-                        String backlogItemId = backlogItem.getId().toString();
-                        String typeId = excelEntity.getFieldValue("type-id").getValue();
-                        if ("71".equals(typeId)) { // feature
-                            String themeId = excelEntity.getFieldValue("parent-id").getValue();
-                            if (themeId != null) {
-                                featureMap.put(agmId, themeId);                                            // remember theme ID
-                            }
-                            backlogItem.setFieldValue("theme-id", themeId);
-                            CRUDservice.update(backlogItem);                                           // update backlog item
-                        } else if ("70".equals(typeId)) { // user story
-                            String featureId = excelEntity.getFieldValue("parent-id").getValue();
-                            String themeId = featureMap.get(featureId);                                // get theme ID
-                            backlogItem.setFieldValue("feature-id", featureId);
-                            backlogItem.setFieldValue("theme-id", themeId);
-                            CRUDservice.update(backlogItem);                                           // update backlog item
-                        }
-                        if (firstReqId == 0) {   // remember req IDs
-                            firstReqId = Integer.parseInt(agmId);
-                            settings.setFirstRequirementNumber(firstReqId);
-                            log.info("First requirement ID: "+firstReqId);
-                        }
-                        iterator.putReferencePrefix("apmuiservice#" + sheetName + "#", backlogItemId);
-                    } else if (sheetName.equals("release")) {
-                        // todo an evil hack ; remove it -> handlers can resolve it
-                        sprintList = getSprints(agmId);
-                        learnSprints(sprintList);
-                    }
+        SheetHandler handler = registry.getHandler(sheetName);
+        handler.init(sheetName);
+        while (iterator.hasNext()) {
+            Entity entity = iterator.next();
+            List<String> entityIds = handler.row(entity);
+            if (entityIds != null) {                                 // anything to add to the translation table?
+                Iterator<String> idIterator = entityIds.iterator();
+                while (idIterator.hasNext()) {                       // fill the translation table
+                    String prefix = idIterator.next();
+                    String agmId = idIterator.next();
+                    iterator.putReferencePrefix(prefix, agmId);
                 }
             }
-            if (sheetName.equals("team-member")) {  // once team-members are created, initialize sprints
-                initializeSprints(sprintList);
-            }
-        } catch (RestClientException e) {
-            throw new IllegalStateException(e);
-        } catch (ALMRestException e) {
-            throw new IllegalStateException(e);
         }
+        handler.terminate();
     }
 
     public static void resolveTenantUrl() {
@@ -453,66 +357,6 @@ public class DataGenerator {
             throw new IllegalStateException(e);
         }
         //todo check response code
-    }
-
-    private static Entities getSprints(String releaseId) throws ALMRestException, RestClientException {
-        log.debug("Getting sprints of release " + releaseId + " ...");
-        EntityCRUDService CRUDservice = factory.getEntityCRUDService("release-cycle");
-        Filter filter = new Filter("release-cycle");
-        filter.addQueryClause("parent-id", releaseId);
-        Entities entities;
-        entities = CRUDservice.readCollection(filter);
-        return entities;
-    }
-
-    public static void learnSprints(Entities sprintList) throws FieldNotFoundException {
-        log.info("Learning created sprints ("+sprintList.getEntityList().size()+")...");
-        int i = 1;
-        for (Entity sprint : sprintList.getEntityList()) {
-            String id = sprint.getId().toString();
-            AgmEntityIterator.putReference("sprint#", i++, id);
-            log.debug("Learning sprint id: "+id);
-        }
-    }
-
-    public static void initializeSprints(Entities entities) throws RestClientException, ALMRestException {
-        log.info("Initializing historical sprints...");
-        // moving sprints from past to current and back will cause that All existing teams will be assigned to such sprints
-        // such past sprints can be then assigned user stories and defect
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        for (Entity sprint : entities.getEntityList()) {
-            String id = sprint.getId().toString();
-            log.debug("Initializing sprint id: "+id);
-
-            String tense = sprint.getFieldValue("tense").getValue();
-            assert tense != null;
-            if ("PAST".equals(tense)) {
-                log.debug("Moving the sprint "+id+" to current and back again (to reset assigned teams)");
-                long now = System.currentTimeMillis();
-                long startDate;
-                long endDate;
-                try {
-                    startDate = sdf.parse(sprint.getFieldValue("start-date").getValue()).getTime();
-                    endDate = sdf.parse(sprint.getFieldValue("end-date").getValue()).getTime();
-                } catch (ParseException e) {
-                    throw new IllegalStateException(e);
-                }
-                long diff = now - startDate;
-
-                assert diff > 0;
-                EntityCRUDService CRUDservice = factory.getEntityCRUDService("release-cycle");
-                Map<String, Object> fields = new HashMap<String, Object>(3);
-                fields.put("id", sprint.getId());
-                fields.put("start-date", sdf.format(new Date(startDate + diff)));
-                fields.put("end-date", sdf.format(new Date(endDate + diff)));
-                Entity updatedSprint = new Entity("release-cycle", fields);
-                CRUDservice.update(updatedSprint);
-
-                updatedSprint.setFieldValue("start-date", sdf.format(new Date(startDate)));
-                updatedSprint.setFieldValue("end-date", sdf.format(new Date(endDate)));
-                CRUDservice.update(updatedSprint);
-            }
-        }
     }
 
     public static void addUsers() {
