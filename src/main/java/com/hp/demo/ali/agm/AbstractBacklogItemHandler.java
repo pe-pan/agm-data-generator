@@ -1,5 +1,6 @@
 package com.hp.demo.ali.agm;
 
+import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entities;
@@ -15,6 +16,7 @@ import java.util.Map;
  * Created by panuska on 4/16/13.
  */
 public abstract class AbstractBacklogItemHandler extends EntityHandler {
+    private static Logger log = Logger.getLogger(AbstractBacklogItemHandler.class.getName());
 
     protected Entity _backlogItem;
     protected String _backlogItemId;

@@ -10,8 +10,6 @@ import java.util.List;
  */
 abstract public class AbstractSheetHandler implements SheetHandler {
 
-    static Logger log = Logger.getLogger(SheetHandler.class.getName());
-
     protected String sheetName;
 
     @Override

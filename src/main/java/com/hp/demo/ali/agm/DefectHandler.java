@@ -1,6 +1,7 @@
 package com.hp.demo.ali.agm;
 
 import com.hp.demo.ali.Settings;
+import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entities;
@@ -15,6 +16,7 @@ import java.util.List;
  * Created by panuska on 4/16/13.
  */
 public class DefectHandler extends AbstractBacklogItemHandler {
+    private static Logger log = Logger.getLogger(DefectHandler.class.getName());
 
     private int firstDefId = 0;
 

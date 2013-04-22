@@ -1,5 +1,6 @@
 package com.hp.demo.ali.agm;
 
+import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
@@ -15,6 +16,8 @@ import java.util.Map;
  * Created by panuska on 4/16/13.
  */
 public class SprintListInitializer extends EntityHandler {
+    private static Logger log = Logger.getLogger(SprintListInitializer.class.getName());
+
     @Override
     public void terminate() {
         try {
