@@ -234,7 +234,7 @@ public class DataGenerator {
     public static void writeLogLine(String entityName, String entityId) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(jobLog, true));
-            writer.write(entityName+": "+entityId+"\n");
+            writer.write(entityName+": "+entityId+System.lineSeparator());
             writer.flush();
             writer.close();
         } catch (IOException e) {
