@@ -4,6 +4,7 @@ import com.hp.demo.ali.agm.PlanBacklogItemHandler;
 import com.hp.demo.ali.agm.BuildServerHandler;
 import com.hp.demo.ali.agm.DefectHandler;
 import com.hp.demo.ali.agm.EntityHandler;
+import com.hp.demo.ali.agm.ProjectTaskHandler;
 import com.hp.demo.ali.agm.ReleaseHandler;
 import com.hp.demo.ali.agm.RequirementHandler;
 import com.hp.demo.ali.agm.SheetHandler;
@@ -140,7 +141,7 @@ public class DataGenerator {
                 generateProject(reader);
             }
             if (settings.isGenerateHistory()) {
-                HistoryGenerator historyGenerator = new HistoryGenerator(reader.getSheet("Work"), factory); //todo History is a reserved name in Excel
+                HistoryGenerator historyGenerator = new HistoryGenerator(factory); //todo History is a reserved name in Excel
                 historyGenerator.generate();
             }
             if (settings.isGenerateBuilds()) {
@@ -191,6 +192,7 @@ public class DataGenerator {
         registry.registerHandler("release-backlog-item", new PlanBacklogItemHandler());
         registry.registerHandler("build-server", new BuildServerHandler());
         registry.registerHandler("team-member", new SprintListInitializer()); //once team members are known, the sprints should get initialized
+        registry.registerHandler("project-task", new ProjectTaskHandler());
 
         for (Sheet sheet : entitySheets) {
             String entityName = sheet.getSheetName();
