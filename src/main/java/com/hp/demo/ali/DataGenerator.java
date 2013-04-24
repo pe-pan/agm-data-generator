@@ -56,39 +56,97 @@ public class DataGenerator {
 
     private static final int CONNECTION_TIMEOUT = 600000;
 
+    private static void printUsage() {
+        System.out.println("Usage: java -jar agm-data-generator-1.01.jar [excel-configuration-file.xlsx] [generate-[u][p][h][b]] [tenant_URL] admin_user_name admin_password");
+        System.out.println("       excel-configuration-file.xlsx - data to generate the project from");
+        System.out.println("         - built-in file used if this parameter is not specified");
+        System.out.println("       generate-");
+        System.out.println("         u - adds (non-portal) users to the portal and project ");
+        System.out.println("         p - generate project data (entities)");
+        System.out.println("         h - generate history within past sprints ");
+        System.out.println("         b - generate builds + commits (ALI data)");
+        System.out.println("           - access to Hudson / SVN is necessary");
+        System.out.println("         - all the above is generated if no option is specified");
+        System.out.println("       tenant_URL - URL where the tenant is running");
+        System.out.println("         - https://gateway.saas.hp.com/msg/ if no URL is specified");
+        System.out.println("       admin_user_name and admin_password are the only mandatory options");
+        System.out.println();
+    }
+
     public static void main(String[] args) throws JAXBException, IOException {
-        if (args.length < 1 || args.length > 4) {
-            System.out.println("Usage: java -jar agm-data-generator-1.01.jar excel-configuration-file.xlsx [tenant_URL] [admin_user_name admin_password]");
-            System.out.println("       admin_user_name and admin_password are optional");
-            System.out.println("       they overwrite the settings from excel configuration file");
-            System.out.println();
+        if (args.length < 2 || args.length > 5) {
+            printUsage();
             System.exit(-1);
         }
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         long startTime = System.currentTimeMillis();
         log.info("Starting at: "+sdf.format(new Date(startTime)));
         try {
-            ExcelReader reader = new ExcelReader(args[0]);
+            int argIndex;
+            ExcelReader reader;
+            if (args.length > 2 && args[0].endsWith(".xlsx")) {
+                reader = new ExcelReader(new FileInputStream(args[0]));
+                log.info("Using configuration "+args[0]);
+                argIndex = 1;
+            } else {
+                reader = new ExcelReader(DataGenerator.class.getResourceAsStream("/data.xlsx")); // use built-in excel file
+                log.info("Using built-in configuration...");
+                argIndex = 0;
+            }
             readUsers(reader);
             Settings.initSettings(reader.getSheet("Settings"));
             settings = Settings.getSettings();
-            if (args.length == 2) {
-                settings.setLoginUrl(args[1]);
-            } else if (args.length == 3) {
-                User admin = User.getUser(settings.getAdmin());
-                admin.setLogin(args[1]);
-                admin.setPassword(args[2]);
-            } else if (args.length == 4) {
-                settings.setLoginUrl(args[1]);
-                User admin = User.getUser(settings.getAdmin());
-                admin.setLogin(args[2]);
-                admin.setPassword(args[3]);
+            for (int i = 0; i < 2; i++) {
+                if (args.length > 2+argIndex) {
+                    if (args[argIndex].startsWith("generate-")) {
+                        settings.setAddUsers(false);
+                        settings.setGenerateProject(false);
+                        settings.setGenerateHistory(false);
+                        settings.setGenerateBuilds(false);
+                        settings.setMeldRepository(false);
+                        for (int j = "generate-".length(); j < args[argIndex].length(); j++) {
+                            switch (args[argIndex].charAt(j)) {
+                                case 'u' :
+                                    settings.setAddUsers(true);
+                                    break;
+                                case 'p' :
+                                    settings.setGenerateProject(true);
+                                    break;
+                                case 'h' :
+                                    settings.setGenerateHistory(true);
+                                    break;
+                                case 'b' :
+                                    settings.setGenerateBuilds(true);
+                                    settings.setMeldRepository(true);
+                                    break;
+                                default:
+                                    System.out.println("Unknown parameter when using option generate: "+args[argIndex].charAt(j));
+                                    printUsage();
+                                    System.exit(-1);
+                            }
+                        }
+                        log.info(settings.isAddUsers() ? "Users will be added to the project..." : "No users will be added to the project...");
+                        log.info(settings.isGenerateProject() ? "Entities will be generated..." : "No entities will be generated...");
+                        log.info(settings.isGenerateHistory() ? "History will be generated..." : "No history wil be generated...");
+                        log.info(settings.isGenerateBuilds() ? "Builds and commits will be generated..." : "No builds/commits will be generated...");
+                    } else if (args[argIndex].startsWith("http")) {
+                        settings.setLoginUrl(args[1]);
+                    } else {
+                        System.out.println("Unclear argument "+args[argIndex]);
+                        System.out.println("Expecting either generate-[u][p][h][b] or http(s)://tenant_URL");
+                        printUsage();
+                        System.exit(-1);
+                    }
+                    argIndex++;
+                }
             }
+            User admin = User.getUser(settings.getAdmin());
+            admin.setLogin(args[argIndex++]);
+            admin.setPassword(args[argIndex]);
 
             resolveTenantUrl();
             final ConnectionService connection = ConnectionManager.getConnection(CONNECTION_TIMEOUT, null, null);
             connection.setTenantId(Integer.parseInt(settings.getTenantId()));
-            User admin = User.getUser(settings.getAdmin());
             connection.connect(settings.getRestUrl(), admin.getLogin(), admin.getPassword());
             factory = connection.getProjectServicesFactory(settings.getDomain(), settings.getProject());
 
@@ -134,14 +192,15 @@ public class DataGenerator {
                         downloader = agmClient.downloadDevBridge();
                     }
                 }
-                if (settings.isAddUsers()) { // todo move this if out of [ if (settings.isGenerateProject()) ] condition
-                    addUsers();
-                }
-
+            }
+            if (settings.isAddUsers()) {
+                addUsers();
+            }
+            if (settings.isGenerateProject()) {
                 generateProject(reader);
             }
             if (settings.isGenerateHistory()) {
-                HistoryGenerator historyGenerator = new HistoryGenerator(factory); //todo History is a reserved name in Excel
+                HistoryGenerator historyGenerator = new HistoryGenerator(factory);
                 historyGenerator.generate();
             }
             if (settings.isGenerateBuilds()) {
@@ -435,6 +494,19 @@ public class DataGenerator {
                 log.error(reason);
             } catch (RestClientException e) {
                 log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
+            }
+            String avatarPath = "/avatars/"+user.getId()+".jpg";
+            InputStream avatarPicture = DataGenerator.class.getResourceAsStream(avatarPath);
+            if (avatarPicture == null) {
+                log.error("Avatar picture not found at: "+avatarPath);
+            } else {
+                try {
+                    factory.getUserAvatarService().uploadAvatar(user.getLogin(), avatarPicture, "image/jpeg");
+                } catch (ALMRestException e) {
+                    log.error("Cannot set user avatar: "+user.getId(), e);
+                } catch (RestClientException e) {
+                    log.error("Cannot set user avatar: "+user.getId(), e);
+                }
             }
         }
     }

@@ -5,8 +5,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,9 +17,9 @@ public class ExcelReader {
 
     private Workbook workbook;
 
-    public ExcelReader(String workbookFile) {
+    public ExcelReader(InputStream workbookStream) {
         try {
-            workbook = WorkbookFactory.create(new FileInputStream(workbookFile));
+            workbook = WorkbookFactory.create(workbookStream);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         } catch (InvalidFormatException e) {

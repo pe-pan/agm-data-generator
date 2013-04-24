@@ -84,6 +84,10 @@ public class Settings {
         return generateProject;
     }
 
+    public void setGenerateProject(boolean generateProject) {
+        this.generateProject = generateProject;
+    }
+
     public String getEnvironment() {
         return environment;
     }
@@ -127,6 +131,10 @@ public class Settings {
         return meldRepository;
     }
 
+    public void setMeldRepository(boolean meldRepository) {
+        this.meldRepository = meldRepository;
+    }
+
     public String getSvnUrl() {
         return svnUrl;
     }
@@ -137,6 +145,10 @@ public class Settings {
 
     public boolean isGenerateBuilds() {
         return generateBuilds;
+    }
+
+    public void setGenerateBuilds(boolean generateBuilds) {
+        this.generateBuilds = generateBuilds;
     }
 
     public String getHudsonUrl() {
@@ -208,6 +220,10 @@ public class Settings {
         return addUsers;
     }
 
+    public void setAddUsers(boolean addUsers) {
+        this.addUsers = addUsers;
+    }
+
     public String getHost() {
         return Host;
     }
@@ -235,6 +251,14 @@ public class Settings {
         this.project = project;
     }
 
+    public boolean isGenerateHistory() {
+        return generateHistory;
+    }
+
+    public void setGenerateHistory(boolean generateHistory) {
+        this.generateHistory = generateHistory;
+    }
+
     private static Settings settings = null;
     public static void initSettings(Sheet settingsSheet) {
         settings = new Settings(settingsSheet);
@@ -248,7 +272,4 @@ public class Settings {
         return settings;
     }
 
-    public boolean isGenerateHistory() {
-        return generateHistory;
-    }
 }
