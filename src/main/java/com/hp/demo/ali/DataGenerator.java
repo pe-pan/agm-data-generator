@@ -130,7 +130,7 @@ public class DataGenerator {
                         log.info(settings.isGenerateHistory() ? "History will be generated..." : "No history wil be generated...");
                         log.info(settings.isGenerateBuilds() ? "Builds and commits will be generated..." : "No builds/commits will be generated...");
                     } else if (args[argIndex].startsWith("http")) {
-                        settings.setLoginUrl(args[1]);
+                        settings.setLoginUrl(args[argIndex]);
                     } else {
                         System.out.println("Unclear argument "+args[argIndex]);
                         System.out.println("Expecting either generate-[u][p][h][b] or http(s)://tenant_URL");
