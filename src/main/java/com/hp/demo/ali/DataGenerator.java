@@ -19,6 +19,7 @@ import com.hp.demo.ali.rest.DevBridgeDownloader;
 import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.rest.RestTools;
 import com.hp.demo.ali.tools.EntityTools;
+import com.hp.demo.ali.tools.XmlFile;
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -626,18 +627,13 @@ public class DataGenerator {
 
     public static void configureSvnAgent() {
         log.info("Configuring SVN agent...");
-        try {
-            File agentConfigFile = new File(settings.getSvnAgentFolder()+"\\config\\agent.xml");
-            String agentConfig = FileUtils.readFileToString(agentConfigFile);                    //todo not the quickest solution but easy to understand
-            agentConfig = agentConfig
-                    .replace("<AGM_HOST/QCBIN_URL_HERE>", "https://" + settings.getHost() + "/qcbin")   //todo should parse as XML and replace XML nodes
-                    .replace("<AGM_DOMAIN_HERE>", settings.getDomain())
-                    .replace("<AGM_PROJECT_HERE>", settings.getProject())
-                    .replace("<AGM_ADMIN_USER_NAME_HERE>", User.getUser(settings.getAdmin()).getLogin())
-                    .replace("<AGM_ADMIN_PASSWORD_HERE>", User.getUser(settings.getAdmin()).getPassword());
-            FileUtils.writeStringToFile(agentConfigFile, agentConfig);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        File agentConfigFile = new File(settings.getSvnAgentFolder()+"\\config\\agent.xml");
+        XmlFile file = new XmlFile(agentConfigFile);
+        file.setNodeValue("/AgentConfig/AGM/@url", settings.getRestUrl());
+        file.setNodeValue("/AgentConfig/Projects/Project/@domain", settings.getDomain());
+        file.setNodeValue("/AgentConfig/Projects/Project/@project", settings.getProject());
+        file.setNodeValue("/AgentConfig/Projects/Project/@username", User.getUser(settings.getAdmin()).getLogin());
+        file.setNodeValue("/AgentConfig/Projects/Project/@password", User.getUser(settings.getAdmin()).getPassword());
+        file.save(agentConfigFile);
     }
 }

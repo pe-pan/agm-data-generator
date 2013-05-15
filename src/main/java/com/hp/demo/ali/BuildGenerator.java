@@ -8,24 +8,15 @@ import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.svn.RepositoryMender;
 import com.hp.demo.ali.tools.EntityTools;
 import com.hp.demo.ali.tools.Scrambler;
+import com.hp.demo.ali.tools.XmlFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.*;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -109,15 +100,14 @@ public class BuildGenerator {
             FileUtils.copyFile(  // the new build needs to know SVN credentials
                     new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"subversion.credentials"),
                     new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"subversion.credentials"));
-            String config = FileUtils.readFileToString(new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"config.xml"));
-            config = config                                             //todo should parse as XML and replace XML nodes
-                    .replace("<almLocation></almLocation>", "<almLocation>https://" + settings.getHost() + "/qcbin</almLocation>")
-                    .replace("<almDomain></almDomain>", "<almDomain>" + settings.getDomain() + "</almDomain>")
-                    .replace("<almProject></almProject>", "<almProject>"+settings.getProject()+"</almProject>")
-                    .replace("<almUsername></almUsername>", "<almUsername>"+User.getUser(settings.getAdmin()).getLogin()+"</almUsername>")
-                    .replace("<almPassword></almPassword>", "<almPassword>"+ Scrambler.scramble(User.getUser(settings.getAdmin()).getPassword())+"</almPassword>")
-                    .replace("<almBuildServer></almBuildServer>", "<almBuildServer>"+ BuildServerHandler.getBuildServerName()+"</almBuildServer>");
-            FileUtils.writeStringToFile(new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"config.xml"), config);
+            XmlFile file = new XmlFile(new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"config.xml"));
+            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almLocation", settings.getRestUrl());
+            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almDomain", settings.getDomain());
+            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almProject", settings.getProject());
+            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almUsername", User.getUser(settings.getAdmin()).getLogin());
+            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almPassword", Scrambler.scramble(User.getUser(settings.getAdmin()).getPassword()));
+            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almBuildServer", BuildServerHandler.getBuildServerName());
+            file.save(new File(settings.getBuildFolder() + File.separator + settings.getJobName() + File.separator + "config.xml"));
 
             FileUtils.writeStringToFile(
                     new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"nextBuildNumber"),
@@ -144,45 +134,28 @@ public class BuildGenerator {
         return returnValue;
     }
 
-
     private static final String BUILD_XML = "build.xml";
     private static final String MAVEN_XML_PREF = "maven-build-";
 
     private String correctBuildFile(File buildXmlFile, UUID buildId, int buildNumber, int totalLines, int coveredLines,
                                     int totalTests, int skippedTests, int failedTests, String status, int duration, long revisionFrom, long revisionTo, long[] skip, String svnUrl) {
         log.debug("Setting the build id into: " + buildId + " and build number into: " + buildNumber);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        Document document = null;
-        try {
-            document = dbf.newDocumentBuilder().parse(buildXmlFile);
+        XmlFile file = new XmlFile(buildXmlFile);
 
-            String oldBuildId = setNodeValue(document, "//build/actions/maven-build-record/id/text()", buildId.toString());
-            setNodeValue(document, "/build/actions/com.hp.alm.ali.hudson.BuildAction/codeCoverage/result/total/text()", totalLines);
-            setNodeValue(document, "//build/actions/com.hp.alm.ali.hudson.BuildAction/codeCoverage/result/covered/text()", coveredLines);
-            setNodeValue(document, "//build/actions/com.hp.alm.ali.hudson.BuildAction/testResults/result/total/text()", totalTests);
-            setNodeValue(document, "//build/actions/com.hp.alm.ali.hudson.BuildAction/testResults/result/failed/text()", failedTests);
-            setNodeValue(document, "//build/actions/com.hp.alm.ali.hudson.BuildAction/testResults/result/skipped/text()", skippedTests);
-            setNodeValue(document, "//build/number/text()", buildNumber);
-            setNodeValue(document, "//build/result/text()", status);
-            setNodeValue(document, "//build/duration/text()", duration);
-            generateRevisionNodes(document, revisionFrom, revisionTo, skip);
-            setNodeValue(document, "//build/actions/com.hp.alm.ali.hudson.BuildAction/codeChanges/changes/repositoryChanges/element/id/text()", svnUrl);
-            setNodeValue(document, "//build/actions/com.hp.alm.ali.hudson.BuildAction/codeChanges/changes/repositoryChanges/element/location/text()", svnUrl);
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer t = tf.newTransformer();
-            t.transform(new DOMSource(document), new StreamResult(new FileOutputStream(buildXmlFile)));
-            return oldBuildId;
-        } catch (SAXException e) {
-            throw new IllegalStateException(e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } catch (ParserConfigurationException e) {
-            throw new IllegalStateException(e);
-        } catch (TransformerConfigurationException e) {
-            throw new IllegalStateException(e);
-        } catch (TransformerException e) {
-            throw new IllegalStateException(e);
-        }
+        String oldBuildId = file.setNodeValue("//build/actions/maven-build-record/id/text()", buildId.toString());
+        file.setNodeValue("/build/actions/com.hp.alm.ali.hudson.BuildAction/codeCoverage/result/total/text()", totalLines);
+        file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/codeCoverage/result/covered/text()", coveredLines);
+        file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/testResults/result/total/text()", totalTests);
+        file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/testResults/result/failed/text()", failedTests);
+        file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/testResults/result/skipped/text()", skippedTests);
+        file.setNodeValue("//build/number/text()", buildNumber);
+        file.setNodeValue("//build/result/text()", status);
+        file.setNodeValue("//build/duration/text()", duration);
+        generateRevisionNodes(file.getDocument(), revisionFrom, revisionTo, skip);
+        file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/codeChanges/changes/repositoryChanges/element/id/text()", svnUrl);
+        file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/codeChanges/changes/repositoryChanges/element/location/text()", svnUrl);
+        file.save(buildXmlFile);
+        return oldBuildId;
     }
 
     private static XPathFactory xpf = XPathFactory.newInstance();
@@ -227,22 +200,6 @@ public class BuildGenerator {
         Node revToNode = (Node) expression.evaluate(revisionChangeNode, XPathConstants.NODE);
         revToNode.setTextContent(Long.toString(revisionTo));
         return true;
-    }
-
-    private String setNodeValue(Document document, String xpathString, String value) {
-        try {
-            XPathExpression expression = xpath.compile(xpathString);
-            Node node = (Node) expression.evaluate(document, XPathConstants.NODE);
-            String oldValue = node.getTextContent();
-            node.setTextContent(value);
-            return oldValue;
-        } catch (XPathExpressionException e) {
-            throw new IllegalStateException("Exception when compiling xpath " + xpathString + " in document " + document.getDocumentURI(), e);
-        }
-    }
-
-    private String setNodeValue(Document document, String xpathString, long value) {
-        return setNodeValue(document, xpathString, Long.toString(value));
     }
 
     public void createJob() {
