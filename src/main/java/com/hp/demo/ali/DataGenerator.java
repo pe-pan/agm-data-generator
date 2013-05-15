@@ -58,7 +58,7 @@ public class DataGenerator {
     private static final int CONNECTION_TIMEOUT = 600000;
 
     private static void printUsage() {
-        System.out.println("Usage: java -jar agm-data-generator-1.01.jar [excel-configuration-file.xlsx] [generate-[u][p][h][b]] [tenant_URL] admin_user_name admin_password");
+        System.out.println("Usage: java -jar agm-data-generator.jar [excel-configuration-file.xlsx] [generate-[u][p][h][b]] [tenant_URL] admin_user_name admin_password");
         System.out.println("       excel-configuration-file.xlsx - data to generate the project from");
         System.out.println("         - built-in file used if this parameter is not specified");
         System.out.println("       generate-");
