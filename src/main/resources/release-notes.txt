@@ -1,0 +1,36 @@
+Release Notes:
+==============
+
+Version 1.02:
+-------------
+Generated data changes:
+  - Release renamed into: "HP Media Store 2.0"
+  - Build renamed into: "MediaStore"
+  - Last 15 builds are more linked to user stories than defects
+  - Story points of several backlog items were decreased
+
+Technical enhancements and bug fixes
+
+Version 1.01:
+-------------
+Added features:
+  - History is being generated
+  - Support for Applications
+  - Define Themes / Features for defects
+  - Team-action / Retrospective are being generated
+  - Skip certain Excel columns / rows (good for metadata)
+
+Technical enhancements:
+  - AgM REST Client library is used
+  - Excel sheet is built-in in the tool itself
+
+Version 1.00:
+-------------
+Introduced features:
+  - Generate AgM entities
+  - Generate Hudson builds
+  - Generate SVN commits
+  - Configure Hudson job
+  - Configure SVN agent
+  - Download DevBridge
+  - Write job log / delete entities from previous run
