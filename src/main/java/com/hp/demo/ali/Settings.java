@@ -42,6 +42,7 @@ public class Settings {
     private String domain;
     private String project;
     private boolean generateHistory;
+    private String solutionName;
 
     private Settings(Sheet settings) {
         log.info("Reading settings...");
@@ -257,6 +258,14 @@ public class Settings {
 
     public void setGenerateHistory(boolean generateHistory) {
         this.generateHistory = generateHistory;
+    }
+
+    public String getSolutionName() {
+        return solutionName;
+    }
+
+    public void setSolutionName(String solutionName) {
+        this.solutionName = solutionName;
     }
 
     private static Settings settings = null;

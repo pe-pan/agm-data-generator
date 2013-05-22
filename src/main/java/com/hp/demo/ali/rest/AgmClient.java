@@ -1,5 +1,6 @@
 package com.hp.demo.ali.rest;
 
+import com.hp.demo.ali.Settings;
 import com.hp.demo.ali.entity.User;
 import org.apache.log4j.Logger;
 
@@ -56,8 +57,10 @@ public class AgmClient {
         RestClient.HttpResponse response;
         response = client.doPost(loginUrl, data);
         log.debug("Logged in to: " + loginUrl);
-        String agmUrl = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href");
-        String portalUrl = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[2]/@href");
+        String solutionName = Settings.getSettings().getSolutionName();
+        String agmUrl = RestTools.extractString(response.getResponse(),
+                solutionName != null ? "//div[@id='wrapper']/div[@class='container'][1]/div/a[span='"+solutionName+"']/@href" : "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href" );
+        String portalUrl = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[span='Customer Portal']/@href");
         response = client.doGet(agmUrl);
 
         Pattern p = Pattern.compile("^https?://([^/]+)/agm/webui/alm/([^/]+)/([^/]+)/apm/[^/]+/\\?TENANTID=(.+)$");

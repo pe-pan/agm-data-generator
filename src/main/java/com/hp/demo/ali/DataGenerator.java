@@ -58,24 +58,31 @@ public class DataGenerator {
     private static final int CONNECTION_TIMEOUT = 600000;
 
     private static void printUsage() {
-        System.out.println("Usage: java -jar agm-data-generator.jar [excel-configuration-file.xlsx] [generate-[u][p][h][b]] [tenant_URL] admin_user_name admin_password");
-        System.out.println("       excel-configuration-file.xlsx - data to generate the project from");
+        System.out.println("Usage: java -jar agm-data-generator.jar [excel-configuration-file.xlsx] [--generate-[u][p][h][b]] [URL] [--solution-name=solution_name] admin_user_name admin_password");
+        System.out.println("       excel-configuration-file.xlsx");
+        System.out.println("         - data to generate the project from");
         System.out.println("         - built-in file used if this parameter is not specified");
-        System.out.println("       generate-");
-        System.out.println("         u - adds (non-portal) users to the portal and project ");
+        System.out.println("         - provide as the first parameter!");
+        System.out.println("       --generate-");
+        System.out.println("         u - adds (non-portal) users to the portal and project");
         System.out.println("         p - generate project data (entities)");
         System.out.println("         h - generate history within past sprints ");
         System.out.println("         b - generate builds + commits (ALI data)");
         System.out.println("           - access to Hudson / SVN is necessary");
         System.out.println("         - all the above is generated if no option is specified");
-        System.out.println("       tenant_URL - URL where the tenant is running");
+        System.out.println("       --solution-name=");
+        System.out.println("         - name of the solution (handy when having more solutions)");
+        System.out.println("         - first solution is used when nothing specified");
+        System.out.println("       URL");
+        System.out.println("         - URL where to login");
         System.out.println("         - https://gateway.saas.hp.com/msg/ if no URL is specified");
         System.out.println("       admin_user_name and admin_password are the only mandatory options");
+        System.out.println("         - always provide as the very last parameters");
         System.out.println();
     }
 
     public static void main(String[] args) throws JAXBException, IOException {
-        if (args.length < 2 || args.length > 5) {
+        if (args.length < 2 || args.length > 6) {
             printUsage();
             System.exit(-1);
         }
@@ -97,15 +104,15 @@ public class DataGenerator {
             readUsers(reader);
             Settings.initSettings(reader.getSheet("Settings"));
             settings = Settings.getSettings();
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 3; i++) {
                 if (args.length > 2+argIndex) {
-                    if (args[argIndex].startsWith("generate-")) {
+                    if (args[argIndex].startsWith("--generate-")) {
                         settings.setAddUsers(false);
                         settings.setGenerateProject(false);
                         settings.setGenerateHistory(false);
                         settings.setGenerateBuilds(false);
                         settings.setMeldRepository(false);
-                        for (int j = "generate-".length(); j < args[argIndex].length(); j++) {
+                        for (int j = "--generate-".length(); j < args[argIndex].length(); j++) {
                             switch (args[argIndex].charAt(j)) {
                                 case 'u' :
                                     settings.setAddUsers(true);
@@ -132,6 +139,9 @@ public class DataGenerator {
                         log.info(settings.isGenerateBuilds() ? "Builds and commits will be generated..." : "No builds/commits will be generated...");
                     } else if (args[argIndex].startsWith("http")) {
                         settings.setLoginUrl(args[argIndex]);
+                    } else if (args[argIndex].startsWith("--solution-name=")) {
+                        settings.setSolutionName(args[argIndex].substring("--solution-name=".length()));
+                        log.info("Solution being populated: "+settings.getSolutionName());
                     } else {
                         System.out.println("Unclear argument "+args[argIndex]);
                         System.out.println("Expecting either generate-[u][p][h][b] or http(s)://tenant_URL");
