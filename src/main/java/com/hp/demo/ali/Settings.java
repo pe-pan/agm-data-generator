@@ -43,6 +43,7 @@ public class Settings {
     private String project;
     private boolean generateHistory;
     private String solutionName;
+    private boolean forceDelete;
 
     private Settings(Sheet settings) {
         log.info("Reading settings...");
@@ -77,8 +78,9 @@ public class Settings {
         aliDevBridgeUrl = SheetTools.getStringValue(settings, 22, 2);
         devBridgeFolder = SheetTools.getStringValue(settings, 23, 2);
         svnAgentFolder = SheetTools.getStringValue(settings, 24, 2);
-        addUsers = "yes".equals(SheetTools.getStringValue(settings, 25, 2));
-        generateHistory = "yes".equals(SheetTools.getStringValue(settings, 26, 2));
+        forceDelete = "yes".equals(SheetTools.getStringValue(settings, 25, 2));
+        addUsers = "yes".equals(SheetTools.getStringValue(settings, 26, 2));
+        generateHistory = "yes".equals(SheetTools.getStringValue(settings, 27, 2));
     }
 
     public boolean isGenerateProject() {
@@ -266,6 +268,14 @@ public class Settings {
 
     public void setSolutionName(String solutionName) {
         this.solutionName = solutionName;
+    }
+
+    public boolean isForceDelete() {
+        return forceDelete;
+    }
+
+    public void setForceDelete(boolean forceDelete) {
+        this.forceDelete = forceDelete;
     }
 
     private static Settings settings = null;

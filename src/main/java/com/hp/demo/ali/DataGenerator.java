@@ -58,7 +58,7 @@ public class DataGenerator {
     private static final int CONNECTION_TIMEOUT = 600000;
 
     private static void printUsage() {
-        System.out.println("Usage: java -jar agm-data-generator.jar [excel-configuration-file.xlsx] [--generate-[u][p][h][b]] [URL] [--solution-name=solution_name] admin_user_name admin_password");
+        System.out.println("Usage: java -jar agm-data-generator.jar [excel-configuration-file.xlsx] [--generate-[u][p][h][b]] [URL] [--solution-name=solution_name] [--force-delete] admin_user_name admin_password");
         System.out.println("       excel-configuration-file.xlsx");
         System.out.println("         - data to generate the project from");
         System.out.println("         - built-in file used if this parameter is not specified");
@@ -73,6 +73,8 @@ public class DataGenerator {
         System.out.println("       --solution-name=");
         System.out.println("         - name of the solution (handy when having more solutions)");
         System.out.println("         - first solution is used when nothing specified");
+        System.out.println("       --force-delete");
+        System.out.println("         - do not ask for permission to delete previous data");
         System.out.println("       URL");
         System.out.println("         - URL where to login");
         System.out.println("         - https://gateway.saas.hp.com/msg/ if no URL is specified");
@@ -82,7 +84,7 @@ public class DataGenerator {
     }
 
     public static void main(String[] args) throws JAXBException, IOException {
-        if (args.length < 2 || args.length > 6) {
+        if (args.length < 2 || args.length > 7) {    // todo 7 is the current number of possible arguments (make it more robust)
             printUsage();
             System.exit(-1);
         }
@@ -104,7 +106,7 @@ public class DataGenerator {
             readUsers(reader);
             Settings.initSettings(reader.getSheet("Settings"));
             settings = Settings.getSettings();
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 4; i++) {   // todo 4 is the current number of optional arguments (configuration file, user credentials are not optional; make it more robust)
                 if (args.length > 2+argIndex) {
                     if (args[argIndex].startsWith("--generate-")) {
                         settings.setAddUsers(false);
@@ -142,6 +144,8 @@ public class DataGenerator {
                     } else if (args[argIndex].startsWith("--solution-name=")) {
                         settings.setSolutionName(args[argIndex].substring("--solution-name=".length()));
                         log.info("Solution being populated: "+settings.getSolutionName());
+                    } else if (args[argIndex].startsWith("--force-delete")) {
+                        settings.setForceDelete(true);
                     } else {
                         System.out.println("Unclear argument "+args[argIndex]);
                         System.out.println("Expecting either generate-[u][p][h][b] or http(s)://tenant_URL");
@@ -162,47 +166,42 @@ public class DataGenerator {
             factory = connection.getProjectServicesFactory(settings.getDomain(), settings.getProject());
 
             DevBridgeDownloader downloader = null;
-            if (settings.isGenerateProject()) {
-                log.debug("REST URL: " + settings.getRestUrl());
-                log.debug("Tenant ID:" + settings.getTenantId());
-
-                jobLog = new File("job-"+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+".log");
-                if (jobLog.exists()) {
-                    log.info("Log from previous run found ("+jobLog.getName()+"), previously created data are going to be deleted...\n"+
-                    "Type 'yes' and press <ENTER> if you wish to continue..."
-                    );
+            if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
+                downloader = agmClient.downloadDevBridge();
+            }
+            jobLog = new File("job-"+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+".log");
+            if (jobLog.exists()) {
+                log.info("Log from previous run found ("+jobLog.getName()+"), previously created data are going to be deleted...");
+                if (!settings.isForceDelete()) {
+                    log.info("Type 'yes' and press <ENTER> if you wish to continue...");
                     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
                     String input = in.readLine();
                     if (!input.equals("yes")) {
                         System.exit(-1);
                     }
-                    if (settings.isGenerateBuilds()) {
-                        downloader = agmClient.downloadDevBridge();
-                    }
-                    openLog();
-                    String previousEntity = "";
-                    for (String line = readLogLine(); line != null; line = readLogLine()) {
-                        int columnIndex = line.indexOf(':');
-                        String entityName = line.substring(0, columnIndex);
-                        String agmId = line.substring(columnIndex+2);
-                        log.debug("Deleting "+entityName+" with ID: "+agmId);
-                        if (!entityName.equals(previousEntity)) {
-                            log.info("Deleting entity: "+entityName);
-                            previousEntity = entityName;
-                        }
-                        EntityCRUDService service = factory.getEntityCRUDService(entityName);
-                        try {
-                            service.delete(Integer.parseInt(agmId));
-                        } catch (EntityNotFoundException e) {
-                            log.error("Cannot delete "+entityName+" with ID: "+agmId);
-                        }
-                    }
                 } else {
-                    log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
-                    if (settings.isGenerateBuilds()) {
-                        downloader = agmClient.downloadDevBridge();
+                    log.info("Delete forced; deleting now!");
+                }
+                openLog();
+                String previousEntity = "";
+                for (String line = readLogLine(); line != null; line = readLogLine()) {
+                    int columnIndex = line.indexOf(':');
+                    String entityName = line.substring(0, columnIndex);
+                    String agmId = line.substring(columnIndex+2);
+                    log.debug("Deleting "+entityName+" with ID: "+agmId);
+                    if (!entityName.equals(previousEntity)) {
+                        log.info("Deleting entity: "+entityName);
+                        previousEntity = entityName;
+                    }
+                    EntityCRUDService service = factory.getEntityCRUDService(entityName);
+                    try {
+                        service.delete(Integer.parseInt(agmId));
+                    } catch (EntityNotFoundException e) {
+                        log.error("Cannot delete "+entityName+" with ID: "+agmId);
                     }
                 }
+            } else {
+                log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
             }
             if (settings.isAddUsers()) {
                 addUsers();
