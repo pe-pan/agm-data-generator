@@ -1,6 +1,15 @@
 Release Notes:
 ==============
 
+Version 1.03:
+-------------
+Generated data changes:
+  - Support for Acceptance-tests
+
+Added features:
+  - Support for multiple solutions
+  - Deleting previously generated data can be forced
+
 Version 1.02:
 -------------
 Generated data changes:
