@@ -55,6 +55,11 @@ public class BuildGenerator {
         } catch (IllegalStateException e) {
             log.debug("Cannot delete the job, probably it does not exist");
         }
+        try {    // if Hudson was not running, the folder was not deleted; let's delete it also on file system
+            FileUtils.deleteDirectory(new File(settings.getBuildFolder() + File.separator + settings.getJobName()));
+        } catch (IOException e) {
+            log.debug("Cannot delete the job folder, probably it does not exist");
+        }
     }
 
     public void generate(Sheet sheet, List<Long> skipRevisions) {
