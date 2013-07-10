@@ -62,10 +62,13 @@ public class AgmClient {
         log.debug("Logged in to: " + loginUrl);
         String solutionName = Settings.getSettings().getSolutionName();
         response = client.doGet(RestTools.getProtocolHost(response.getLocation())+"/portal2/service/services/requestsAndServices");
-        String agmUrl = solutionName != null ?
-                ((List<String>)JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl")).get(0) :
-                (String)JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[0].loginUrl");
-
+        String agmUrl;
+        if (solutionName != null) {
+            agmUrl = ((List<String>)JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl")).get(0);
+        } else {
+            agmUrl = JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[0].loginUrl");
+            log.info("Solution being populated: "+JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[0].displayName"));
+        }
         String instanceId =
                 JsonPath.read(response.getResponse(),
                         solutionName != null ?
