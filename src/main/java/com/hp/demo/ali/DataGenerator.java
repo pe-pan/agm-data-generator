@@ -525,19 +525,6 @@ public class DataGenerator {
             } catch (RestClientException e) {
                 log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
             }
-            String avatarPath = "/avatars/"+user.getId()+".jpg";
-            InputStream avatarPicture = DataGenerator.class.getResourceAsStream(avatarPath);
-            if (avatarPicture == null) {
-                log.error("Avatar picture not found at: "+avatarPath);
-            } else {
-                try {
-                    factory.getUserAvatarService().uploadAvatar(user.getLogin(), avatarPicture, "image/jpeg");
-                } catch (ALMRestException e) {
-                    log.error("Cannot set user avatar: "+user.getId(), e);
-                } catch (RestClientException e) {
-                    log.error("Cannot set user avatar: "+user.getId(), e);
-                }
-            }
         }
     }
 
