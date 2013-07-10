@@ -62,18 +62,17 @@ public class AgmClient {
         log.debug("Logged in to: " + loginUrl);
         String solutionName = Settings.getSettings().getSolutionName();
         response = client.doGet(RestTools.getProtocolHost(response.getLocation())+"/portal2/service/services/requestsAndServices");
-        List<String> agmUrlList =
-                JsonPath.read(response.getResponse(),
-                        solutionName != null ?
-                                "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl" :
-                                "$.data[0].solutionInstances[0].loginUrl");
+        String agmUrl = solutionName != null ?
+                ((List<String>)JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl")).get(0) :
+                (String)JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[0].loginUrl");
+
         String instanceId =
                 JsonPath.read(response.getResponse(),
                         solutionName != null ?
                                 "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].instanceId" :
                                 "$.data[0].solutionInstances[0].instanceId").toString();
 
-        response = client.doGet(agmUrlList.get(0));
+        response = client.doGet(agmUrl);
 
         Pattern p = Pattern.compile("^https?://([^/]+)/agm/webui/alm/([^/]+)/([^/]+)/apm/[^/]+/\\?TENANTID=(.+)$");
         Matcher m = p.matcher(response.getLocation());
