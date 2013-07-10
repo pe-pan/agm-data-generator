@@ -13,6 +13,19 @@
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
     </properties>
+    <repositories>
+        <repository>
+            <id>nexus</id>
+            <name>internal mirror for all stable repositories</name>
+            <url>http://czvmnexus.devlab.ad:8081/nexus/content/groups/HORIZON-ALL</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -60,14 +73,14 @@
             <version>1.10.9999-SNAPSHOT</version>
         </dependency>
         <dependency>
-        	<groupId>com.jayway.jsonpath</groupId>
-        	<artifactId>json-path</artifactId>
-        	<version>0.8.1</version>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+            <version>0.8.1</version>
         </dependency>
         <dependency>
-        	<groupId>com.googlecode.json-simple</groupId>
-        	<artifactId>json-simple</artifactId>
-        	<version>1.1.1</version>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
         </dependency>
     </dependencies>
     <build>
