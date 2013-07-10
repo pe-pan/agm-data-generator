@@ -2,8 +2,10 @@ package com.hp.demo.ali.rest;
 
 import com.hp.demo.ali.Settings;
 import com.hp.demo.ali.entity.User;
+import com.jayway.jsonpath.JsonPath;
 import org.apache.log4j.Logger;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +34,7 @@ public class AgmClient {
         String loginUrl = agmUrl.replace("https://", "http://");
         RestClient.HttpResponse  response = client.doGet(loginUrl);
         loginUrl = response.getLocation().length() > 0 ? response.getLocation() : agmUrl;
-        String loginContext = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/form[@id='loginForm']/@action");
+        String loginContext = RestTools.extractString(response.getResponse(), "//form[@id='loginForm']/@action");
         return RestTools.getProtocolHost(loginUrl)+loginContext;
     }
 
@@ -56,17 +58,27 @@ public class AgmClient {
         };
         RestClient.HttpResponse response;
         response = client.doPost(loginUrl, data);
+        String portalUrl = response.getLocation();
         log.debug("Logged in to: " + loginUrl);
         String solutionName = Settings.getSettings().getSolutionName();
-        String agmUrl = RestTools.extractString(response.getResponse(),
-                solutionName != null ? "//div[@id='wrapper']/div[@class='container'][1]/div/a[span='"+solutionName+"']/@href" : "//div[@id='wrapper']/div[@class='container'][1]/div/a[1]/@href" );
-        String portalUrl = RestTools.extractString(response.getResponse(), "//div[@id='wrapper']/div[@class='container'][1]/div/a[span='Customer Portal']/@href");
-        response = client.doGet(agmUrl);
+        response = client.doGet(RestTools.getProtocolHost(response.getLocation())+"/portal2/service/services/requestsAndServices");
+        List<String> agmUrlList =
+                JsonPath.read(response.getResponse(),
+                        solutionName != null ?
+                                "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl" :
+                                "$.data[0].solutionInstances[0].loginUrl");
+        String instanceId =
+                JsonPath.read(response.getResponse(),
+                        solutionName != null ?
+                                "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].instanceId" :
+                                "$.data[0].solutionInstances[0].instanceId").toString();
+
+        response = client.doGet(agmUrlList.get(0));
 
         Pattern p = Pattern.compile("^https?://([^/]+)/agm/webui/alm/([^/]+)/([^/]+)/apm/[^/]+/\\?TENANTID=(.+)$");
         Matcher m = p.matcher(response.getLocation());
         m.matches();
-        String[] tenantProperties = new String[6];
+        String[] tenantProperties = new String[7];
         tenantProperties[0] = m.group(1);   // host
         tenantProperties[1] = m.group(2);   // domain
         tenantProperties[2] = m.group(3);   // project
@@ -74,6 +86,7 @@ public class AgmClient {
 
         tenantProperties[4] = "https://" + tenantProperties[0] + "/qcbin";
         tenantProperties[5] = RestTools.getProtocolHost(portalUrl);   // portal URL
+        tenantProperties[6] = instanceId;
 
         restUrl = tenantProperties[4] + "/rest/domains/" + tenantProperties[1] + "/projects/" + tenantProperties[2] + "/";
         return tenantProperties;

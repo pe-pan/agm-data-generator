@@ -15,11 +15,13 @@ import com.hp.demo.ali.rest.AgmClient;
 import com.hp.demo.ali.entity.User;
 import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
+import com.hp.demo.ali.rest.ContentType;
 import com.hp.demo.ali.rest.DevBridgeDownloader;
+import com.hp.demo.ali.rest.IllegalRestStateException;
 import com.hp.demo.ali.rest.RestClient;
-import com.hp.demo.ali.rest.RestTools;
 import com.hp.demo.ali.tools.EntityTools;
 import com.hp.demo.ali.tools.XmlFile;
+import com.jayway.jsonpath.JsonPath;
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -34,6 +36,8 @@ import org.hp.almjclient.services.ConnectionService;
 import org.hp.almjclient.services.EntityCRUDService;
 import org.hp.almjclient.services.impl.ConnectionManager;
 import org.hp.almjclient.services.impl.ProjectServicesFactory;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
@@ -392,6 +396,7 @@ public class DataGenerator {
         settings.setTenantId(tenantProperties[3]);
         settings.setRestUrl(tenantProperties[4]);
         settings.setPortalUrl(tenantProperties[5]);
+        settings.setInstanceId(tenantProperties[6]);
     }
 
     public static void synchronizeAliDevBridge() {
@@ -439,50 +444,65 @@ public class DataGenerator {
                 { "password", admin.getPassword() }
         };
         portalClient.doPost(settings.getLoginUrl(), data);
-        portalClient.doGet(settings.getPortalUrl()+"/portal/pages/Dashboard?TENANTID=0");
-        RestClient.HttpResponse response = portalClient.doGet(settings.getPortalUrl()+"/portal/pages/ListUsers2");
-        String token = RestTools.extractString(response.getResponse(), "//div[@id='newUserDialog']/form[@id='createUserForm']/input[@name='struts.token']/@value");
-
+        RestClient.HttpResponse response = portalClient.doGet(settings.getPortalUrl()+"/portal2/service/settings/general?");
+        String token = JsonPath.read(response.getResponse(), "$.cSRFTokenVal");
+        response = portalClient.doGet(settings.getPortalUrl()+"/portal2/service/users/session?");
+        String timezone = JsonPath.read(response.getResponse(), "$.timezone");
+        String owningAccountId = JsonPath.read(response.getResponse(), "$.owningAccountId").toString();
+        String owningAccountName = JsonPath.read(response.getResponse(), "$.owningAccountName");
+        String owningAccountSaasId = JsonPath.read(response.getResponse(), "$.owningAccountSaasId").toString();
         for (User user : User.getUsers()) {
-            data = new String[][] {
-                    { "firstName", user.getFirstName() },
-                    { "lastName", user.getLastName() },
-                    { "email", user.getLogin() },
-                    { "phone", "1" },
-                    { "portalUser", "off" },
-                    { "timezone", "Europe/Prague" },
-                    { "roles", "" },
-                    { "struts.token.name", "struts.token" },
-                    { "struts.token", token }
-            };
+            JSONObject userJson = new JSONObject();
+            userJson.put("firstName", user.getFirstName());
+            userJson.put("lastName", user.getLastName());
+            userJson.put("email", user.getLogin());
+            userJson.put("loginName", user.getLogin());
+            userJson.put("phone", "1");
+            userJson.put("timezone", timezone);
+            JSONArray roles = new JSONArray();
+            roles.add("CUSTOMER_PORTAL_BASIC");
+            userJson.put("roles", roles);
+            userJson.put("acceptNotification", true);
+            userJson.put("status", true);
+            userJson.put("id", null);
+            JSONArray instanceIds = new JSONArray();
+            instanceIds.add(settings.getInstanceId()+"#true");
+            userJson.put("allowedServices", instanceIds);
+            userJson.put("userImpersonation", 0);
+            userJson.put("owningAccountId", owningAccountId);
+            userJson.put("owningAccountName", owningAccountName);
+            userJson.put("owningAccountSaasId", owningAccountSaasId);
             log.info("Adding user: " + user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
             try {
-                response = portalClient.doPost(settings.getPortalUrl()+"/portal/pages/CreateUser2", data);
-                int i = response.getResponse().indexOf("token");
-                i = response.getResponse().indexOf(':', i);
-                i = response.getResponse().indexOf('"', i)+1;
-                int lastI = response.getResponse().indexOf('"', i);
-                token = response.getResponse().substring(i, lastI);
-            } catch (IllegalStateException e) {
-                // perhaps, it was not added as it already exists -> trying to attach it as an existing user account
-                // todo handle it basing on the error stream value
-                try {
-                    log.debug("Trying to attach an existing user account: "+ user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
-                    data = new String[][] {
-                            { "email", user.getLogin() },
-                            { "struts.token.name", "struts.token" },
-                            { "struts.token", token }
-                    };
-                    response = portalClient.doPost(settings.getPortalUrl()+"/portal/pages/AttachUserToAccount", data);
-                    int i = response.getResponse().indexOf("token");
-                    i = response.getResponse().indexOf(':', i);
-                    i = response.getResponse().indexOf('"', i)+1;
-                    int lastI = response.getResponse().indexOf('"', i);
-                    token = response.getResponse().substring(i, lastI);
-                } catch (IllegalStateException e2) {
-                    log.error("Cannot add user to portal: "+user.getFirstName()+" "+user.getLastName());
-                    response = portalClient.doGet(settings.getPortalUrl()+"/portal/pages/ListUsers2"); // todo the token is being returned in the error stream; rewrite it so you do not have to do this GET
-                    token = RestTools.extractString(response.getResponse(), "//div[@id='newUserDialog']/form[@id='createUserForm']/input[@name='struts.token']/@value");
+                portalClient.setCustomHeader("csrf.token", token);
+                response = portalClient.doPost(settings.getPortalUrl()+"/portal2/service/users", userJson.toString(), ContentType.JSON_JSON);
+                token = JsonPath.read(response.getResponse(), "$.csrftoken");
+            } catch (IllegalRestStateException e) {
+                int responseCode = e.getResponseCode();
+                String errorMessage = JsonPath.read(e.getErrorStream(), "$.errorMessage");
+                if (responseCode == 409) {
+                    // perhaps, it was not added as it already exists -> trying to attach it as an existing user account
+                    log.info(errorMessage);
+                    token = JsonPath.read(e.getErrorStream(), "$.csrftoken");
+                    try {
+                        log.debug("Trying to attach an existing user account: "+ user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
+                        userJson = new JSONObject();
+                        userJson.put("loginName", user.getLogin());
+                        userJson.put("allowedServices", instanceIds);
+                        roles = new JSONArray();
+                        roles.add("CUSTOMER_PORTAL_BASIC");
+                        userJson.put("roles", roles);
+
+                        portalClient.setCustomHeader("csrf.token", token);
+                        response = portalClient.doPut(settings.getPortalUrl()+"/portal2/service/users/attach/"+user.getLogin(), userJson.toString(), ContentType.JSON_JSON);
+                        token = JsonPath.read(response.getResponse(), "$.csrftoken");
+                    } catch (IllegalRestStateException e2) {
+                        log.error("Cannot add user to portal: "+user.getFirstName()+" "+user.getLastName());
+                        log.error(e2.getErrorStream());
+                        token = JsonPath.read(e.getErrorStream(), "$.csrftoken");
+                    }
+                } else {
+                    log.error(errorMessage);
                 }
             }
             try {

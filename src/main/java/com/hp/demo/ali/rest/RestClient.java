@@ -131,6 +131,11 @@ public class RestClient {
                         break;
                     }
                 }
+                if (headerName != null) {
+                    conn.setRequestProperty(headerName, headerValue);
+                    log.debug("Setting "+headerName+": "+headerValue);
+                    headerName = null;
+                }
                 conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.97 Safari/537.22");
                 log.debug("Setting Referer into: "+oldLocation);
                 conn.setRequestProperty("Referer", oldLocation);      // todo an evil hack; this is because of downloading DevBridge... so they know the URL where DevBridge will be pointing at
@@ -186,19 +191,31 @@ public class RestClient {
             }
         } catch (IOException e) {
             log.debug("Exception caught", e);
+            String errorStream = null;
+            int responseCode = 0;
             try {
                 if (conn != null && conn.getErrorStream() != null) {
-                    log.debug("Error stream: "+ IOUtils.toString(conn.getErrorStream()));
+                    responseCode = conn.getResponseCode();
+                    log.debug("Response Code: "+ responseCode);
+                    errorStream = IOUtils.toString(conn.getErrorStream());
+                    log.debug("Error stream: "+ errorStream);
                 }
             } catch (IOException e1) {
                 log.debug("Cannot convert error stream to string");
             }
-            throw new IllegalStateException(e);
+            throw new IllegalRestStateException(responseCode, errorStream, e);
         } finally {
             if (conn != null && handler == null) {  // close the connection only if received the data synchronously
                 conn.disconnect();
             }
         }
+    }
+
+    private String headerName = null;
+    private String headerValue = null;
+    public void setCustomHeader(String headerName, String headerValue) {
+        this.headerName = headerName;
+        this.headerValue = headerValue;
     }
 
     private String serializeParameters(String [][]data) {
@@ -241,6 +258,14 @@ public class RestClient {
 
     public HttpResponse doPost(String url, String[][] data, AsyncHandler handler) {
         return doRequest(url, serializeParameters(data), Method.POST, ContentType.NONE, handler);
+    }
+
+    public HttpResponse doPost(String url, String data, ContentType type) {
+        return doRequest(url, data, Method.POST, type);
+    }
+
+    public HttpResponse doPut(String url, String data, ContentType type) {
+        return doRequest(url, data, Method.PUT, type);
     }
 
     public HttpResponse doPut(String url, String data) {

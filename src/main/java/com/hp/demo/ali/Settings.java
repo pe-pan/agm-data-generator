@@ -44,6 +44,7 @@ public class Settings {
     private boolean generateHistory;
     private String solutionName;
     private boolean forceDelete;
+    private String instanceId;
 
     private Settings(Sheet settings) {
         log.info("Reading settings...");
@@ -209,6 +210,15 @@ public class Settings {
     public void setPortalUrl(String portalUrl) {
         log.debug("Setting portal URL: "+portalUrl);
         this.portalUrl = portalUrl;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        log.debug("Setting instance ID: "+instanceId);
+        this.instanceId = instanceId;
     }
 
     public String getDevBridgeFolder() {
