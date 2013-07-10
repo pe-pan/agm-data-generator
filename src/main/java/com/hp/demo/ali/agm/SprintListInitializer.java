@@ -27,12 +27,12 @@ public class SprintListInitializer extends EntityHandler {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             for (Entity sprint : ReleaseHandler.getSprintList().getEntityList()) {
                 String id = sprint.getId().toString();
-                log.debug("Initializing sprint id: "+id);
+                log.debug("Initializing sprint id: " + id);
 
                 String tense = sprint.getFieldValue("tense").getValue();
                 assert tense != null;
                 if ("PAST".equals(tense)) {
-                    log.debug("Moving the sprint "+id+" to current and back again (to reset assigned teams)");
+                    log.debug("Moving the sprint " + id + " to current and back again (to reset assigned teams)");
                     long now = System.currentTimeMillis();
                     long startDate;
                     long endDate;
@@ -58,7 +58,7 @@ public class SprintListInitializer extends EntityHandler {
                     CRUDService.update(updatedSprint);
                 }
             }
-            } catch (RestClientException e) {
+        } catch (RestClientException e) {
             throw new IllegalStateException(e);
         } catch (ALMRestException e) {
             throw new IllegalStateException(e);
