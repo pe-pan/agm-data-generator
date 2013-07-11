@@ -4,6 +4,7 @@ import com.hp.demo.ali.Settings;
 import com.hp.demo.ali.entity.User;
 import com.jayway.jsonpath.JsonPath;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -58,12 +59,43 @@ public class AgmClient {
         };
         RestClient.HttpResponse response;
         response = client.doPost(loginUrl, data);
-        String portalUrl = response.getLocation();
+        String portalUrl = RestTools.getProtocolHost(response.getLocation());
         log.debug("Logged in to: " + loginUrl);
+        log.debug("Portal URL: "+portalUrl);
+        String accountName = Settings.getSettings().getAccountName();
+        if (accountName != null) {
+            response = client.doGet(portalUrl+"/portal2/service/settings/general?");
+            String token = JsonPath.read(response.getResponse(), "$.cSRFTokenVal");
+
+            response = client.doGet(portalUrl+"/portal2/service/users/session?");
+            String owningAccountId = JsonPath.read(response.getResponse(), "$.owningAccountId").toString();
+            log.debug("Owning Account ID: "+owningAccountId );
+            List accountIds = JsonPath.read(response.getResponse(), "$.accountsAndServices[?(@.accountName == '"+accountName+"')].accountId");
+            if (accountIds.size() == 0) {
+                throw new IllegalArgumentException("The provided account name does not exist: "+accountName);
+            }
+            String accountId = accountIds.get(0).toString();
+            log.debug("Account ID: "+accountId);
+            client.setCustomHeader("csrf.token", token);
+            JSONObject accountData = new JSONObject();
+            accountData.put("id", owningAccountId);
+            accountData.put("nextAccountId", accountId);
+
+            client.doPut(portalUrl+"/portal2/service/accounts/updateCurrentAccount/"+owningAccountId, accountData.toString(), ContentType.JSON_JSON);
+            log.info("Populate data for this account: "+accountName);
+        }
         String solutionName = Settings.getSettings().getSolutionName();
         response = client.doGet(RestTools.getProtocolHost(response.getLocation())+"/portal2/service/services/requestsAndServices");
         String agmUrl;
+        List solutions = JsonPath.read(response.getResponse(), "$.data[0].solutionInstances");
+        if (solutions.size() == 0) {
+            throw new IllegalStateException("There are no solutions under the given account: ");
+        }
         if (solutionName != null) {
+            List agmUrls = (List<String>)JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl");
+            if (agmUrls.size() == 0) {
+                throw new IllegalArgumentException("The provided solution name does not exist: "+solutionName);
+            }
             agmUrl = ((List<String>)JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl")).get(0);
         } else {
             agmUrl = JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[0].loginUrl");
@@ -87,7 +119,7 @@ public class AgmClient {
         tenantProperties[3] = m.group(4);   // tenant ID
 
         tenantProperties[4] = "https://" + tenantProperties[0] + "/qcbin";
-        tenantProperties[5] = RestTools.getProtocolHost(portalUrl);   // portal URL
+        tenantProperties[5] = portalUrl;    // portal URL
         tenantProperties[6] = instanceId;
 
         restUrl = tenantProperties[4] + "/rest/domains/" + tenantProperties[1] + "/projects/" + tenantProperties[2] + "/";

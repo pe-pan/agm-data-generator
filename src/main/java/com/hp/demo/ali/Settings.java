@@ -45,6 +45,7 @@ public class Settings {
     private String solutionName;
     private boolean forceDelete;
     private String instanceId;
+    private String accountName;
 
     private Settings(Sheet settings) {
         log.info("Reading settings...");
@@ -214,6 +215,14 @@ public class Settings {
 
     public String getInstanceId() {
         return instanceId;
+    }
+
+    public String getAccountName() {
+        return accountName;
+    }
+
+    public void setAccountName(String accountName) {
+        this.accountName = accountName;
     }
 
     public void setInstanceId(String instanceId) {

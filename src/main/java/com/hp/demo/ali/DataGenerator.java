@@ -77,6 +77,9 @@ public class DataGenerator {
         System.out.println("       --solution-name=");
         System.out.println("         - name of the solution (handy when having more solutions)");
         System.out.println("         - first solution is used when nothing specified");
+        System.out.println("       --account-name=");
+        System.out.println("         - name of the account (handy when having more accounts)");
+        System.out.println("         - the logged-in account is used when nothing specified");
         System.out.println("       --force-delete");
         System.out.println("         - do not ask for permission to delete previous data");
         System.out.println("       URL");
@@ -110,7 +113,7 @@ public class DataGenerator {
             readUsers(reader);
             Settings.initSettings(reader.getSheet("Settings"));
             settings = Settings.getSettings();
-            for (int i = 0; i < 4; i++) {   // todo 4 is the current number of optional arguments (configuration file, user credentials are not optional; make it more robust)
+            for (int i = 0; i < 5; i++) {   // todo 5 is the current number of optional arguments (configuration file, user credentials are not optional; make it more robust)
                 if (args.length > 2+argIndex) {
                     if (args[argIndex].startsWith("--generate-")) {
                         settings.setAddUsers(false);
@@ -145,6 +148,9 @@ public class DataGenerator {
                         log.info(settings.isGenerateBuilds() ? "Builds and commits will be generated..." : "No builds/commits will be generated...");
                     } else if (args[argIndex].startsWith("http")) {
                         settings.setLoginUrl(args[argIndex]);
+                    } else if (args[argIndex].startsWith("--account-name=")) {
+                        settings.setAccountName(args[argIndex].substring("--account-name=".length()));
+                        log.info("Account name being used: "+settings.getAccountName());
                     } else if (args[argIndex].startsWith("--solution-name=")) {
                         settings.setSolutionName(args[argIndex].substring("--solution-name=".length()));
                         log.info("Solution being populated: "+settings.getSolutionName());
@@ -152,7 +158,6 @@ public class DataGenerator {
                         settings.setForceDelete(true);
                     } else {
                         System.out.println("Unclear argument "+args[argIndex]);
-                        System.out.println("Expecting either generate-[u][p][h][b] or http(s)://tenant_URL");
                         printUsage();
                         System.exit(-1);
                     }
@@ -387,6 +392,11 @@ public class DataGenerator {
             log.debug(e);
             log.error("Incorrect credentials or URL: " + admin.getLogin() + " / " + admin.getPassword());
             log.error("At: " + settings.getLoginUrl());
+            System.exit(-1);
+            throw e;        //will never be executed
+        } catch (IllegalArgumentException e) {
+            log.debug(e);
+            log.error(e.getMessage());
             System.exit(-1);
             throw e;        //will never be executed
         }
