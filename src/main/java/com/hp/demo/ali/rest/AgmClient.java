@@ -89,7 +89,7 @@ public class AgmClient {
         String agmUrl;
         List solutions = JsonPath.read(response.getResponse(), "$.data[0].solutionInstances");
         if (solutions.size() == 0) {
-            throw new IllegalStateException("There are no solutions under the given account: ");
+            throw new IllegalArgumentException("There are no solutions under the given account: "+(accountName == null ? "default " : accountName));
         }
         if (solutionName != null) {
             List agmUrls = (List<String>)JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl");
