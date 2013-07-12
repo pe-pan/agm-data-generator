@@ -20,6 +20,7 @@ public class SprintListInitializer extends EntityHandler {
 
     @Override
     public void terminate() {
+        super.terminate();
         try {
             log.info("Initializing historical sprints...");
             // moving sprints from past to current and back will cause that All existing teams will be assigned to such sprints
