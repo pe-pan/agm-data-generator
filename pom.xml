@@ -132,6 +132,7 @@
                     <archive>
                         <manifest>
                             <mainClass>com.hp.demo.ali.DataGenerator</mainClass>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
                 </configuration>

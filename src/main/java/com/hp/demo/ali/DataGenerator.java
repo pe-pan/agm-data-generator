@@ -62,6 +62,9 @@ public class DataGenerator {
     private static final int CONNECTION_TIMEOUT = 600000;
 
     private static void printUsage() {
+        System.out.println("AgM data generator "+DataGenerator.class.getPackage().getImplementationVersion());
+        System.out.println("For more information and release notes, go to");
+        System.out.println("       https://connections.houston.hp.com/docs/DOC-58222");
         System.out.println("Usage: java -jar agm-data-generator.jar [excel-configuration-file.xlsx] [--generate-[u][p][h][b]] [URL] [--solution-name=solution_name] [--force-delete] admin_user_name admin_password");
         System.out.println("       excel-configuration-file.xlsx");
         System.out.println("         - data to generate the project from");
@@ -97,6 +100,7 @@ public class DataGenerator {
         }
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         long startTime = System.currentTimeMillis();
+        log.info("AgM data generator "+DataGenerator.class.getPackage().getImplementationVersion());
         log.info("Starting at: "+sdf.format(new Date(startTime)));
         try {
             int argIndex;
