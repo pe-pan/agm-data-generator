@@ -6,7 +6,6 @@ import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entities;
 import org.hp.almjclient.model.marshallers.Entity;
 import org.hp.almjclient.model.marshallers.favorite.Filter;
-import org.hp.almjclient.services.EntityCRUDService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,6 @@ public abstract class AbstractBacklogItemHandler extends EntityHandler {
 
     protected Entity _backlogItem;
     protected String _backlogItemId;
-//    protected EntityCRUDService _CRUDService;
 
     protected static Map<String, String> featureMap = new HashMap<String, String>();
 
@@ -33,7 +31,6 @@ public abstract class AbstractBacklogItemHandler extends EntityHandler {
     protected void _findBacklogItem(String agmId) throws ALMRestException, RestClientException {
         Filter filter = new Filter("release-backlog-item");
         filter.addQueryClause("entity-id", agmId);
-//        _CRUDService = SheetHandlerRegistry.getFactory().getEntityCRUDService("release-backlog-item");
         Entities entities = CRUDService.readCollection(filter);
         _backlogItem = entities.getEntityList().get(0);
         _backlogItemId = _backlogItem.getId().toString();

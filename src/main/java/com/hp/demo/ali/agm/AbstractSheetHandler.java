@@ -1,10 +1,5 @@
 package com.hp.demo.ali.agm;
 
-import org.apache.log4j.Logger;
-import org.hp.almjclient.model.marshallers.Entity;
-
-import java.util.List;
-
 /**
  * Created by panuska on 3/14/13.
  */
