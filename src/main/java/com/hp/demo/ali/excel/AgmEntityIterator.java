@@ -39,7 +39,7 @@ public class AgmEntityIterator<E> extends EntityIterator implements Iterable, It
         String[] row = rowIterator.next();
         Map<String, Object> fields = new HashMap<String, Object>(row.length);
         entityId = row[0];
-        for (int i = 1; i < row.length; i++) {  // skip very first column (it contains the entity ID)
+        for (int i = 0; i < row.length; i++) {  // do not skip the very first column (it contains the original entity ID - written in Excel file)
             String value = row[i];
             if (!NULL.equals(value)) {
                 String fieldName = fieldNames[i];

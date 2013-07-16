@@ -29,6 +29,7 @@ public class EntityHandler extends AbstractSheetHandler {
     @Override
     public List<String> row(Entity entity) {
         try {
+            entity.removeField("id");      // remove the original Entity ID (the one written in Excel); if not removed here, it'll lead to NumberFormatException on the row below
             log.debug("Creating "+entity);
             Entity response = CRUDService.create(entity);
             log.debug("Created "+response);
