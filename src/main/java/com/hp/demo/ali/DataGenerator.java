@@ -100,7 +100,7 @@ public class DataGenerator {
         }
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         long startTime = System.currentTimeMillis();
-        log.info("AgM data generator "+DataGenerator.class.getPackage().getImplementationVersion());
+        log.info("AgM data generator " + DataGenerator.class.getPackage().getImplementationVersion());
         log.info("Starting at: "+sdf.format(new Date(startTime)));
         try {
             int argIndex;
@@ -246,9 +246,14 @@ public class DataGenerator {
                 synchronizeAliDevBridge();
             }
         } catch (RestClientException e) {
+            log.debug(e);
             throw new IllegalStateException(e);
         } catch (ALMRestException e) {
+            log.debug(e);
             throw new IllegalStateException(e);
+        } catch (RuntimeException e) {
+            log.debug(e);
+            throw e;
         } finally {
             long endTime = System.currentTimeMillis();
             log.info("Finished at: "+sdf.format(new Date(endTime)));

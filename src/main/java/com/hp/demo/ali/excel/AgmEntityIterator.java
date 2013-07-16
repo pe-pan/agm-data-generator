@@ -63,14 +63,17 @@ public class AgmEntityIterator<E> extends EntityIterator implements Iterable, It
     }
 
     public void putReferencePrefix(String prefix, String value) {
+        log.debug("Putting translation: "+prefix+entityId+" = "+value);
         idTranslationTable.put(prefix+entityId, value);
     }
 
     public static void putReference(String prefix, int index, String value) {
+        log.debug("Putting translation: "+prefix+index+" = "+value);
         idTranslationTable.put(prefix+index, value);
     }
 
     public static void putReference(String key, String value) {
+        log.debug("Putting translation: "+key+" = "+value);
         idTranslationTable.put(key, value);
     }
 
