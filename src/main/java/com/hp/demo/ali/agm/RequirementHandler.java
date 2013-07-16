@@ -1,12 +1,11 @@
 package com.hp.demo.ali.agm;
 
 import com.hp.demo.ali.Settings;
+import com.hp.demo.ali.excel.AgmEntityIterator;
 import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
-
-import java.util.List;
 
 /**
  * Created by panuska on 4/16/13.
@@ -17,10 +16,11 @@ public class RequirementHandler extends AbstractBacklogItemHandler {
     private int firstReqId = 0;
 
     @Override
-    public List<String> row(Entity entity) {
+    public Entity row(Entity entity) {
         try {
-            List<String> returnValue = super.row(entity);
-            String agmId = returnValue.get(1);
+            String excelId = entity.getFieldValue("id").getValue();
+            Entity response = super.row(entity);
+            String agmId = response.getId().toString();
             _findBacklogItem(agmId);
 
             String typeId = entity.getFieldValue("type-id").getValue();
@@ -40,9 +40,8 @@ public class RequirementHandler extends AbstractBacklogItemHandler {
                 Settings.getSettings().setFirstRequirementNumber(firstReqId);
                 log.info("First requirement ID: "+firstReqId);
             }
-            returnValue.add("apmuiservice#" + sheetName + "#");
-            returnValue.add(_backlogItemId);
-            return returnValue;
+            AgmEntityIterator.putReference("apmuiservice#" + sheetName + "#" + excelId, _backlogItemId);
+            return response;
         } catch (RestClientException e) {
             throw new IllegalStateException(e);
         } catch (ALMRestException e) {

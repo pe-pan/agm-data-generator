@@ -1,6 +1,7 @@
 package com.hp.demo.ali.agm;
 
 import com.hp.demo.ali.Settings;
+import com.hp.demo.ali.excel.AgmEntityIterator;
 import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
@@ -29,16 +30,17 @@ public class DefectHandler extends AbstractBacklogItemHandler {
     }
 
     @Override
-    public List<String> row(Entity entity) {
+    public Entity row(Entity entity) {
         try {
             String featureId = entity.getFieldValue("parent-id").getValue();      // set feature/theme the defect belongs to
             entity.removeField("parent-id");
 
-            List<String> returnValue = super.row(entity);
-            String agmId = returnValue.get(1);
+            String excelId = entity.getFieldValue("id").getValue();
+            Entity response = super.row(entity);
+            String agmId = response.getId().toString();
             _findBacklogItem(agmId);
             _updateBacklogItem(featureId);
-            _addBacklogItemId(returnValue);
+            AgmEntityIterator.putReference("apmuiservice#" + sheetName + "#" + excelId, _backlogItemId);
 
             Filter filter = new Filter("project-task");                                 // delete the automatically created task
             filter.addQueryClause("release-backlog-item-id", _backlogItemId);
@@ -58,7 +60,7 @@ public class DefectHandler extends AbstractBacklogItemHandler {
                 Settings.getSettings().setFirstDefectNumber(firstDefId);
                 log.info("First defect ID: "+firstDefId);
             }
-            return returnValue;
+            return response;
         } catch (ALMRestException e) {
             throw new IllegalStateException(e);
         } catch (RestClientException e) {

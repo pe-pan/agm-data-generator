@@ -366,15 +366,7 @@ public class DataGenerator {
         handler.init(sheetName);
         while (iterator.hasNext()) {
             Entity entity = iterator.next();
-            List<String> entityIds = handler.row(entity);
-            if (entityIds != null) {                                 // anything to add to the translation table?
-                Iterator<String> idIterator = entityIds.iterator();
-                while (idIterator.hasNext()) {                       // fill the translation table
-                    String prefix = idIterator.next();
-                    String agmId = idIterator.next();
-                    iterator.putReferencePrefix(prefix, agmId);
-                }
-            }
+            handler.row(entity);
         }
         handler.terminate();
     }

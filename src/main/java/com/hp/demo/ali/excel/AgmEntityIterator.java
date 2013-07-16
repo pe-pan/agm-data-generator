@@ -18,7 +18,6 @@ public class AgmEntityIterator<E> extends EntityIterator implements Iterable, It
 
     private Set<String> referenceColumns = new HashSet<String>();
     private String entityType;
-    private String entityId;
     private static Map<String, String> idTranslationTable = new HashMap<String, String>();
 
     public AgmEntityIterator(Sheet sheet) {
@@ -38,7 +37,6 @@ public class AgmEntityIterator<E> extends EntityIterator implements Iterable, It
     public E next() {
         String[] row = rowIterator.next();
         Map<String, Object> fields = new HashMap<String, Object>(row.length);
-        entityId = row[0];
         for (int i = 0; i < row.length; i++) {  // do not skip the very first column (it contains the original entity ID - written in Excel file)
             String value = row[i];
             if (!NULL.equals(value)) {
@@ -60,16 +58,6 @@ public class AgmEntityIterator<E> extends EntityIterator implements Iterable, It
         }
 
         return (E)new Entity(entityType, fields);
-    }
-
-    public void putReferencePrefix(String prefix, String value) {
-        log.debug("Putting translation: "+prefix+entityId+" = "+value);
-        idTranslationTable.put(prefix+entityId, value);
-    }
-
-    public static void putReference(String prefix, int index, String value) {
-        log.debug("Putting translation: "+prefix+index+" = "+value);
-        idTranslationTable.put(prefix+index, value);
     }
 
     public static void putReference(String key, String value) {

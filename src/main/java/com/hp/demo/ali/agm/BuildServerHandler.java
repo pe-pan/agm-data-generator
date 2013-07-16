@@ -3,8 +3,6 @@ package com.hp.demo.ali.agm;
 import org.hp.almjclient.exceptions.FieldNotFoundException;
 import org.hp.almjclient.model.marshallers.Entity;
 
-import java.util.List;
-
 /**
  * Created by panuska on 4/16/13.
  */
@@ -17,7 +15,7 @@ public class BuildServerHandler extends EntityHandler {
     }
 
     @Override
-    public List<String> row(Entity entity) {
+    public Entity row(Entity entity) {
         try {
             buildServerName = entity.getFieldValue("name").getValue();
             return super.row(entity);

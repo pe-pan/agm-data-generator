@@ -22,15 +22,20 @@ public class ProjectTaskHandler extends EntityHandler {
     }
 
     @Override
-    public List<String> row(Entity entity) {
+    public Entity row(Entity entity) {
         // when calculating history
         // check completed day is > in progress day
         // check in progress remaining hours < estimated
         int dayWhenInProgress = getAndRemoveFieldValue(entity, "day-when-in-progress");
         int newRemaining = getAndRemoveFieldValue(entity, "new-remaining");
         int dayWhenCompleted = getAndRemoveFieldValue(entity, "day-when-completed");
-        List<String> returnValue = super.row(entity);
-        String agmId = returnValue.get(1);
+        Entity response = super.row(entity);
+        String agmId;
+        try {
+            agmId = response.getId().toString();
+        } catch (FieldNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
 
         if (dayWhenCompleted >= 0 && dayWhenInProgress >= 0) {
             if (dayWhenCompleted <= dayWhenInProgress) {
@@ -58,7 +63,7 @@ public class ProjectTaskHandler extends EntityHandler {
             work.add(agmId);
             log.debug("On day "+dayWhenCompleted+" task "+agmId+" switching to Completed; remaining set to "+0);
         }
-        return returnValue;
+        return response;
     }
 
     private int getAndRemoveFieldValue(Entity entity, String fieldName) {

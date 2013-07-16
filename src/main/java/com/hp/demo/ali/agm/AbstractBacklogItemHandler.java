@@ -8,7 +8,6 @@ import org.hp.almjclient.model.marshallers.Entity;
 import org.hp.almjclient.model.marshallers.favorite.Filter;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,10 +41,5 @@ public abstract class AbstractBacklogItemHandler extends EntityHandler {
         _backlogItem.setFieldValue("theme-id", themeId);
         log.debug("Updating "+_backlogItem);
         CRUDService.update(_backlogItem);                                           // update backlog item
-    }
-
-    protected void _addBacklogItemId(List<String> returnValue) {
-        returnValue.add("apmuiservice#" + sheetName + "#");
-        returnValue.add(_backlogItemId);
     }
 }

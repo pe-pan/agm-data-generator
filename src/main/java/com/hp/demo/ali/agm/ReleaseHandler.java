@@ -13,7 +13,6 @@ import org.hp.almjclient.services.EntityCRUDService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by panuska on 3/14/13.
@@ -36,7 +35,7 @@ public class ReleaseHandler extends EntityHandler {
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
-    public List<String> row(Entity entity) {
+    public Entity row(Entity entity) {
         try {
             //calculates the release date using current date (it's relative to the current date)
             releaseStartDate = new Date(Settings.getSettings().getFirstBuildDate().getTime() + (Long.parseLong(entity.getFieldValue("start-date").getValue()) * 24*60*60*1000));
@@ -47,18 +46,18 @@ public class ReleaseHandler extends EntityHandler {
             log.debug("Setting end of the release to: "+sdf.format(endDate));
             entity.setFieldValue("end-date", sdf.format(endDate));
 
-            List<String> returnValue = super.row(entity);
+            Entity response = super.row(entity);
 
             // learns all the created sprints
-            sprintList = getSprints(returnValue.get(1));
+            sprintList = getSprints(response.getId().toString());
             log.info("Learning created sprints ("+sprintList.getEntityList().size()+")...");
             int i = 1;
             for (Entity sprint : sprintList.getEntityList()) {
                 String id = sprint.getId().toString();
                 log.debug("Learning sprint#"+i+" with id: "+id);
-                AgmEntityIterator.putReference("sprint#", i++, id);
+                AgmEntityIterator.putReference("sprint#"+i++, id);
             }
-            return returnValue;
+            return response;
         } catch (ALMRestException e) {
             throw new IllegalStateException(e);
         } catch (RestClientException e) {
