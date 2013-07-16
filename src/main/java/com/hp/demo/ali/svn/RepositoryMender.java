@@ -1,12 +1,8 @@
 package com.hp.demo.ali.svn;
 
 import com.hp.demo.ali.Settings;
-import com.hp.demo.ali.entity.Entity;
-import com.hp.demo.ali.entity.Field;
 import com.hp.demo.ali.entity.User;
-import com.hp.demo.ali.excel.EntityIterator;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNPropertyValue;
 import org.tmatesoft.svn.core.SVNURL;
@@ -16,7 +12,6 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by panuska on 11/20/12.
@@ -26,10 +21,11 @@ public class RepositoryMender {
     private static Logger log = Logger.getLogger(RepositoryMender.class.getName());
     private SVNRepository repository;
 
-    int requirementNumber;
-    int defectNumber;
+    private int requirementNumber;
+    private int defectNumber;
+
     public RepositoryMender(Settings settings) {
-        SVNURL svnUrl = null;
+        SVNURL svnUrl;
         String url = settings.getSvnUrl();
         User user = User.getUser(settings.getSvnUser());
         try {
@@ -46,114 +42,7 @@ public class RepositoryMender {
         defectNumber = settings.getFirstDefectNumber();
     }
 
-    public void mendRepository(Sheet sheet) {
-        log.debug("Working on: "+sheet.getSheetName());
-        EntityIterator<Entity> iterator = new EntityIterator<Entity>(sheet);
-        while (iterator.hasNext()) {
-            Entity entity =  iterator.next();
-
-            List<Field> fields = entity.getFields().getField();
-            Field revisionField = fields.remove(0);
-            assert("revision".equals(revisionField.getName())); //revision is the very first field
-            long revision = Long.parseLong(revisionField.getValue().getValue());
-            log.debug("Let's reset revision: "+revision);
-            for (Field field : fields) {
-                SVNPropertyValue value = SVNPropertyValue.create(field.getValue().getValue());
-                try {
-                    log.debug("Setting "+field.getName()+" into "+value);
-                    repository.setRevisionPropertyValue(revision, field.getName(), value);
-                } catch (SVNException e) {
-                    throw new IllegalStateException(e);
-                }
-            }
-        }
-    }
-
     private static SimpleDateFormat svnDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:s.S'Z'");
-
-    public void mendRepository(Date releaseStart, int firstDefect, int lastDefect, int firstRequirement, int lastRequirement) {
-        log.debug("Melding repository...");
-        long today = System.currentTimeMillis();
-
-        if (releaseStart.getTime() >= today || lastDefect < firstDefect || lastRequirement < firstRequirement) {
-            throw new IllegalArgumentException("Release start is in future or defect/requirement ids are wrongly set: "+ svnDateFormat.format(releaseStart));
-        }
-
-        long lastRevision;
-        try {
-            lastRevision = repository.getLatestRevision();
-        } catch (SVNException e) {
-            throw new IllegalStateException(e);
-        }
-        log.debug("Mending release starting at: "+ svnDateFormat.format(releaseStart)+"; till the revision: "+lastRevision);
-
-        long incrementDate = (today - releaseStart.getTime()) / lastRevision; // todo commits will be spread uniformly; create a better algorithm
-
-        int numberOfDefects = lastDefect - firstDefect;
-        int numberOfRequirements = lastRequirement - firstRequirement;
-
-        boolean defectsMoreThanRequirements = numberOfDefects > numberOfRequirements;
-        int entityRatio;
-        if (defectsMoreThanRequirements) {
-            entityRatio = numberOfDefects / numberOfRequirements;
-        } else {
-            entityRatio = numberOfRequirements / numberOfDefects;
-        }
-
-        int ratioIncrement = 0;
-        int defectId = firstDefect;
-        int requirementId = firstRequirement;
-        long commitTime = releaseStart.getTime();
-        for (long i = 0; i < lastRevision; i++) {
-            String message;
-            if (defectsMoreThanRequirements) {
-                if (ratioIncrement >= entityRatio) {
-                    message = "implementing user story #"+requirementId+": ";
-                    ratioIncrement = 0;
-                    requirementId++;
-                    if (requirementId >= lastRequirement) {
-                        requirementId = firstRequirement;
-                    }
-                } else {
-                    message = "fixing defect #"+defectId+": ";
-                    defectId++;
-                    if (defectId >= lastDefect) {
-                        defectId = firstDefect;
-                    }
-                }
-            } else {
-                if (ratioIncrement >= entityRatio) {
-                    message = "fixing defect #"+defectId+": ";
-                    ratioIncrement = 0;
-                    defectId++;
-                    if (defectId >= lastDefect) {
-                        defectId = firstDefect;
-                    }
-                } else {
-                    message = "implementing user story #"+requirementId+": ";
-                    requirementId++;
-                    if (requirementId >= lastRequirement) {
-                        requirementId = firstRequirement;
-                    }
-                }
-            }
-            ratioIncrement++;
-            commitTime += incrementDate;
-            try {
-                SVNPropertyValue originalValue = repository.getRevisionPropertyValue(i, "svn:log");
-                if (originalValue != null && !originalValue.getString().startsWith(message)) {
-                    message = message + originalValue.getString();
-                }
-                SVNPropertyValue svnMessage = SVNPropertyValue.create(message);
-                SVNPropertyValue svnDate = SVNPropertyValue.create(svnDateFormat.format(new Date(commitTime)));
-                log.debug("Revision "+i+": setting d:"+svnDate.getString()+" and m:"+message);
-                repository.setRevisionPropertyValue(i, "svn:log", svnMessage);
-                repository.setRevisionPropertyValue(i, "svn:date", svnDate);
-            } catch (SVNException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-    }
 
     public void setProperty(long revision, String propertyName, String propertyValue) {
         log.debug("At revision "+revision+" setting "+propertyName+" = "+propertyValue);
