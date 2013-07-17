@@ -1,5 +1,6 @@
 package com.hp.demo.ali;
 
+import com.hp.demo.ali.agm.KanbanStatusInitializer;
 import com.hp.demo.ali.agm.PlanBacklogItemHandler;
 import com.hp.demo.ali.agm.BuildServerHandler;
 import com.hp.demo.ali.agm.DefectHandler;
@@ -280,6 +281,7 @@ public class DataGenerator {
         registry.registerHandler("build-server", new BuildServerHandler());
         registry.registerHandler("team-member", new SprintListInitializer()); //once team members are known, the sprints should get initialized
         registry.registerHandler("project-task", new ProjectTaskHandler());
+        registry.registerHandler("team", new KanbanStatusInitializer());      // once teams are known, the kanban statuses should be also known
 
         for (Sheet sheet : entitySheets) {
             String entityName = sheet.getSheetName();
