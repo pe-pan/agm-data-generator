@@ -34,8 +34,7 @@ public class HistoryGenerator {
         ServiceResourceAdapter adapter = factory.getServiceResourceAdapter();
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yy");
         try {
-            int shift = 0;
-            for (int day = 0; ReleaseHandler.getReleaseStartDate().getTime()+((long)(day+shift)) * 24*60*60*1000 < System.currentTimeMillis(); day++) {
+            for (int day = 0; ReleaseHandler.getReleaseStartDate().getTime()+((long)day) * 24*60*60*1000 < System.currentTimeMillis(); day++) {
                 List<Object> work = ProjectTaskHandler.getWorkOnDay(day);
                 if (work != null) {
                     while (work.size() > 0) {
@@ -74,23 +73,10 @@ public class HistoryGenerator {
                         Entity backlogItem = new Entity("release-backlog-item", fields);
                         service.update(backlogItem);
                     }
-                    Date aggrDate = new Date(ReleaseHandler.getReleaseStartDate().getTime()+((long)(day+shift)) * 24*60*60*1000);
-                    if (shift == 0 && aggrDate.getDay() == 6) {  // once I found Saturday, shift to over weekend
-                        log.debug("Weekend found; we are not usually working on weekends...");  //todo does the algorithm really works fine? (I doubt...)
-                        log.debug("Calculating aggregation for date: "+sdf.format(aggrDate));
-                        adapter.get(String.class, factory.getProjectRestMetaData().getCollectionBaseUrl()+"internal/services/calculateAggregation/"+sdf.format(aggrDate));
-
-                        shift++;
-                        aggrDate = new Date(ReleaseHandler.getReleaseStartDate().getTime()+((long)(day+shift)) * 24*60*60*1000);
-                        log.debug("Calculating aggregation for date: "+sdf.format(aggrDate));
-                        adapter.get(String.class, factory.getProjectRestMetaData().getCollectionBaseUrl()+"internal/services/calculateAggregation/"+sdf.format(aggrDate));
-
-                        shift++;
-                        aggrDate = new Date(ReleaseHandler.getReleaseStartDate().getTime()+((long)(day+shift)) * 24*60*60*1000);
-                    }
-                    log.debug("Calculating aggregation for date: "+sdf.format(aggrDate));
-                    adapter.get(String.class, factory.getProjectRestMetaData().getCollectionBaseUrl()+"internal/services/calculateAggregation/"+sdf.format(aggrDate));
                 }
+                Date aggrDate = new Date(ReleaseHandler.getReleaseStartDate().getTime()+((long)day) * 24*60*60*1000);
+                log.debug("Calculating aggregation for date: "+sdf.format(aggrDate));
+                adapter.get(String.class, factory.getProjectRestMetaData().getCollectionBaseUrl()+"internal/services/calculateAggregation/"+sdf.format(aggrDate));
             }
         } catch (RestClientException e) {
             throw new IllegalStateException(e);
