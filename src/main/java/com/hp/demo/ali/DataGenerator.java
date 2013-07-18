@@ -50,7 +50,7 @@ import java.util.*;
  */
 public class DataGenerator {
 
-    private static Logger log = Logger.getLogger(RestClient.class.getName());
+    private static Logger log = Logger.getLogger(DataGenerator.class.getName());
 
     private static Settings settings;
     private static AgmClient agmClient = AgmClient.getAgmClient();
