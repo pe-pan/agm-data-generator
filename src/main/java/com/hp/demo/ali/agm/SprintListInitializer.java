@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
-import org.hp.almjclient.services.EntityCRUDService;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -46,8 +45,7 @@ public class SprintListInitializer extends EntityHandler {
                     long diff = now - startDate;
 
                     assert diff > 0;
-                    EntityCRUDService CRUDService = SheetHandlerRegistry.getFactory().getEntityCRUDService("release-cycle");
-                    Map<String, Object> fields = new HashMap<String, Object>(3);
+                    Map<String, Object> fields = new HashMap<>(3);
                     fields.put("id", sprint.getId());
                     fields.put("start-date", sdf.format(new Date(startDate + diff)));
                     fields.put("end-date", sdf.format(new Date(endDate + diff)));
@@ -59,9 +57,7 @@ public class SprintListInitializer extends EntityHandler {
                     CRUDService.update(updatedSprint);
                 }
             }
-        } catch (RestClientException e) {
-            throw new IllegalStateException(e);
-        } catch (ALMRestException e) {
+        } catch (RestClientException | ALMRestException e) {
             throw new IllegalStateException(e);
         }
     }

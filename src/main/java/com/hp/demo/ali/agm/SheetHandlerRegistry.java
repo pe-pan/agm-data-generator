@@ -1,7 +1,5 @@
 package com.hp.demo.ali.agm;
 
-import org.hp.almjclient.services.impl.ProjectServicesFactory;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,15 +10,8 @@ public class SheetHandlerRegistry {
 
     private Map<String, SheetHandler> registry;
 
-    static private ProjectServicesFactory factory;
-
-    public SheetHandlerRegistry(ProjectServicesFactory factory) {
-        registry = new HashMap<String, SheetHandler>(20);
-        this.factory = factory;
-    }
-
-    static ProjectServicesFactory getFactory() {
-        return factory;
+    public SheetHandlerRegistry() {
+        registry = new HashMap<>(20);
     }
 
     public void registerHandler(String name, SheetHandler handler) {

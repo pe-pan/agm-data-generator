@@ -3,13 +3,13 @@ package com.hp.demo.ali.agm;
 
 import com.hp.demo.ali.Settings;
 import com.hp.demo.ali.excel.AgmEntityIterator;
+import com.hp.demo.ali.rest.AgmRestService;
 import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entities;
 import org.hp.almjclient.model.marshallers.Entity;
 import org.hp.almjclient.model.marshallers.favorite.Filter;
-import org.hp.almjclient.services.EntityCRUDService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -58,20 +58,18 @@ public class ReleaseHandler extends EntityHandler {
                 AgmEntityIterator.putReference("sprint#"+i++, id);
             }
             return response;
-        } catch (ALMRestException e) {
-            throw new IllegalStateException(e);
-        } catch (RestClientException e) {
+        } catch (ALMRestException | RestClientException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private static Entities getSprints(String releaseId) throws ALMRestException, RestClientException {
+    private Entities getSprints(String releaseId) throws ALMRestException, RestClientException {
         log.debug("Getting sprints of release " + releaseId + " ...");
-        EntityCRUDService CRUDservice = SheetHandlerRegistry.getFactory().getEntityCRUDService("release-cycle");
+        CRUDService = AgmRestService.getCRUDService();
         Filter filter = new Filter("release-cycle");
         filter.addQueryClause("parent-id", releaseId);
         Entities entities;
-        entities = CRUDservice.readCollection(filter);
+        entities = CRUDService.readCollection(filter);
         return entities;
     }
 }

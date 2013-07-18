@@ -2,6 +2,7 @@ package com.hp.demo.ali;
 
 import com.hp.demo.ali.agm.ProjectTaskHandler;
 import com.hp.demo.ali.agm.ReleaseHandler;
+import com.hp.demo.ali.rest.AgmRestService;
 import org.apache.log4j.Logger;
 import org.hp.almjclient.connection.ServiceResourceAdapter;
 import org.hp.almjclient.exceptions.ALMRestException;
@@ -9,8 +10,6 @@ import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entities;
 import org.hp.almjclient.model.marshallers.Entity;
 import org.hp.almjclient.model.marshallers.favorite.Filter;
-import org.hp.almjclient.services.EntityCRUDService;
-import org.hp.almjclient.services.impl.ProjectServicesFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,15 +23,11 @@ import java.util.Map;
 public class HistoryGenerator {
     private static Logger log = Logger.getLogger(HistoryGenerator.class.getName());
 
-    private ProjectServicesFactory factory;
-    public HistoryGenerator(ProjectServicesFactory factory) {
-        this.factory = factory;
-    }
-
     public void generate() {
         log.info("Generating history...");
-        ServiceResourceAdapter adapter = factory.getServiceResourceAdapter();
+        ServiceResourceAdapter adapter = AgmRestService.getAdapter();
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yy");
+        AgmRestService service = AgmRestService.getCRUDService();
         try {
             for (int day = 0; ReleaseHandler.getReleaseStartDate().getTime()+((long)day) * 24*60*60*1000 < System.currentTimeMillis(); day++) {
                 List<Object> work = ProjectTaskHandler.getWorkOnDay(day);
@@ -43,7 +38,7 @@ public class HistoryGenerator {
                         int remaining = "In Progress".equals(status) ? (Integer)work.remove(0) : 0; // once completed, remaining is 0
 //                        int invested = 6 - remaining;                // todo estimated work must be always 6
 
-                        Map<String, Object> fields = new HashMap<String, Object>(4);
+                        Map<String, Object> fields = new HashMap<>(4);
                         fields.put("id", agmId);
                         fields.put("remaining", remaining);
 //                        fields.put("invested", invested);
@@ -52,7 +47,6 @@ public class HistoryGenerator {
 //                        log.debug("Updating task "+agmId+": remaining="+remaining+" invested="+invested+" status="+status);
                         log.debug("Updating task "+agmId+": remaining="+remaining+" status="+status);
                         Entity projectTask = new Entity("project-task", fields);
-                        EntityCRUDService service = factory.getEntityCRUDService("project-task");
                         projectTask = service.update(projectTask);
                         String backlogItemId = projectTask.getFieldValue("release-backlog-item-id").getValue();
 
@@ -66,8 +60,7 @@ public class HistoryGenerator {
                             case 0: status = "Done"; break;
                         }
                         log.debug("Setting backlog item "+backlogItemId+" to "+status);
-                        service = factory.getEntityCRUDService("release-backlog-item");
-                        fields = new HashMap<String, Object>(2);
+                        fields = new HashMap<>(2);
                         fields.put("id", backlogItemId);
                         fields.put("status", status);
                         Entity backlogItem = new Entity("release-backlog-item", fields);
@@ -76,11 +69,9 @@ public class HistoryGenerator {
                 }
                 Date aggrDate = new Date(ReleaseHandler.getReleaseStartDate().getTime()+((long)day) * 24*60*60*1000);
                 log.debug("Calculating aggregation for date: "+sdf.format(aggrDate));
-                adapter.get(String.class, factory.getProjectRestMetaData().getCollectionBaseUrl()+"internal/services/calculateAggregation/"+sdf.format(aggrDate));
+                adapter.get(String.class, AgmRestService.getCollectionBaseUrl()+"internal/services/calculateAggregation/"+sdf.format(aggrDate));
             }
-        } catch (RestClientException e) {
-            throw new IllegalStateException(e);
-        } catch (ALMRestException e) {
+        } catch (RestClientException | ALMRestException e) {
             throw new IllegalStateException(e);
         }
     }

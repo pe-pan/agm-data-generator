@@ -8,7 +8,6 @@ import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entities;
 import org.hp.almjclient.model.marshallers.Entity;
 import org.hp.almjclient.model.marshallers.favorite.Filter;
-import org.hp.almjclient.services.EntityCRUDService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +19,6 @@ public class DefectHandler extends AbstractBacklogItemHandler {
     private static Logger log = Logger.getLogger(DefectHandler.class.getName());
 
     private int firstDefId = 0;
-
-    private EntityCRUDService taskCRUDService;
-
-    @Override
-    public void init(String sheetName) {
-        super.init(sheetName);
-        taskCRUDService = SheetHandlerRegistry.getFactory().getEntityCRUDService("project-task");
-    }
 
     @Override
     public Entity row(Entity entity) {
@@ -44,14 +35,14 @@ public class DefectHandler extends AbstractBacklogItemHandler {
 
             Filter filter = new Filter("project-task");                                 // delete the automatically created task
             filter.addQueryClause("release-backlog-item-id", _backlogItemId);
-            Entities tasks = taskCRUDService.readCollection(filter);
-            List<Integer> taskIds = new ArrayList<Integer>(tasks.getEntityList().size());
+            Entities tasks = CRUDService.readCollection(filter);
+            List<Integer> taskIds = new ArrayList<>(tasks.getEntityList().size());
             for (Entity entityTask : tasks.getEntityList()) {
                 taskIds.add(entityTask.getId());
             }
             log.debug("Deleting all the by default created tasks. In total: "+taskIds.size());
             if (taskIds.size() > 0) {
-                taskCRUDService.delete("project-task", taskIds, true);
+                CRUDService.delete("project-task", taskIds, true);
             }
 
             if (firstDefId == 0) {
@@ -61,9 +52,7 @@ public class DefectHandler extends AbstractBacklogItemHandler {
                 log.info("First defect ID: "+firstDefId);
             }
             return response;
-        } catch (ALMRestException e) {
-            throw new IllegalStateException(e);
-        } catch (RestClientException e) {
+        } catch (ALMRestException | RestClientException e) {
             throw new IllegalStateException(e);
         }
     }

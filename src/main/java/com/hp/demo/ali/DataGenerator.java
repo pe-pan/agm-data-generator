@@ -16,6 +16,7 @@ import com.hp.demo.ali.rest.AgmClient;
 import com.hp.demo.ali.entity.User;
 import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
+import com.hp.demo.ali.rest.AgmRestService;
 import com.hp.demo.ali.rest.ContentType;
 import com.hp.demo.ali.rest.DevBridgeDownloader;
 import com.hp.demo.ali.rest.IllegalRestStateException;
@@ -33,10 +34,6 @@ import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.EntityNotFoundException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
-import org.hp.almjclient.services.ConnectionService;
-import org.hp.almjclient.services.EntityCRUDService;
-import org.hp.almjclient.services.impl.ConnectionManager;
-import org.hp.almjclient.services.impl.ProjectServicesFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -55,12 +52,9 @@ public class DataGenerator {
     private static Settings settings;
     private static AgmClient agmClient = AgmClient.getAgmClient();
 
-    private static ProjectServicesFactory factory;
     private static SheetHandlerRegistry registry;
 
     private static BuildGenerator buildGenerator;
-
-    private static final int CONNECTION_TIMEOUT = 600000;
 
     private static void printUsage() {
         System.out.println("AgM data generator "+DataGenerator.class.getPackage().getImplementationVersion());
@@ -174,10 +168,7 @@ public class DataGenerator {
             admin.setPassword(args[argIndex]);
 
             resolveTenantUrl();
-            final ConnectionService connection = ConnectionManager.getConnection(CONNECTION_TIMEOUT, null, null);
-            connection.setTenantId(Integer.parseInt(settings.getTenantId()));
-            connection.connect(settings.getRestUrl(), admin.getLogin(), admin.getPassword());
-            factory = connection.getProjectServicesFactory(settings.getDomain(), settings.getProject());
+            AgmRestService.initRestService();
 
             DevBridgeDownloader downloader = null;
             if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
@@ -207,9 +198,9 @@ public class DataGenerator {
                         log.info("Deleting entity: "+entityName);
                         previousEntity = entityName;
                     }
-                    EntityCRUDService service = factory.getEntityCRUDService(entityName);
+                    AgmRestService service = AgmRestService.getCRUDService();
                     try {
-                        service.delete(Integer.parseInt(agmId));
+                        service.delete(entityName, Integer.parseInt(agmId));
                     } catch (EntityNotFoundException e) {
                         log.error("Cannot delete "+entityName+" with ID: "+agmId);
                     }
@@ -224,7 +215,7 @@ public class DataGenerator {
                 generateProject(reader);
             }
             if (settings.isGenerateHistory()) {
-                HistoryGenerator historyGenerator = new HistoryGenerator(factory);
+                HistoryGenerator historyGenerator = new HistoryGenerator();
                 historyGenerator.generate();
             }
             if (settings.isGenerateBuilds()) {
@@ -246,10 +237,7 @@ public class DataGenerator {
 
                 synchronizeAliDevBridge();
             }
-        } catch (RestClientException e) {
-            log.debug(e);
-            throw new IllegalStateException(e);
-        } catch (ALMRestException e) {
+        } catch (RestClientException | ALMRestException e) {
             log.debug(e);
             throw new IllegalStateException(e);
         } catch (RuntimeException e) {
@@ -266,7 +254,7 @@ public class DataGenerator {
 
     private static void generateProject(ExcelReader reader) {
         log.info("Generating project data...");
-        registry = new SheetHandlerRegistry(factory);
+        registry = new SheetHandlerRegistry();
         SheetHandler generalHandler = new EntityHandler();
         List<Sheet> entitySheets = reader.getAllEntitySheets();
         for (Sheet sheet : entitySheets) {
@@ -293,7 +281,7 @@ public class DataGenerator {
     private static Sheet readUsers(ExcelReader reader) {
         log.info("Reading list of users...");
         Sheet users = reader.getSheet("Users");
-        EntityIterator<com.hp.demo.ali.entity.Entity> iterator = new EntityIterator<com.hp.demo.ali.entity.Entity>(users);
+        EntityIterator<com.hp.demo.ali.entity.Entity> iterator = new EntityIterator<>(users);
         while (iterator.hasNext()) {
             com.hp.demo.ali.entity.Entity userEntity = iterator.next();
             String id = EntityTools.getFieldValue(userEntity, "id");
@@ -308,8 +296,8 @@ public class DataGenerator {
     }
 
     static List<Long> readSkippedRevisions(Sheet sheet) {
-        EntityIterator<com.hp.demo.ali.entity.Entity> iterator = new EntityIterator<com.hp.demo.ali.entity.Entity>(sheet);
-        List<Long> revisions = new LinkedList<Long>();
+        EntityIterator<com.hp.demo.ali.entity.Entity> iterator = new EntityIterator<>(sheet);
+        List<Long> revisions = new LinkedList<>();
         while (iterator.hasNext()) {
             com.hp.demo.ali.entity.Entity entity =  iterator.next();
             long revision = EntityTools.getFieldLongValue(entity, "revisions to skip");
@@ -331,7 +319,7 @@ public class DataGenerator {
         }
     }
 
-    private static List<String> logItems = new LinkedList<String>();
+    private static List<String> logItems = new LinkedList<>();
     private static void openLog() {
         log.debug("Reading all the job log...");
         try {
@@ -362,7 +350,7 @@ public class DataGenerator {
 
     private static void generateEntity(ExcelReader reader, String sheetName) {
         Sheet sheet = reader.getSheet(sheetName);
-        AgmEntityIterator<Entity> iterator = new AgmEntityIterator<Entity>(sheet);
+        AgmEntityIterator<Entity> iterator = new AgmEntityIterator<>(sheet);
 
         SheetHandler handler = registry.getHandler(sheetName);
         handler.init(sheetName);
@@ -434,15 +422,13 @@ public class DataGenerator {
     public static void configureAliDevBridge() {
         log.info("Configuring ALI Dev Bridge...");
 
-        ServiceResourceAdapter adapter = factory.getServiceResourceAdapter();
+        ServiceResourceAdapter adapter = AgmRestService.getAdapter();
         try {
-            Map<String, String> headers = new HashMap<String, String>(1);
+            Map<String, String> headers = new HashMap<>(1);
             headers.put("INTERNAL_DATA", "20101021");
             adapter.addSessionCookie("STATE="+"20101021");
-            adapter.postWithHeaders(String.class, factory.getProjectRestMetaData().getCollectionBaseUrl() + "scm/dev-bridge/deployment-url", "bridge_url=" + settings.getAliDevBridgeUrl(), headers, ServiceResourceAdapter.ContentType.NONE);
-        } catch (RestClientException e) {
-            throw new IllegalStateException(e);
-        } catch (ALMRestException e) {
+            adapter.postWithHeaders(String.class, AgmRestService.getCollectionBaseUrl() + "scm/dev-bridge/deployment-url", "bridge_url=" + settings.getAliDevBridgeUrl(), headers, ServiceResourceAdapter.ContentType.NONE);
+        } catch (RestClientException | ALMRestException e) {
             throw new IllegalStateException(e);
         }
         //todo check response code
@@ -525,8 +511,8 @@ public class DataGenerator {
                         "\", \"lastName\":\""+user.getLastName()+
                         "\", \"phone\":\"1\", \"email\":\""+user.getLogin()+
                         "\", \"timezone\":\"Europe/Prague\"}]}";
-                ServiceResourceAdapter adapter = factory.getServiceResourceAdapter();
-                Map<String, String> headers = new HashMap<String, String>(1);
+                ServiceResourceAdapter adapter = AgmRestService.getAdapter();
+                Map<String, String> headers = new HashMap<>(1);
                 headers.put("INTERNAL_DATA", "20120922");
                 adapter.addSessionCookie("AGM_STATE="+"20120922");
                 adapter.putWithHeaders(String.class, settings.getRestUrl()+"/rest/api/portal/users", formData, headers, ServiceResourceAdapter.ContentType.JSON);

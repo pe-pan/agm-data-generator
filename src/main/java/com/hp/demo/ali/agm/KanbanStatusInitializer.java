@@ -1,7 +1,7 @@
 package com.hp.demo.ali.agm;
 
 import com.hp.demo.ali.excel.AgmEntityIterator;
-import org.apache.log4j.Logger;
+import com.hp.demo.ali.rest.AgmRestService;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
@@ -21,7 +21,7 @@ public class KanbanStatusInitializer extends EntityHandler {
             Entity response = super.row(entity);
             String agmId = response.getId().toString();
 
-            KanbanStatusConfigurationService service = SheetHandlerRegistry.getFactory().getKanbanStatusConfigurationSerive();
+            KanbanStatusConfigurationService service = AgmRestService.getKanbanStatusConfigurationService();
 
             String result = service.getKanbanStatuses(new Integer(agmId));
             JSONObject kanbanStatuses = (JSONObject) JSONValue.parse(result);
@@ -34,9 +34,7 @@ public class KanbanStatusInitializer extends EntityHandler {
                 AgmEntityIterator.putReference("ks#"+sheetName+"#"+originalId+"#"+name, statusId);
             }
             return response;
-        } catch (ALMRestException e) {
-            throw new IllegalStateException(e);
-        } catch (RestClientException e) {
+        } catch (ALMRestException | RestClientException e) {
             throw new IllegalStateException(e);
         }
     }
