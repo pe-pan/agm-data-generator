@@ -69,4 +69,8 @@ public class AgmEntityIterator<E> extends EntityIterator implements Iterable, It
         log.debug("Transition table content: ");
         log.debug(idTranslationTable);
     }
+
+    public static String dereference(String key) {
+        return idTranslationTable.get(key);
+    }
 }

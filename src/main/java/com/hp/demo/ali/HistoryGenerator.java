@@ -2,6 +2,7 @@ package com.hp.demo.ali;
 
 import com.hp.demo.ali.agm.ProjectTaskHandler;
 import com.hp.demo.ali.agm.ReleaseHandler;
+import com.hp.demo.ali.excel.AgmEntityIterator;
 import com.hp.demo.ali.rest.AgmRestService;
 import org.apache.log4j.Logger;
 import org.hp.almjclient.connection.ServiceResourceAdapter;
@@ -39,6 +40,7 @@ public class HistoryGenerator {
                         String status = (String)work.remove(0);
                         String agmId = (String)work.remove(0);
                         int remaining = "In Progress".equals(status) ? (Integer)work.remove(0) : 0; // once completed, remaining is 0
+                        String originalTeamId = (String)work.remove(0);
 //                        int invested = 6 - remaining;                // todo estimated work must be always 6
 
                         Map<String, Object> fields = new HashMap<>(4);
@@ -53,19 +55,30 @@ public class HistoryGenerator {
                         projectTask = service.update(projectTask);
                         String backlogItemId = projectTask.getFieldValue("release-backlog-item-id").getValue();
 
+                        String ksStatus = "New";
                         Filter filter = new Filter("project-task");
                         filter.addQueryClause("status", "<> COMPLETED");
                         filter.addQueryClause("release-backlog-item-id", backlogItemId);
                         Entities unfinishedTasks = service.readCollection(filter);
                         switch (unfinishedTasks.getEntityList().size()) {
-                            case 2: status = "In Progress"; break;
-                            case 1: status = "In Testing"; break;
-                            case 0: status = "Done"; break;
+                            case 2:
+                                status = "In Progress";
+                                ksStatus = "Planning";
+                                break;
+                            case 1:
+                                status = "In Testing";
+                                ksStatus = "In Progress";
+                                break;
+                            case 0:
+                                status = "Done";
+                                ksStatus = "Done";
+                                break;
                         }
                         log.debug("Setting backlog item "+backlogItemId+" to "+status);
                         fields = new HashMap<>(2);
                         fields.put("id", backlogItemId);
                         fields.put("status", status);
+                        fields.put("kanban-status-id", AgmEntityIterator.dereference("ks#"+originalTeamId+"#"+ksStatus));
                         Entity backlogItem = new Entity("release-backlog-item", fields);
                         service.update(backlogItem);
                     }

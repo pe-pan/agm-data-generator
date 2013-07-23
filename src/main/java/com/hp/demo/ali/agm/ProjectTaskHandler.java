@@ -26,9 +26,10 @@ public class ProjectTaskHandler extends EntityHandler {
         // when calculating history
         // check completed day is > in progress day
         // check in progress remaining hours < estimated
-        int dayWhenInProgress = getAndRemoveFieldValue(entity, "day-when-in-progress");
-        int newRemaining = getAndRemoveFieldValue(entity, "new-remaining");
-        int dayWhenCompleted = getAndRemoveFieldValue(entity, "day-when-completed");
+        int dayWhenInProgress = getAndRemoveIntFieldValue(entity, "day-when-in-progress");
+        int newRemaining = getAndRemoveIntFieldValue(entity, "new-remaining");
+        int dayWhenCompleted = getAndRemoveIntFieldValue(entity, "day-when-completed");
+        String originalTeamId = getAndRemoveFieldValue(entity, "team-id");
         Entity response = super.row(entity);
         String agmId;
         try {
@@ -51,7 +52,8 @@ public class ProjectTaskHandler extends EntityHandler {
             work.add("In Progress");
             work.add(agmId);
             work.add(newRemaining);
-            log.debug("On day "+dayWhenInProgress+" task "+agmId+" switching to In Progress; remaining set to "+newRemaining);
+            work.add(originalTeamId);
+            log.debug("On day "+dayWhenInProgress+" task "+agmId+" belonging to "+originalTeamId+" switching to In Progress; remaining set to "+newRemaining);
         }
         if (dayWhenCompleted > 0) {
             List<Object> work = workCalendar.get(dayWhenCompleted);
@@ -61,18 +63,24 @@ public class ProjectTaskHandler extends EntityHandler {
             }
             work.add("Completed");
             work.add(agmId);
-            log.debug("On day "+dayWhenCompleted+" task "+agmId+" switching to Completed; remaining set to "+0);
+            work.add(originalTeamId);
+            log.debug("On day "+dayWhenCompleted+" task "+agmId+" belonging to "+originalTeamId+" switching to Completed; remaining set to "+0);
         }
         return response;
     }
 
-    private int getAndRemoveFieldValue(Entity entity, String fieldName) {
+    private String getAndRemoveFieldValue(Entity entity, String fieldName) {
         try {
-            int returnValue = Integer.parseInt(entity.getFieldValue(fieldName).getValue());
+            String returnValue = entity.getFieldValue(fieldName).getValue();
             entity.removeField(fieldName);
             return returnValue;
         } catch (FieldNotFoundException e) {
-            return -1;
+            return null;
         }
+    }
+
+    private int getAndRemoveIntFieldValue(Entity entity, String fieldName) {
+        String value = getAndRemoveFieldValue(entity, fieldName);
+        return value == null ? -1 : Integer.parseInt(value);
     }
 }
