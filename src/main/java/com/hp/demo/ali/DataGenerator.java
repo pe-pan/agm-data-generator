@@ -289,7 +289,8 @@ public class DataGenerator {
             String password = EntityTools.getFieldValue(userEntity, "password");
             String firstName = EntityTools.getFieldValue(userEntity, "first name");
             String lastName = EntityTools.getFieldValue(userEntity, "last name");
-            User user = new User(id, login, password, firstName, lastName);
+            boolean portalUser = "yes".equals(EntityTools.getFieldValue(userEntity, "portal user"));
+            User user = new User(id, login, password, firstName, lastName, portalUser);
             User.addUser(user);
         }
         return users;
@@ -451,79 +452,81 @@ public class DataGenerator {
         String owningAccountName = JsonPath.read(response.getResponse(), "$.owningAccountName");
         String owningAccountSaasId = JsonPath.read(response.getResponse(), "$.owningAccountSaasId").toString();
         for (User user : User.getUsers()) {
-            JSONObject userJson = new JSONObject();
-            userJson.put("firstName", user.getFirstName());
-            userJson.put("lastName", user.getLastName());
-            userJson.put("email", user.getLogin());
-            userJson.put("loginName", user.getLogin());
-            userJson.put("phone", "1");
-            userJson.put("timezone", timezone);
-            JSONArray roles = new JSONArray();
-            roles.add("CUSTOMER_PORTAL_BASIC");
-            userJson.put("roles", roles);
-            userJson.put("acceptNotification", true);
-            userJson.put("status", true);
-            userJson.put("id", null);
-            JSONArray instanceIds = new JSONArray();
-            instanceIds.add(settings.getInstanceId()+"#true");
-            userJson.put("allowedServices", instanceIds);
-            userJson.put("userImpersonation", 0);
-            userJson.put("owningAccountId", owningAccountId);
-            userJson.put("owningAccountName", owningAccountName);
-            userJson.put("owningAccountSaasId", owningAccountSaasId);
-            log.info("Adding user: " + user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
-            try {
-                portalClient.setCustomHeader("csrf.token", token);
-                response = portalClient.doPost(settings.getPortalUrl()+"/portal2/service/users", userJson.toString(), ContentType.JSON_JSON);
-                token = JsonPath.read(response.getResponse(), "$.csrftoken");
-            } catch (IllegalRestStateException e) {
-                int responseCode = e.getResponseCode();
-                String errorMessage = JsonPath.read(e.getErrorStream(), "$.errorMessage");
-                if (responseCode == 409) {
-                    // perhaps, it was not added as it already exists -> trying to attach it as an existing user account
-                    log.info(errorMessage);
-                    token = JsonPath.read(e.getErrorStream(), "$.csrftoken");
-                    try {
-                        log.debug("Trying to attach an existing user account: "+ user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
-                        userJson = new JSONObject();
-                        userJson.put("loginName", user.getLogin());
-                        userJson.put("allowedServices", instanceIds);
-                        roles = new JSONArray();
-                        roles.add("CUSTOMER_PORTAL_BASIC");
-                        userJson.put("roles", roles);
-
-                        portalClient.setCustomHeader("csrf.token", token);
-                        response = portalClient.doPut(settings.getPortalUrl()+"/portal2/service/users/attach/"+user.getLogin(), userJson.toString(), ContentType.JSON_JSON);
-                        token = JsonPath.read(response.getResponse(), "$.csrftoken");
-                    } catch (IllegalRestStateException e2) {
-                        log.error("Cannot add user to portal: "+user.getFirstName()+" "+user.getLastName());
-                        log.error(e2.getErrorStream());
+            if (user.isPortalUser()) {
+                JSONObject userJson = new JSONObject();
+                userJson.put("firstName", user.getFirstName());
+                userJson.put("lastName", user.getLastName());
+                userJson.put("email", user.getLogin());
+                userJson.put("loginName", user.getLogin());
+                userJson.put("phone", "1");
+                userJson.put("timezone", timezone);
+                JSONArray roles = new JSONArray();
+                roles.add("CUSTOMER_PORTAL_BASIC");
+                userJson.put("roles", roles);
+                userJson.put("acceptNotification", true);
+                userJson.put("status", true);
+                userJson.put("id", null);
+                JSONArray instanceIds = new JSONArray();
+                instanceIds.add(settings.getInstanceId()+"#true");
+                userJson.put("allowedServices", instanceIds);
+                userJson.put("userImpersonation", 0);
+                userJson.put("owningAccountId", owningAccountId);
+                userJson.put("owningAccountName", owningAccountName);
+                userJson.put("owningAccountSaasId", owningAccountSaasId);
+                log.info("Adding user: " + user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
+                try {
+                    portalClient.setCustomHeader("csrf.token", token);
+                    response = portalClient.doPost(settings.getPortalUrl()+"/portal2/service/users", userJson.toString(), ContentType.JSON_JSON);
+                    token = JsonPath.read(response.getResponse(), "$.csrftoken");
+                } catch (IllegalRestStateException e) {
+                    int responseCode = e.getResponseCode();
+                    String errorMessage = JsonPath.read(e.getErrorStream(), "$.errorMessage");
+                    if (responseCode == 409) {
+                        // perhaps, it was not added as it already exists -> trying to attach it as an existing user account
+                        log.info(errorMessage);
                         token = JsonPath.read(e.getErrorStream(), "$.csrftoken");
+                        try {
+                            log.debug("Trying to attach an existing user account: "+ user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
+                            userJson = new JSONObject();
+                            userJson.put("loginName", user.getLogin());
+                            userJson.put("allowedServices", instanceIds);
+                            roles = new JSONArray();
+                            roles.add("CUSTOMER_PORTAL_BASIC");
+                            userJson.put("roles", roles);
+
+                            portalClient.setCustomHeader("csrf.token", token);
+                            response = portalClient.doPut(settings.getPortalUrl()+"/portal2/service/users/attach/"+user.getLogin(), userJson.toString(), ContentType.JSON_JSON);
+                            token = JsonPath.read(response.getResponse(), "$.csrftoken");
+                        } catch (IllegalRestStateException e2) {
+                            log.error("Cannot add user to portal: "+user.getFirstName()+" "+user.getLastName());
+                            log.error(e2.getErrorStream());
+                            token = JsonPath.read(e.getErrorStream(), "$.csrftoken");
+                        }
+                    } else {
+                        log.error(errorMessage);
                     }
-                } else {
-                    log.error(errorMessage);
                 }
-            }
-            try {
-                //todo serialize using JSON library
-                String formData = "{\"users\":[{\"loginName\":\""+user.getLogin()+
-                        "\", \"firstName\":\""+user.getFirstName()+
-                        "\", \"lastName\":\""+user.getLastName()+
-                        "\", \"phone\":\"1\", \"email\":\""+user.getLogin()+
-                        "\", \"timezone\":\"Europe/Prague\"}]}";
-                ServiceResourceAdapter adapter = AgmRestService.getAdapter();
-                Map<String, String> headers = new HashMap<>(1);
-                headers.put("INTERNAL_DATA", "20120922");
-                adapter.addSessionCookie("AGM_STATE="+"20120922");
-                adapter.putWithHeaders(String.class, settings.getRestUrl()+"/rest/api/portal/users", formData, headers, ServiceResourceAdapter.ContentType.JSON);
-            } catch (ALMRestException e) {
-                log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
-                String responseHtml = e.getResponse().getEntity(String.class);
-                String reason = responseHtml.substring(responseHtml.indexOf("<h1>")+"<h1>".length(), responseHtml.indexOf("</h1>")); //todo parse the HTML better way
-                log.error(reason);
-            } catch (RestClientException e) {
-                log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
-            }
+                try {
+                    //todo serialize using JSON library
+                    String formData = "{\"users\":[{\"loginName\":\""+user.getLogin()+
+                            "\", \"firstName\":\""+user.getFirstName()+
+                            "\", \"lastName\":\""+user.getLastName()+
+                            "\", \"phone\":\"1\", \"email\":\""+user.getLogin()+
+                            "\", \"timezone\":\"Europe/Prague\"}]}";
+                    ServiceResourceAdapter adapter = AgmRestService.getAdapter();
+                    Map<String, String> headers = new HashMap<>(1);
+                    headers.put("INTERNAL_DATA", "20120922");
+                    adapter.addSessionCookie("AGM_STATE="+"20120922");
+                    adapter.putWithHeaders(String.class, settings.getRestUrl()+"/rest/api/portal/users", formData, headers, ServiceResourceAdapter.ContentType.JSON);
+                } catch (ALMRestException e) {
+                    log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
+                    String responseHtml = e.getResponse().getEntity(String.class);
+                    String reason = responseHtml.substring(responseHtml.indexOf("<h1>")+"<h1>".length(), responseHtml.indexOf("</h1>")); //todo parse the HTML better way
+                    log.error(reason);
+                } catch (RestClientException e) {
+                    log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
+                }
+                }
         }
     }
 

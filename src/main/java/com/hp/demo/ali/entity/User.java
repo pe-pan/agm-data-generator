@@ -16,13 +16,15 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
+    private boolean portalUser;
 
-    public User(String id, String login, String password, String firstName, String lastName) {
+    public User(String id, String login, String password, String firstName, String lastName, boolean portalUser) {
         this.id = id;
         this.login = login;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.portalUser = portalUser;
     }
 
     public String getId() {
@@ -54,7 +56,11 @@ public class User {
         return lastName;
     }
 
-    static private Map<String, User> users = new HashMap<String, User>();
+    public boolean isPortalUser() {
+        return portalUser;
+    }
+
+    static private Map<String, User> users = new HashMap<>();
 
     public static void addUser(User user) {
         users.put(user.getId(), user);
