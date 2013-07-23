@@ -30,6 +30,9 @@ public class HistoryGenerator {
         AgmRestService service = AgmRestService.getCRUDService();
         try {
             for (int day = 0; ReleaseHandler.getReleaseStartDate().getTime()+((long)day) * 24*60*60*1000 < System.currentTimeMillis(); day++) {
+                if (day % 14 == 0) {
+                    log.info("Sprint #"+(day/14+1));  //todo default sprint length == 2 weeks
+                }
                 List<Object> work = ProjectTaskHandler.getWorkOnDay(day);
                 if (work != null) {
                     while (work.size() > 0) {
