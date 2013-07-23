@@ -168,6 +168,7 @@ public class AgmRestService {
                     } else {
                         log.error("An exception caught; attempts to retry: " + numberOfTriesLeft);
                         log.error("Going to sleep for " + timeToWait + " ms");
+                        log.debug(e);
                         try {
                             Thread.sleep(timeToWait);
                         } catch (InterruptedException e1) {
