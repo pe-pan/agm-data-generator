@@ -101,6 +101,8 @@ public class BuildGenerator {
                 if (settings.isMeldRepository()) {
                     mender.alterRepository(fromRevision, toRevision, currentBuildDate.getTime() - nextBuild, currentBuildDate.getTime(), requirements, defects, unassigned, teamMembers);
                 }
+                FileUtils.write(new File(outputFolder + File.separator + "changelog.xml"), mender.getRevisionsLog(fromRevision, toRevision - 1));
+                FileUtils.write(new File(outputFolder + File.separator + "revision.txt"), settings.getSvnUrl()+"/trunk/"+(toRevision-1));  //todo /trunk/ is hard-coded -> should be taken from Excel/scm-branch/path
             }
             FileUtils.copyFile(  // the new build needs to know SVN credentials
                     new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"subversion.credentials"),
@@ -148,8 +150,12 @@ public class BuildGenerator {
         XmlFile file = new XmlFile(buildXmlFile);
 
         String oldBuildId = file.setNodeValue("//build/actions/maven-build-record/id/text()", buildId.toString());
-        file.setNodeValue("/build/actions/com.hp.alm.ali.hudson.BuildAction/codeCoverage/result/total/text()", totalLines);
+        file.setNodeValue("//build/actions/hudson.scm.SubversionTagAction/tags/entry/hudson.scm.SubversionSCM_-SvnInfo/revision/text()", revisionTo);
+        file.setNodeValue("//build/actions/hudson.scm.SVNRevisionState/revisions/entry/long/text()", revisionTo);
+        file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/codeCoverage/content/hudson.FilePath/default/remote/text()", buildXmlFile.getParent()+File.separator+"aliCoverage.xml");
+        file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/codeCoverage/result/total/text()", totalLines);
         file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/codeCoverage/result/covered/text()", coveredLines);
+        file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/testResults/content/hudson.FilePath/default/remote/text()", buildXmlFile.getParent()+File.separator+"aliTests.xml");
         file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/testResults/result/total/text()", totalTests);
         file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/testResults/result/failed/text()", failedTests);
         file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/testResults/result/skipped/text()", skippedTests);
@@ -159,6 +165,7 @@ public class BuildGenerator {
         generateRevisionNodes(file.getDocument(), revisionFrom, revisionTo, skip);
         file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/codeChanges/changes/repositoryChanges/element/id/text()", svnUrl);
         file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/codeChanges/changes/repositoryChanges/element/location/text()", svnUrl);
+        file.setNodeValue("//build/actions/com.hp.alm.ali.hudson.BuildAction/codeChanges/revision/text()", revisionTo);
         file.save(buildXmlFile);
         return oldBuildId;
     }

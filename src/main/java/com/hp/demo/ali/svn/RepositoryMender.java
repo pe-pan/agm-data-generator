@@ -2,8 +2,11 @@ package com.hp.demo.ali.svn;
 
 import com.hp.demo.ali.Settings;
 import com.hp.demo.ali.entity.User;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNPropertyValue;
 import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.*;
@@ -11,7 +14,9 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by panuska on 11/20/12.
@@ -42,7 +47,7 @@ public class RepositoryMender {
         defectNumber = settings.getFirstDefectNumber();
     }
 
-    private static SimpleDateFormat svnDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:s.S'Z'");
+    private static SimpleDateFormat svnDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'");
 
     public void setProperty(long revision, String propertyName, String propertyValue) {
         log.debug("At revision "+revision+" setting "+propertyName+" = "+propertyValue);
@@ -59,6 +64,37 @@ public class RepositoryMender {
         } catch (SVNException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public CharSequence getRevisionsLog(long startRevision, long endRevision) {
+        StringBuilder builder = new StringBuilder(
+                "<?xml version='1.0' encoding='UTF-8'?>"+System.lineSeparator()+"<log>"+System.lineSeparator());
+        Collection<SVNLogEntry> logEntries;
+        try {
+            logEntries = repository.log(new String[]{""}, null, startRevision, endRevision, true, true);
+        } catch (SVNException e) {
+            throw new IllegalStateException(e);
+        }
+        for (SVNLogEntry logEntry : logEntries) {
+            builder.append("  <logentry revision='").append(logEntry.getRevision()).append("'>").append(System.lineSeparator()).
+                    append("    <author>").append(logEntry.getAuthor()).append("</author>").append(System.lineSeparator()).
+                    append("    <date>").append(svnDateFormat.format(logEntry.getDate())).append("</date>").append(System.lineSeparator()).
+                    append("    <msg>").append(StringEscapeUtils.escapeXml(logEntry.getMessage())).append("</msg>").append(System.lineSeparator());
+            if (logEntry.getChangedPaths().size() > 0) {
+                builder.append("    <paths>").append(System.lineSeparator());
+                Set<String> changedPathsSet = logEntry.getChangedPaths().keySet();
+
+                for (String changedPaths : changedPathsSet ) {
+                    SVNLogEntryPath entryPath = logEntry.getChangedPaths().get(changedPaths);
+                    builder.append("      <path action='").append(entryPath.getType()).append("'>").
+                            append(entryPath.getPath()).append("</path>").append(System.lineSeparator());
+                }
+                builder.append("    </paths>").append(System.lineSeparator());
+            }
+            builder.append("  </logentry>").append(System.lineSeparator());
+        }
+        builder.append("</log>").append(System.lineSeparator());
+        return builder;
     }
 
     User[] users = User.getUsers();
