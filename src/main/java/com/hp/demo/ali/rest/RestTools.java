@@ -43,7 +43,7 @@ public class RestTools {
         try {
             return a.getNodeValue();
         } catch (NullPointerException e) {
-            throw new IllegalStateException("Entity not found!\nEntity: "+xpathString+"\nDocument: "+html);
+            throw new IllegalStateException("Entity not found!"+System.lineSeparator()+"Entity: "+xpathString+System.lineSeparator()+"Document: "+html);
         }
     }
 }

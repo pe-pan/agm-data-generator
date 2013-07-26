@@ -622,21 +622,21 @@ public class DataGenerator {
         log.info("Configuring ALI Dev Bridge bits...");
         try {
             FileUtils.write(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"wrapper\\wrapper-custom.conf"),
-                    "\n"+
-                    "wrapper.java.additional.101=-Dali.bridge.port=8380\n"+                //todo remove this hard-coded options
-                    "wrapper.java.additional.102=-Dali.bridge.ssl.port=8543\n"+
-                    "wrapper.java.additional.104=-Dali.bridge.http.warning=false\n"+
-                    "wrapper.java.command=c:\\Java\\jdk1.7.0_03\\bin\\java.exe\n", true);
+                    System.lineSeparator()+
+                    "wrapper.java.additional.101=-Dali.bridge.port=8380"+System.lineSeparator()+                //todo remove this hard-coded options
+                    "wrapper.java.additional.102=-Dali.bridge.ssl.port=8543"+System.lineSeparator()+
+                    "wrapper.java.additional.104=-Dali.bridge.http.warning=false"+System.lineSeparator()+
+                    "wrapper.java.command=c:\\Java\\jdk1.7.0_03\\bin\\java.exe"+System.lineSeparator(), true);
 
             Collection<File> descriptors = FileUtils.listFiles(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"deploy"), new String[] {"xml"}, false);
             assert descriptors.size() == 1;
             File tenantDescriptor = descriptors.iterator().next();
             String tenantDescriptorName = tenantDescriptor.getName().substring(0, tenantDescriptor.getName().length()-4);
             FileUtils.write(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"tenants\\"+tenantDescriptorName+"\\conf\\connection.properties"),
-                    "\n" +
-                    "httpProxy=156.152.46.12:8088\n" +                                     //todo remove this hard-coded options
-                    "httpsProxy=156.152.46.12:8088\n" +
-                    "noProxyHosts=alm-server\n", true);
+                    System.lineSeparator()+
+                    "httpProxy=156.152.46.12:8088"+System.lineSeparator()+                                     //todo remove this hard-coded options
+                    "httpsProxy=156.152.46.12:8088"+System.lineSeparator()+
+                    "noProxyHosts=alm-server"+System.lineSeparator(), true);
         } catch (IOException e) {
             log.error("Cannot configure installed ALI Dev Bridge bits", e);
             throw new IllegalStateException(e);
