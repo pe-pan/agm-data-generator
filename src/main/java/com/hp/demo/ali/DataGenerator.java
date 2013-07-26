@@ -211,6 +211,11 @@ public class DataGenerator {
             if (settings.isAddUsers()) {
                 addUsers();
             }
+            if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
+                configureSvnAgent();
+                configureAliDevBridge();
+                stopDevBridge();
+            }
             if (settings.isGenerateProject()) {
                 generateProject(reader);
             }
@@ -226,10 +231,6 @@ public class DataGenerator {
                 buildGenerator.createJob();
             }
             if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
-                configureSvnAgent();
-                configureAliDevBridge();
-
-                stopDevBridge();
                 downloader.waitTillDownloaded();
                 replaceDevBridgeBits(downloader);
                 configureDevBridgeBits();
