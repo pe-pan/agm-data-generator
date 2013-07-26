@@ -201,7 +201,7 @@ public class DataGenerator {
                     AgmRestService service = AgmRestService.getCRUDService();
                     try {
                         service.delete(entityName, Integer.parseInt(agmId));
-                    } catch (EntityNotFoundException e) {
+                    } catch (RestClientException | ALMRestException  e) {
                         log.error("Cannot delete "+entityName+" with ID: "+agmId);
                     }
                 }
@@ -237,9 +237,6 @@ public class DataGenerator {
 
                 synchronizeAliDevBridge();
             }
-        } catch (RestClientException | ALMRestException e) {
-            log.debug(e);
-            throw new IllegalStateException(e);
         } catch (RuntimeException e) {
             log.debug(e);
             throw e;
