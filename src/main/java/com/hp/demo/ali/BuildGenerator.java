@@ -64,7 +64,7 @@ public class BuildGenerator {
 
     public void generate(Sheet sheet, List<Long> skipRevisions) {
         log.info("Generating builds...");
-        EntityIterator<Entity> iterator = new EntityIterator<Entity>(sheet);
+        EntityIterator<Entity> iterator = new EntityIterator<>(sheet);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-'00'");
         try {
             while (iterator.hasNext()) {
@@ -127,7 +127,7 @@ public class BuildGenerator {
             return null;
         }
         assert (skipRevisions.get(0) >= fromRevision);
-        List<Long> subset = new LinkedList<Long>();
+        List<Long> subset = new LinkedList<>();
         while (skipRevisions.size() > 0 && skipRevisions.get(0) <= toRevision) {
             subset.add(skipRevisions.remove(0));
         }
@@ -167,7 +167,7 @@ public class BuildGenerator {
     private static XPath xpath = xpf.newXPath();
 
     private void generateRevisionNodes(Document document, long revisionFrom, long revisionTo, long[] skip) {
-        XPathExpression expression = null;
+        XPathExpression expression;
         try {
             expression = xpath.compile("//build/actions/com.hp.alm.ali.hudson.BuildAction/codeChanges/changes/repositoryChanges/element/revisionChanges/com.hp.alm.scm.build.RevisionChange");
             Node revisionChangeNode = (Node) expression.evaluate(document, XPathConstants.NODE);
