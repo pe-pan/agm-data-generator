@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.hp.almjclient.connection.ServiceResourceAdapter;
 import org.hp.almjclient.exceptions.ALMRestException;
-import org.hp.almjclient.exceptions.EntityNotFoundException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
 import org.json.simple.JSONArray;
@@ -56,8 +55,6 @@ public class DataGenerator {
     private static AgmClient agmClient = AgmClient.getAgmClient();
 
     private static SheetHandlerRegistry registry;
-
-    private static BuildGenerator buildGenerator;
 
     private static String getBuildTime() {
         String buildTime = null;
@@ -135,7 +132,7 @@ public class DataGenerator {
             readUsers(reader);
             Settings.initSettings(reader.getSheet("Settings"));
             settings = Settings.getSettings();
-            for (int i = 0; i < 5; i++) {   // todo 5 is the current number of optional arguments (configuration file, user credentials are not optional; make it more robust)
+            for (int i = 0; i < 5; i++) {   // todo 5 is the current number of optional arguments (user credentials are not optional; make it more robust)
                 if (args.length > 2+argIndex) {
                     if (args[argIndex].startsWith("--generate-")) {
                         settings.setAddUsers(false);
@@ -249,7 +246,7 @@ public class DataGenerator {
             }
             if (settings.isGenerateBuilds()) {
                 List<Long>skippedRevisions = readSkippedRevisions(reader.getSheet("Skip-Revisions"));
-                buildGenerator = new BuildGenerator(settings);
+                BuildGenerator buildGenerator = new BuildGenerator(settings);
                 buildGenerator.deleteJob();
                 buildGenerator.generate(reader.getSheet("Builds"), skippedRevisions);
                 buildGenerator.createJob();
@@ -557,7 +554,7 @@ public class DataGenerator {
     public static void stopDevBridge() {
         log.info("Stopping ALI Dev Bridge...");
         String devBridgeScript = settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"bin\\DevBridge.bat";   // todo this is Windows only!
-        Process devBridge = null;
+        Process devBridge;
         try {
             devBridge = Runtime.getRuntime().exec(devBridgeScript+" stop");
             devBridge.waitFor();
@@ -598,7 +595,7 @@ public class DataGenerator {
     public static void startDevBridge() {
         log.info("Starting ALI Dev Bridge...");
         String devBridgeScript = settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"bin\\DevBridge.bat";
-        Process devBridge = null;
+        Process devBridge;
         try {
             devBridge = Runtime.getRuntime().exec(devBridgeScript+" install");
             devBridge.waitFor();
