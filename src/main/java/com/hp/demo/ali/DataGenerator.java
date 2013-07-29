@@ -64,10 +64,10 @@ public class DataGenerator {
                 "       https://connections.houston.hp.com/docs/DOC-58222"+System.lineSeparator()+
                 "Usage:"+System.lineSeparator()+
                 "======"+System.lineSeparator()+
-                "java -jar agm-data-generator.jar [excel-configuration-file.xlsx]"+System.lineSeparator()+
-                "[--generate-[u][p][h][b]] [URL] [--solution-name=solution_name]"+System.lineSeparator()+
-                "[--account-name=account_name] [--force-delete] admin_user_name admin_password"+System.lineSeparator()+
-                "============================================================================="+System.lineSeparator()+
+                " java -jar agm-data-generator.jar [excel-configuration-file.xlsx]"+System.lineSeparator()+
+                " [--generate-[u][p][h][b]] [URL] [--solution-name=solution_name]"+System.lineSeparator()+
+                " [--account-name=account_name] [--force-delete] admin_user_name admin_password"+System.lineSeparator()+
+                " ============================================================================="+System.lineSeparator()+
                 "       excel-configuration-file.xlsx"+System.lineSeparator()+          //here: v
                 "         - data to generate the project from"+System.lineSeparator()+
                 "         - built-in file used if this parameter is not specified"+System.lineSeparator()+
