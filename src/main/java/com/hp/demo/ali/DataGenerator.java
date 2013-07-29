@@ -41,6 +41,9 @@ import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 /**
  * Created by panuska on 10/12/12.
@@ -56,10 +59,22 @@ public class DataGenerator {
 
     private static BuildGenerator buildGenerator;
 
+    private static String getBuildTime() {
+        String buildTime = null;
+        try {
+            JarFile jarFile = new JarFile(DataGenerator.class.getProtectionDomain().getCodeSource().getLocation().getFile());
+            Manifest manifest = jarFile.getManifest();
+            Attributes attr = manifest.getMainAttributes();
+            buildTime = attr.getValue("Build-Time");
+        } catch (IOException e) {
+            log.debug("Exception when reading build time from manifest file!", e);
+        }
+        return buildTime;
+    }
     private static void printUsage() {
         System.out.println(
-                "AgM data generator "+DataGenerator.class.getPackage().getImplementationVersion()+System.lineSeparator()+
-                "======================="+System.lineSeparator()+
+                "AgM data generator "+DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+getBuildTime()+")"+System.lineSeparator()+
+                "======================================================"+System.lineSeparator()+
                 "For more information and release notes, go to"+System.lineSeparator()+
                 "       https://connections.houston.hp.com/docs/DOC-58222"+System.lineSeparator()+
                 "Usage:"+System.lineSeparator()+
@@ -103,7 +118,7 @@ public class DataGenerator {
         }
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         long startTime = System.currentTimeMillis();
-        log.info("AgM data generator " + DataGenerator.class.getPackage().getImplementationVersion());
+        log.info("AgM data generator " + DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+getBuildTime()+")");
         log.info("Starting at: "+sdf.format(new Date(startTime)));
         try {
             int argIndex;
