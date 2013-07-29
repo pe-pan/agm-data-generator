@@ -211,6 +211,7 @@ public class DataGenerator {
             if (settings.isAddUsers()) {
                 addUsers();
             }
+            configureProject();
             if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
                 configureSvnAgent();
                 configureAliDevBridge();
@@ -651,5 +652,37 @@ public class DataGenerator {
         file.setNodeValue("/AgentConfig/Projects/Project/@username", User.getUser(settings.getAdmin()).getLogin());
         file.setNodeValue("/AgentConfig/Projects/Project/@password", User.getUser(settings.getAdmin()).getPassword());
         file.save(agentConfigFile);
+    }
+
+    public static void configureProject() {
+        log.info("Configuring project...");
+        String [][] params = new String[][] {
+                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_ASSIGNMENT_CHANGE" },
+                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_STATUS_CHANGE" },
+                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_EXCEED_CYCLE_TIME" },
+                { "APM_EXTENSION", "project", "projectlevelkey", "PLANNING", "AUTO_CREATE_TASK_FOR_DEFECT" }
+        };
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("<ConfigurationResourceParameters>");
+        for (String[] paramSet : params) {
+            builder.append("<ConfigurationResourceParameter><configurationKey><extensionName>").append(paramSet[0]).append("</extensionName>").
+                    append("<scopeType>").append(paramSet[1]).append("</scopeType>").
+                    append("<scopeKey>").append(paramSet[2]).append("</scopeKey>").
+                    append("<componentKey>").append(paramSet[3]).append("</componentKey>").
+                    append("<propertyKey>").append(paramSet[4]).append("</propertyKey>").
+                    append("</configurationKey>" +
+                    "<configurationValue>" +
+                    "<value>false</value>" +
+                    "<className>java.lang.Boolean</className>" +
+                    "</configurationValue>" +
+                    "</ConfigurationResourceParameter>");
+        }
+        builder.append("</ConfigurationResourceParameters>");
+        try {
+            AgmRestService.getAdapter().post(String.class, AgmRestService.getCollectionBaseUrl()+"/customization/configurationservice/setvalues", builder.toString(), ServiceResourceAdapter.ContentType.XML);
+        } catch (RestClientException | ALMRestException e) {
+            throw new IllegalStateException(e);
+        }
     }
 }
