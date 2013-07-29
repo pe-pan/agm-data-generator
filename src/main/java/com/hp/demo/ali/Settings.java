@@ -28,7 +28,6 @@ public class Settings {
     private String jobName;
     private String templateJobName;
     private String buildFolder;
-    private String buildTemplateFolder;
     private Date firstBuildDate;
     private int firstBuildNumber;
     private long firstSvnRevision;
@@ -63,7 +62,6 @@ public class Settings {
         jobName = SheetTools.getStringValue(settings, 13, 2);
         templateJobName = SheetTools.getStringValue(settings, 14, 2);
         buildFolder = SheetTools.getStringValue(settings, 15, 2);
-        buildTemplateFolder = SheetTools.getStringValue(settings, 16, 2);
         try {
             long days = SheetTools.getLongValue(settings, 17, 2);
             firstBuildDate = new Date(System.currentTimeMillis() + days*24*60*60*1000);
@@ -170,10 +168,6 @@ public class Settings {
 
     public String getBuildFolder() {
         return buildFolder;
-    }
-
-    public String getBuildTemplateFolder() {
-        return buildTemplateFolder;
     }
 
     public Date getFirstBuildDate() {

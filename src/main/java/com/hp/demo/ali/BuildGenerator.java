@@ -12,12 +12,16 @@ import com.hp.demo.ali.tools.XmlFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.tika.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import javax.xml.xpath.*;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -44,7 +48,6 @@ public class BuildGenerator {
         currentBuildNumber = settings.getFirstBuildNumber();
         startingRevision = settings.getFirstSvnRevision();
         mender = new RepositoryMender(settings);
-        log.debug("Build template folder is: " + settings.getBuildTemplateFolder());
     }
 
     public void deleteJob() {
@@ -86,7 +89,7 @@ public class BuildGenerator {
                 currentBuildDate = new Date(currentBuildDate.getTime() + nextBuild);     //nextBuild is in milliseconds
                 String outputFolder = settings.getBuildFolder() + File.separator + settings.getJobName() + File.separator + "builds" + File.separator + sdf.format(currentBuildDate);
                 log.info("Generating build " + sdf.format(currentBuildDate));
-                FileUtils.copyDirectory(new File(settings.getBuildTemplateFolder()), new File(outputFolder));
+                copyBuildTemplateFolder(outputFolder);
                 File buildXmlFile = new File(outputFolder + File.separator + BUILD_XML);
                 UUID buildId = UUID.randomUUID();
                 long fromRevision = startingRevision;
@@ -121,6 +124,39 @@ public class BuildGenerator {
                     Integer.toString(currentBuildNumber));
         } catch (IOException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    private static final String buildTemplateFolder = "/build-template";
+    private static final String buildFiles[] = {   //todo this list must get updated anytime the build-template folder gets updated!
+        "/aliCoverage.xml",
+            "/aliLog",
+            "/aliTests.xml",
+            "/build.xml",
+            "/changelog.xml",
+            "/coverage.xml",
+            "/coverage1.xml",
+            "/coverage2.xml",
+            "/junitResult.xml",
+            "/log",
+            "/maven-build-2c43ca47-15ac-45fa-9f89-1289a679d965.xml",
+            "/revision.txt"
+    };
+
+    private void copyBuildTemplateFolder(String outputFolder) {
+        log.debug("Build template folder is: jar-file!" + buildTemplateFolder);
+
+        new File(outputFolder).mkdirs();
+        for (String fileName : buildFiles) {
+            try {
+                InputStream in = getClass().getResourceAsStream(buildTemplateFolder + fileName);
+                OutputStream out = new FileOutputStream(outputFolder+fileName);
+                IOUtils.copy(in, out );
+                in.close();
+                out.close();
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
         }
     }
 
