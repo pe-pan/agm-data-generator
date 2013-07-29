@@ -1,6 +1,15 @@
 Release Notes:
 ==============
 
+Version 1.04:
+-------------
+Added features:
+  - Support for new design of SaaS portal
+  - Option to specify account name on cmd-line (when having more accounts and populating a tenant under different than default account)
+  - Show tool version on startup
+
+Technical enhancements and bug fixes
+
 Version 1.03:
 -------------
 Generated data changes:
