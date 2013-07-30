@@ -1,6 +1,24 @@
 Release Notes:
 ==============
 
+Version 1.05:
+-------------
+Generated data changes:
+  - More realistic names of Sprint #7 tasks
+  - More realistic days when tasks / RBLIs are being moved between states
+
+Added features:
+  - Support for Kanban
+  - More robust against REST calls failures (calls are being 5-times re-tried on a failure)
+  - Skip auxiliary users when adding users to the project
+  - Display build time on startup
+
+Bug fixes:
+  - Sprint closure graph: RBLIs now appear in Planned section (not in Added section)
+  - JUnit results + coverage now appear on RBLI (not only on builds)
+
+Technical enhancements and additional bug fixes
+
 Version 1.04:
 -------------
 Added features:
