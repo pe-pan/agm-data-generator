@@ -70,42 +70,48 @@ public class DataGenerator {
     }
     private static void printUsage() {
         System.out.println(
-                "AgM data generator "+DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+getBuildTime()+")"+System.lineSeparator()+
-                "======================================================"+System.lineSeparator()+
-                "For more information and release notes, go to"+System.lineSeparator()+
-                "       https://connections.houston.hp.com/docs/DOC-58222"+System.lineSeparator()+
-                "Usage:"+System.lineSeparator()+
-                "======"+System.lineSeparator()+
-                " java -jar agm-data-generator.jar [excel-configuration-file.xlsx]"+System.lineSeparator()+
-                " [--generate-[u][p][h][b]] [URL] [--solution-name=solution_name]"+System.lineSeparator()+
-                " [--account-name=account_name] [--force-delete] admin_user_name admin_password"+System.lineSeparator()+
-                " ============================================================================="+System.lineSeparator()+
-                "       excel-configuration-file.xlsx"+System.lineSeparator()+          //here: v
-                "         - data to generate the project from"+System.lineSeparator()+
-                "         - built-in file used if this parameter is not specified"+System.lineSeparator()+
-                "         - provide as the very first parameter!"+System.lineSeparator()+
-                "       --generate-"+System.lineSeparator()+
-                "         u - adds (non-portal) users to the portal and project"+System.lineSeparator()+
-                "         p - generate project data (entities)"+System.lineSeparator()+
-                "         h - generate history within past sprints "+System.lineSeparator()+
-                "         b - generate builds +System.lineSeparator()+ commits (ALI data)"+System.lineSeparator()+
-                "           - access to Hudson / SVN is necessary"+System.lineSeparator()+
-                "         - all the above is generated if no option is specified"+System.lineSeparator()+
-                "         - nothing is generated if '--generate-' is specified"+System.lineSeparator()+
-                "       --solution-name="+System.lineSeparator()+
-                "         - name of the solution (handy when having more solutions)"+System.lineSeparator()+
-                "         - first found solution is used when nothing specified"+System.lineSeparator()+
-                "       --account-name="+System.lineSeparator()+
-                "         - name of the account (handy when having more accounts)"+System.lineSeparator()+
-                "         - the logged-in account is used when nothing specified"+System.lineSeparator()+
-                "       --force-delete"+System.lineSeparator()+
-                "         - do not ask for permission to delete previous data"+System.lineSeparator()+
-                "         - only deletes data when used along with '--generate-' option"+System.lineSeparator()+
-                "       URL"+System.lineSeparator()+
-                "         - URL where to login"+System.lineSeparator()+
-                "         - https://gateway.saas.hp.com/msg/ if no URL is specified"+System.lineSeparator()+
-                "       admin_user_name and admin_password are the only mandatory options"+System.lineSeparator()+
-                "         - always provide as the very last parameters"+System.lineSeparator()+System.lineSeparator());
+                " /============================================================================\\"+System.lineSeparator()+
+                " | AgM data generator "+DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+getBuildTime()+")                     |"+System.lineSeparator()+
+                " |============================================================================|"+System.lineSeparator()+
+                " | For more information and release notes, go to                              |"+System.lineSeparator()+
+                " |   https://connections.houston.hp.com/docs/DOC-58222                        |"+System.lineSeparator()+
+                " |============================================================================|"+System.lineSeparator()+
+                " | Usage:                                                                     |"+System.lineSeparator()+
+                " |   java -jar agm-data-generator.jar [excel-configuration-file.xlsx]         |"+System.lineSeparator()+
+                " |   [--generate-[u][p][h][b]] [URL] [--solution-name=solution_name]          |"+System.lineSeparator()+
+                " |   [--account-name=account_name] [--force-delete] admin_name admin_password |"+System.lineSeparator()+
+                " |----------------------------------------------------------------------------|"+System.lineSeparator()+
+                " |     excel-configuration-file.xlsx                                          |"+System.lineSeparator()+
+                " |       - data to generate the project from                                  |"+System.lineSeparator()+
+                " |       - built-in file used if this parameter is not specified              |"+System.lineSeparator()+
+                " |       - provide as the very first parameter!                               |"+System.lineSeparator()+
+                " |     --generate-                                                            |"+System.lineSeparator()+
+                " |       u - adds (non-portal) users to the portal and project                |"+System.lineSeparator()+
+                " |       p - generate project data (entities)                                 |"+System.lineSeparator()+
+                " |       h - generate history within past sprints                             |"+System.lineSeparator()+
+                " |       b - generate builds / commits (ALI data)                             |"+System.lineSeparator()+
+                " |         - access to Hudson / SVN is necessary                              |"+System.lineSeparator()+
+                " |       - all the above is generated if no option is specified               |"+System.lineSeparator()+
+                " |       - nothing is generated if '--generate-' is specified                 |"+System.lineSeparator()+
+                " |     --solution-name=                                                       |"+System.lineSeparator()+
+                " |       - name of the solution (handy when having more solutions)            |"+System.lineSeparator()+
+                " |       - first found solution is used when nothing specified                |"+System.lineSeparator()+
+                " |     --account-name=                                                        |"+System.lineSeparator()+
+                " |       - name of the account (handy when having more accounts)              |"+System.lineSeparator()+
+                " |       - the logged-in account is used when nothing specified               |"+System.lineSeparator()+
+                " |     --force-delete                                                         |"+System.lineSeparator()+
+                " |       - do not ask for permission to delete previous data                  |"+System.lineSeparator()+
+                " |       - only deletes data when used along with '--generate-' option        |"+System.lineSeparator()+
+                " |     URL                                                                    |"+System.lineSeparator()+
+                " |       - URL where to login                                                 |"+System.lineSeparator()+
+                " |       - https://gateway.saas.hp.com/msg/ if no URL is specified            |"+System.lineSeparator()+
+                " |     admin_name and admin_password are the only mandatory options           |"+System.lineSeparator()+
+                " |       - always provide as the very last parameters                         |"+System.lineSeparator()+
+                " |============================================================================|"+System.lineSeparator()+
+                " | Example of how to provide parameters:                                      |"+System.lineSeparator()+
+                " |   data.xlsx \"--solution-name=Horizon_Demo\" \"--account-name=kenshoo\"        |"+System.lineSeparator()+
+                " |   --generate-phb --force-delete petr.panuska@hp.com my_horizon_password    |"+System.lineSeparator()+
+                " \\============================================================================/"+System.lineSeparator()+System.lineSeparator());
     }
 
     public static void main(String[] args) throws JAXBException, IOException {
