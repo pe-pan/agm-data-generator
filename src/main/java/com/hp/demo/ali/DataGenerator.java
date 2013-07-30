@@ -237,8 +237,10 @@ public class DataGenerator {
             if (settings.isAddUsers()) {
                 addUsers();
             }
-            configureProject();
-            if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
+            if (settings.isGenerateProject() || settings.isGenerateHistory()) {
+                configureProject();
+            }
+            if (settings.isGenerateProject() || settings.isGenerateBuilds()) {
                 configureSvnAgent();
                 configureAliDevBridge();
                 stopDevBridge();
@@ -257,7 +259,7 @@ public class DataGenerator {
                 buildGenerator.generate(reader.getSheet("Builds"), skippedRevisions);
                 buildGenerator.createJob();
             }
-            if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
+            if (settings.isGenerateProject() || settings.isGenerateBuilds()) {
                 downloader.waitTillDownloaded();
                 replaceDevBridgeBits(downloader);
                 configureDevBridgeBits();
