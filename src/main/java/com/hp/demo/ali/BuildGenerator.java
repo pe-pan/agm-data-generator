@@ -10,9 +10,9 @@ import com.hp.demo.ali.tools.EntityTools;
 import com.hp.demo.ali.tools.Scrambler;
 import com.hp.demo.ali.tools.XmlFile;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.tika.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -151,7 +151,7 @@ public class BuildGenerator {
             try {
                 InputStream in = getClass().getResourceAsStream(buildTemplateFolder + fileName);
                 OutputStream out = new FileOutputStream(outputFolder+fileName);
-                IOUtils.copy(in, out );
+                IOUtils.copy(in, out);
                 in.close();
                 out.close();
             } catch (IOException e) {
