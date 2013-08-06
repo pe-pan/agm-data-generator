@@ -197,7 +197,7 @@ public class DataGenerator {
             AgmRestService.initRestService();
 
             DevBridgeDownloader downloader = null;
-            if (settings.isGenerateProject() && settings.isGenerateBuilds()) {
+            if (settings.isGenerateProject() || settings.isGenerateBuilds()) {
                 downloader = agmClient.downloadDevBridge();
             }
             jobLog = new File("job-"+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+".log");
