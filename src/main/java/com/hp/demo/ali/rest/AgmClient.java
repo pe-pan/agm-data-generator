@@ -101,11 +101,14 @@ public class AgmClient {
             agmUrl = JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[0].loginUrl");
             log.info("Solution being populated: "+JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[0].displayName"));
         }
-        String instanceId =
-                JsonPath.read(response.getResponse(),
-                        solutionName != null ?
-                                "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].instanceId" :
-                                "$.data[0].solutionInstances[0].instanceId").toString();
+        String instanceId;
+        if (solutionName != null) {
+            List<Integer> instanceIds = JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].instanceId");
+            instanceId = instanceIds.get(0).toString();
+        } else {
+            Integer instanceIdInteger = JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[0].instanceId");
+            instanceId = instanceIdInteger.toString();
+        }
 
         response = client.doGet(agmUrl);
 
