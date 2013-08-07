@@ -92,21 +92,21 @@ public class AgmClient {
             throw new IllegalArgumentException("There are no solutions under the given account: "+(accountName == null ? "default " : accountName));
         }
         if (solutionName != null) {
-            List agmUrls = (List<String>)JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl");
+            List<String> agmUrls = (List<String>)JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl");
             if (agmUrls.size() == 0) {
                 throw new IllegalArgumentException("The provided solution name does not exist: "+solutionName);
             }
-            agmUrl = ((List<String>)JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl")).get(0);
+            agmUrl = agmUrls.get(0);
         } else {
-            agmUrl = JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[0].loginUrl");
-            log.info("Solution being populated: "+JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[0].displayName"));
+            agmUrl = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].loginUrl");
+            log.info("Solution being populated: "+JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].displayName"));
         }
         String instanceId;
         if (solutionName != null) {
-            List<Integer> instanceIds = JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[?(@.displayName == '"+solutionName+"')].instanceId");
+            List<Integer> instanceIds = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].instanceId");
             instanceId = instanceIds.get(0).toString();
         } else {
-            Integer instanceIdInteger = JsonPath.read(response.getResponse(), "$.data[0].solutionInstances[0].instanceId");
+            Integer instanceIdInteger = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].instanceId");
             instanceId = instanceIdInteger.toString();
         }
 
