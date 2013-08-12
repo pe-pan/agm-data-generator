@@ -1,6 +1,10 @@
 Release Notes:
 ==============
 
+Version 1.06:
+-------------
+Bug fixes
+
 Version 1.05:
 -------------
 Generated data changes:
