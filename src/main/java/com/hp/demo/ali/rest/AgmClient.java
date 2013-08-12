@@ -87,9 +87,9 @@ public class AgmClient {
         String solutionName = Settings.getSettings().getSolutionName();
         response = client.doGet(RestTools.getProtocolHost(response.getLocation())+"/portal2/service/services/requestsAndServices");
         String agmUrl;
-        List solutions = JsonPath.read(response.getResponse(), "$.data[0].solutionInstances");
+        List solutions = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances");
         if (solutions.size() == 0) {
-            throw new IllegalArgumentException("There are no solutions under the given account: "+(accountName == null ? "default " : accountName));
+            throw new IllegalArgumentException("There are no 'Agile Manager' solutions under the given account: "+(accountName == null ? "default " : accountName));
         }
         if (solutionName != null) {
             List<String> agmUrls = (List<String>)JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl");
