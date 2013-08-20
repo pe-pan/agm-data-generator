@@ -35,11 +35,7 @@ public class XmlFile {
     public XmlFile(File file) {
         try {
             document = dbf.newDocumentBuilder().parse(file);
-        } catch (SAXException e) {
-            throw new IllegalStateException(e);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        } catch (ParserConfigurationException e) {
+        } catch (SAXException | IOException | ParserConfigurationException e) {
             throw new IllegalStateException(e);
         }
     }
