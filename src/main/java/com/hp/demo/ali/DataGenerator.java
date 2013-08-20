@@ -35,6 +35,7 @@ import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.w3c.dom.Element;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
@@ -55,6 +56,7 @@ public class DataGenerator {
     private static AgmClient agmClient = AgmClient.getAgmClient();
 
     private static SheetHandlerRegistry registry;
+    private static ProxyConfigurator proxyConfigurator;
 
     private static String getBuildTime() {
         String buildTime = null;
@@ -189,6 +191,10 @@ public class DataGenerator {
                     argIndex++;
                 }
             }
+
+            proxyConfigurator = new ProxyConfigurator();
+            proxyConfigurator.init(settings.getLoginUrl());
+
             User admin = User.getUser(settings.getAdmin());
             admin.setLogin(args[argIndex++]);
             admin.setPassword(args[argIndex]);
@@ -256,6 +262,7 @@ public class DataGenerator {
                 List<Long>skippedRevisions = readSkippedRevisions(reader.getSheet("Skip-Revisions"));
                 BuildGenerator buildGenerator = new BuildGenerator(settings);
                 buildGenerator.deleteJob();
+                buildGenerator.configureHudson(proxyConfigurator);
                 buildGenerator.generate(reader.getSheet("Builds"), skippedRevisions);
                 buildGenerator.createJob();
             }
@@ -658,12 +665,10 @@ public class DataGenerator {
             Collection<File> descriptors = FileUtils.listFiles(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"deploy"), new String[] {"xml"}, false);
             assert descriptors.size() == 1;
             File tenantDescriptor = descriptors.iterator().next();
-            String tenantDescriptorName = tenantDescriptor.getName().substring(0, tenantDescriptor.getName().length()-4);
+            String tenantDescriptorName = tenantDescriptor.getName().substring(0, tenantDescriptor.getName().length() - 4);
+            CharSequence content = proxyConfigurator.getDevBridgeProxyConfiguration();
             FileUtils.write(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"tenants\\"+tenantDescriptorName+"\\conf\\connection.properties"),
-                    System.lineSeparator()+
-                    "httpProxy=156.152.46.12:8088"+System.lineSeparator()+                                     //todo remove this hard-coded options
-                    "httpsProxy=156.152.46.12:8088"+System.lineSeparator()+
-                    "noProxyHosts=alm-server"+System.lineSeparator(), true);
+                    content);
         } catch (IOException e) {
             log.error("Cannot configure installed ALI Dev Bridge bits", e);
             throw new IllegalStateException(e);
@@ -674,6 +679,8 @@ public class DataGenerator {
         log.info("Configuring SVN agent...");
         File agentConfigFile = new File(settings.getSvnAgentFolder()+"\\config\\agent.xml");
         XmlFile file = new XmlFile(agentConfigFile);
+        Element httpProxy = proxyConfigurator.getSvnAgentProxyConfiguration(file.createElement("HttpProxy"));  //todo refactor so the element instance is being created inside of the method getSvnAgentProxyConfiguration
+        file.setNode("/AgentConfig", "HttpProxy", httpProxy);
         file.setNodeValue("/AgentConfig/AGM/@url", settings.getRestUrl());
         file.setNodeValue("/AgentConfig/Projects/Project/@domain", settings.getDomain());
         file.setNodeValue("/AgentConfig/Projects/Project/@project", settings.getProject());

@@ -1,6 +1,7 @@
 package com.hp.demo.ali.tools;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -17,8 +18,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 /**
@@ -37,6 +36,28 @@ public class XmlFile {
             document = dbf.newDocumentBuilder().parse(file);
         } catch (SAXException | IOException | ParserConfigurationException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    public Element createElement(String nodeTag) {
+        return document.createElement(nodeTag);
+    }
+
+    public Node setNode(String xpathString, String nodeTag, Element child) {
+        try {
+            XPathExpression expression = xpath.compile(xpathString+"/"+nodeTag);
+            Node node = (Node) expression.evaluate(document, XPathConstants.NODE);
+            if (node != null) {
+                node.getParentNode().removeChild(node);
+            }
+            if (child != null) {
+                expression = xpath.compile(xpathString);
+                Node parent = (Node) expression.evaluate(document, XPathConstants.NODE);
+                parent.appendChild(child);
+            }
+            return node;
+        } catch (XPathExpressionException e) {
+            throw new IllegalStateException("Exception when compiling xpath " + xpathString + " in document " + document.getDocumentURI(), e);
         }
     }
 

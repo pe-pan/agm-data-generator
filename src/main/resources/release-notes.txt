@@ -1,6 +1,10 @@
 Release Notes:
 ==============
 
+Version 1.07:
+-------------
+Support for proxy configuration
+
 Version 1.06:
 -------------
 Bug fixes

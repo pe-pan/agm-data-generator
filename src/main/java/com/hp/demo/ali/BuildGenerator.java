@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -261,4 +262,40 @@ public class BuildGenerator {
             //todo reload returns 503 (exception) -> check it's the correct one
         }
     }
+
+    private final String[] startHudsonService = {"cmd.exe", "/c", "sc", "start", "hudson"};
+    private final String[] stopHudsonService = {"cmd.exe", "/c", "sc", "stop", "hudson"};
+    private void startProcess (String activity, String[] args) {
+        try {
+            log.debug("Executing "+ Arrays.toString(args));
+            Process process = Runtime.getRuntime().exec(args);
+            log.debug(activity+" Hudson service STD:" + IOUtils.toString(process.getInputStream()));
+            process.waitFor();
+        } catch (InterruptedException e) {
+            log.error(activity+" of Hudson service interrupted!", e);
+        } catch (IOException e) {
+            log.error("Cannot execute the command or read its std. output; cmd: "+Arrays.toString(args), e);
+        }
+    }
+
+    public void configureHudson(ProxyConfigurator proxyConfigurator) {
+        String content = proxyConfigurator.getHudsonProxyConfiguration();
+        File file = new File(settings.getHudsonFolder()+File.separator+"proxy.xml");
+
+        try {
+            String originalContent = FileUtils.readFileToString(file);
+            if (!content.equals(originalContent)) {
+                log.debug("Writing Hudson proxy configuration "+content+"into: "+file.getAbsolutePath());
+                FileUtils.write(file, content);
+                log.info("New proxy settings written; restarting Hudson service");
+                startProcess("Stopping", stopHudsonService);
+                startProcess("Starting", startHudsonService);
+            } else {
+                log.debug("Identical Hudson proxy settings already exists; nothing necessary to be written");
+            }
+        } catch (IOException e) {
+            log.error("Cannot read/write Hudson proxy configuration into: "+file.getAbsolutePath(), e);
+        }
+    }
+
 }
