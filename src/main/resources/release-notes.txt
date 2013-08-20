@@ -5,6 +5,7 @@ Version 1.07:
 -------------
 Added features:
   - Proxy configuration support
+  - Option to specify tenant URL (omit account and solution names then)
 
 Version 1.06:
 -------------

@@ -62,56 +62,57 @@ public class AgmClient {
         String portalUrl = RestTools.getProtocolHost(response.getLocation());
         log.debug("Logged in to: " + loginUrl);
         log.debug("Portal URL: "+portalUrl);
-        String accountName = Settings.getSettings().getAccountName();
-        if (accountName != null) {
-            response = client.doGet(portalUrl+"/portal2/service/settings/general?");
-            String token = JsonPath.read(response.getResponse(), "$.cSRFTokenVal");
+        String instanceId = "";
+        String tenantUrl = Settings.getSettings().getTenantUrl();
+        if (tenantUrl == null) {
+            String accountName = Settings.getSettings().getAccountName();
+            if (accountName != null) {
+                response = client.doGet(portalUrl+"/portal2/service/settings/general?");
+                String token = JsonPath.read(response.getResponse(), "$.cSRFTokenVal");
 
-            response = client.doGet(portalUrl+"/portal2/service/users/session?");
-            String owningAccountId = JsonPath.read(response.getResponse(), "$.owningAccountId").toString();
-            log.debug("Owning Account ID: "+owningAccountId );
-            List accountIds = JsonPath.read(response.getResponse(), "$.accountsAndServices[?(@.accountName == '"+accountName+"')].accountId");
-            if (accountIds.size() == 0) {
-                throw new IllegalArgumentException("The provided account name does not exist: "+accountName);
+                response = client.doGet(portalUrl+"/portal2/service/users/session?");
+                String owningAccountId = JsonPath.read(response.getResponse(), "$.owningAccountId").toString();
+                log.debug("Owning Account ID: "+owningAccountId );
+                List accountIds = JsonPath.read(response.getResponse(), "$.accountsAndServices[?(@.accountName == '"+accountName+"')].accountId");
+                if (accountIds.size() == 0) {
+                    throw new IllegalArgumentException("The provided account name does not exist: "+accountName);
+                }
+                String accountId = accountIds.get(0).toString();
+                log.debug("Account ID: "+accountId);
+                client.setCustomHeader("csrf.token", token);
+                JSONObject accountData = new JSONObject();
+                accountData.put("id", owningAccountId);
+                accountData.put("nextAccountId", accountId);
+
+                client.doPut(portalUrl+"/portal2/service/accounts/updateCurrentAccount/"+owningAccountId, accountData.toString(), ContentType.JSON_JSON);
+                log.info("Populate data for this account: "+accountName);
             }
-            String accountId = accountIds.get(0).toString();
-            log.debug("Account ID: "+accountId);
-            client.setCustomHeader("csrf.token", token);
-            JSONObject accountData = new JSONObject();
-            accountData.put("id", owningAccountId);
-            accountData.put("nextAccountId", accountId);
-
-            client.doPut(portalUrl+"/portal2/service/accounts/updateCurrentAccount/"+owningAccountId, accountData.toString(), ContentType.JSON_JSON);
-            log.info("Populate data for this account: "+accountName);
-        }
-        String solutionName = Settings.getSettings().getSolutionName();
-        response = client.doGet(RestTools.getProtocolHost(response.getLocation())+"/portal2/service/services/requestsAndServices");
-        String agmUrl;
-        List solutions = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances");
-        if (solutions.size() == 0) {
-            throw new IllegalArgumentException("There are no 'Agile Manager' solutions under the given account: "+(accountName == null ? "default " : accountName));
-        }
-        if (solutionName != null) {
-            List<String> agmUrls = (List<String>)JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl");
-            if (agmUrls.size() == 0) {
-                throw new IllegalArgumentException("The provided solution name does not exist: "+solutionName);
+            String solutionName = Settings.getSettings().getSolutionName();
+            response = client.doGet(RestTools.getProtocolHost(response.getLocation())+"/portal2/service/services/requestsAndServices");
+            List solutions = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances");
+            if (solutions.size() == 0) {
+                throw new IllegalArgumentException("There are no 'Agile Manager' solutions under the given account: "+(accountName == null ? "default " : accountName));
             }
-            agmUrl = agmUrls.get(0);
-        } else {
-            agmUrl = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].loginUrl");
-            log.info("Solution being populated: "+JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].displayName"));
-        }
-        String instanceId;
-        if (solutionName != null) {
-            List<Integer> instanceIds = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].instanceId");
-            instanceId = instanceIds.get(0).toString();
-        } else {
-            Integer instanceIdInteger = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].instanceId");
-            instanceId = instanceIdInteger.toString();
-        }
+            if (solutionName != null) {
+                List<String> agmUrls = (List<String>)JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl");
+                if (agmUrls.size() == 0) {
+                    throw new IllegalArgumentException("The provided solution name does not exist: "+solutionName);
+                }
+                tenantUrl = agmUrls.get(0);
+            } else {
+                tenantUrl = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].loginUrl");
+                log.info("Solution being populated: "+JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].displayName"));
+            }
+            if (solutionName != null) {
+                List<Integer> instanceIds = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].instanceId");
+                instanceId = instanceIds.get(0).toString();
+            } else {
+                Integer instanceIdInteger = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].instanceId");
+                instanceId = instanceIdInteger.toString();
+            }
 
-        response = client.doGet(agmUrl);
-
+        }
+        response = client.doGet(tenantUrl);
         Pattern p = Pattern.compile("^https?://([^/]+)/agm/webui/alm/([^/]+)/([^/]+)/apm/[^/]+/\\?TENANTID=(.+)$");
         Matcher m = p.matcher(response.getLocation());
         m.matches();
@@ -123,7 +124,7 @@ public class AgmClient {
 
         tenantProperties[4] = "https://" + tenantProperties[0] + "/qcbin";
         tenantProperties[5] = portalUrl;    // portal URL
-        tenantProperties[6] = instanceId;
+        tenantProperties[6] = instanceId;   // todo this is the reason why --tenant-url and --generate-u cannot be combined -> test if it can be combined and if so, remove the warnings
 
         restUrl = tenantProperties[4] + "/rest/domains/" + tenantProperties[1] + "/projects/" + tenantProperties[2] + "/";
         return tenantProperties;

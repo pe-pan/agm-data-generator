@@ -81,7 +81,8 @@ public class DataGenerator {
                 " | Usage:                                                                     |"+System.lineSeparator()+
                 " |   java -jar agm-data-generator.jar [excel-configuration-file.xlsx]         |"+System.lineSeparator()+
                 " |   [--generate-[u][p][h][b]] [URL] [--solution-name=solution_name]          |"+System.lineSeparator()+
-                " |   [--account-name=account_name] [--force-delete] admin_name admin_password |"+System.lineSeparator()+
+                " |   [--account-name=account_name] [--tenant-url=tenant_url] [--force-delete] |"+System.lineSeparator()+
+                " |   admin_name admin_password                                                |"+System.lineSeparator()+
                 " |----------------------------------------------------------------------------|"+System.lineSeparator()+
                 " |     excel-configuration-file.xlsx                                          |"+System.lineSeparator()+
                 " |       - data to generate the project from                                  |"+System.lineSeparator()+
@@ -101,6 +102,10 @@ public class DataGenerator {
                 " |     --account-name=                                                        |"+System.lineSeparator()+
                 " |       - name of the account (handy when having more accounts)              |"+System.lineSeparator()+
                 " |       - the logged-in account is used when nothing specified               |"+System.lineSeparator()+
+                " |     --tenant-url=                                                          |"+System.lineSeparator()+
+                " |       - URL where the tenant is accessible                                 |"+System.lineSeparator()+
+                " |       - supresses solution-name and account-name options (if provided)     |"+System.lineSeparator()+
+                " |       - users cannot be added when providing this option                   |"+System.lineSeparator()+
                 " |     --force-delete                                                         |"+System.lineSeparator()+
                 " |       - do not ask for permission to delete previous data                  |"+System.lineSeparator()+
                 " |       - only deletes data when used along with '--generate-' option        |"+System.lineSeparator()+
@@ -117,7 +122,7 @@ public class DataGenerator {
     }
 
     public static void main(String[] args) throws JAXBException, IOException {
-        if (args.length < 2 || args.length > 7) {    // todo 7 is the current number of possible arguments (make it more robust)
+        if (args.length < 2 || args.length > 8) {    // todo 8 is the current number of possible arguments (make it more robust)
             printUsage();
             System.exit(-1);
         }
@@ -140,7 +145,7 @@ public class DataGenerator {
             readUsers(reader);
             Settings.initSettings(reader.getSheet("Settings"));
             settings = Settings.getSettings();
-            for (int i = 0; i < 5; i++) {   // todo 5 is the current number of optional arguments (user credentials are not optional; make it more robust)
+            for (int i = 0; i < 6; i++) {   // todo 6 is the current number of optional arguments (user credentials are not optional); make it more robust
                 if (args.length > 2+argIndex) {
                     if (args[argIndex].startsWith("--generate-")) {
                         settings.setAddUsers(false);
@@ -181,6 +186,9 @@ public class DataGenerator {
                     } else if (args[argIndex].startsWith("--solution-name=")) {
                         settings.setSolutionName(args[argIndex].substring("--solution-name=".length()));
                         log.info("Solution being populated: "+settings.getSolutionName());
+                    } else if (args[argIndex].startsWith("--tenant-url=")) {
+                        settings.setTenantUrl(args[argIndex].substring("--tenant-url=".length()));
+                        log.info("Tenant URL: "+settings.getTenantUrl());
                     } else if (args[argIndex].startsWith("--force-delete")) {
                         settings.setForceDelete(true);
                     } else {
@@ -190,6 +198,11 @@ public class DataGenerator {
                     }
                     argIndex++;
                 }
+            }
+            if (settings.isAddUsers() && settings.getTenantUrl() != null) {
+                log.error("Invalid combination: Adding users while providing Tenant URL is not supported.");
+                log.error("Use --generate-phb option when providing --tenant-url option.");
+                log.error("The tool does not have to work properly!");
             }
 
             proxyConfigurator = new ProxyConfigurator();

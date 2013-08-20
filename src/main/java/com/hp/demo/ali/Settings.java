@@ -46,6 +46,7 @@ public class Settings {
     private boolean forceDelete;
     private String instanceId;
     private String accountName;
+    private String tenantUrl;
 
     private Settings(Sheet settings) {
         log.info("Reading settings...");
@@ -295,6 +296,14 @@ public class Settings {
 
     public void setForceDelete(boolean forceDelete) {
         this.forceDelete = forceDelete;
+    }
+
+    public String getTenantUrl() {
+        return tenantUrl;
+    }
+
+    public void setTenantUrl(String tenantUrl) {
+        this.tenantUrl = tenantUrl;
     }
 
     private static Settings settings = null;
