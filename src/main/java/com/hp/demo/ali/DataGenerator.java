@@ -668,12 +668,11 @@ public class DataGenerator {
     public static void configureDevBridgeBits() {  //todo rename; too similar to configureAliDevBridge method name
         log.info("Configuring ALI Dev Bridge bits...");
         try {
-            FileUtils.write(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"wrapper\\wrapper-custom.conf"),
-                    System.lineSeparator()+
-                    "wrapper.java.additional.101=-Dali.bridge.port=8380"+System.lineSeparator()+                //todo remove this hard-coded options
-                    "wrapper.java.additional.102=-Dali.bridge.ssl.port=8543"+System.lineSeparator()+
-                    "wrapper.java.additional.104=-Dali.bridge.http.warning=false"+System.lineSeparator()+
-                    "wrapper.java.command=c:\\Java\\jdk1.7.0_03\\bin\\java.exe"+System.lineSeparator(), true);
+            InputStream in = DataGenerator.class.getResourceAsStream("/wrapper-custom.conf");
+            OutputStream out = new FileOutputStream(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"wrapper"+File.separator+"wrapper-custom.conf", true);
+            IOUtils.copy(in, out);
+            in.close();
+            out.close();
 
             Collection<File> descriptors = FileUtils.listFiles(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"deploy"), new String[] {"xml"}, false);
             assert descriptors.size() == 1;

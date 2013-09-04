@@ -1,6 +1,10 @@
 Release Notes:
 ==============
 
+Version 1.08:
+-------------
+Technical enhancements
+
 Version 1.07:
 -------------
 Added features:
