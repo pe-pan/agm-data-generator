@@ -757,11 +757,11 @@ public class DataGenerator {
     }
 
     static void deleteAllData(ExcelReader reader, File jobLog) {
-        log.info("#################################################################");
-        log.info("#################################################################");
-        log.info("## You asked to delete ALL data from the tenant! Are you sure? ##");
-        log.info("#################################################################");
-        log.info("#################################################################");
+        log.info("###############################################################");
+        log.info("###############################################################");
+        log.info("# You asked to delete ALL data from the tenant! Are you sure? #");
+        log.info("###############################################################");
+        log.info("###############################################################");
         askForDeletePermission();
         List<Sheet> sheets = reader.getAllEntitySheets();
         ListIterator<Sheet> iterator = sheets.listIterator(sheets.size());
