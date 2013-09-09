@@ -47,6 +47,7 @@ public class Settings {
     private String instanceId;
     private String accountName;
     private String tenantUrl;
+    private boolean deleteAll;
 
     private Settings(Sheet settings) {
         log.info("Reading settings...");
@@ -304,6 +305,14 @@ public class Settings {
 
     public void setTenantUrl(String tenantUrl) {
         this.tenantUrl = tenantUrl;
+    }
+
+    public boolean isDeleteAll() {
+        return deleteAll;
+    }
+
+    public void setDeleteAll(boolean deleteAll) {
+        this.deleteAll = deleteAll;
     }
 
     private static Settings settings = null;

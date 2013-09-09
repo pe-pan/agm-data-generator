@@ -31,8 +31,10 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.hp.almjclient.connection.ServiceResourceAdapter;
 import org.hp.almjclient.exceptions.ALMRestException;
+import org.hp.almjclient.exceptions.FieldNotFoundException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
+import org.hp.almjclient.model.marshallers.favorite.Filter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.w3c.dom.Element;
@@ -106,6 +108,9 @@ public class DataGenerator {
                 " |       - URL where the tenant is accessible                                 |"+System.lineSeparator()+
                 " |       - supresses solution-name and account-name options (if provided)     |"+System.lineSeparator()+
                 " |       - users cannot be added when providing this option                   |"+System.lineSeparator()+
+                " |     --delete-all                                                           |"+System.lineSeparator()+
+                " |       - deletes all data from the tenant regardless previous runs          |"+System.lineSeparator()+
+                " |       - does not pay attention to the job log content                      |"+System.lineSeparator()+
                 " |     --force-delete                                                         |"+System.lineSeparator()+
                 " |       - do not ask for permission to delete previous data                  |"+System.lineSeparator()+
                 " |       - only deletes data when used along with '--generate-' option        |"+System.lineSeparator()+
@@ -122,7 +127,7 @@ public class DataGenerator {
     }
 
     public static void main(String[] args) throws JAXBException, IOException {
-        if (args.length < 2 || args.length > 8) {    // todo 8 is the current number of possible arguments (make it more robust)
+        if (args.length < 2 || args.length > 9) {    // todo 9 is the current number of possible arguments (make it more robust)
             printUsage();
             System.exit(-1);
         }
@@ -145,7 +150,7 @@ public class DataGenerator {
             readUsers(reader);
             Settings.initSettings(reader.getSheet("Settings"));
             settings = Settings.getSettings();
-            for (int i = 0; i < 6; i++) {   // todo 6 is the current number of optional arguments (user credentials are not optional); make it more robust
+            for (int i = 0; i < 7; i++) {   // todo 7 is the current number of optional arguments (user credentials are not optional); make it more robust
                 if (args.length > 2+argIndex) {
                     if (args[argIndex].startsWith("--generate-")) {
                         settings.setAddUsers(false);
@@ -191,6 +196,8 @@ public class DataGenerator {
                         log.info("Tenant URL: "+settings.getTenantUrl());
                     } else if (args[argIndex].startsWith("--force-delete")) {
                         settings.setForceDelete(true);
+                    } else if (args[argIndex].startsWith("--delete-all")) {
+                        settings.setDeleteAll(true);
                     } else {
                         System.out.println("Unclear argument "+args[argIndex]);
                         printUsage();
@@ -220,38 +227,10 @@ public class DataGenerator {
                 downloader = agmClient.downloadDevBridge();
             }
             jobLog = new File("job-"+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+".log");
-            if (jobLog.exists()) {
-                log.info("Log from previous run found ("+jobLog.getName()+"), previously created data are going to be deleted...");
-                if (!settings.isForceDelete()) {
-                    log.info("Type 'yes' and press <ENTER> if you wish to continue...");
-                    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-                    String input = in.readLine();
-                    if (!input.equals("yes")) {
-                        System.exit(-1);
-                    }
-                } else {
-                    log.info("Delete forced; deleting now!");
-                }
-                openLog();
-                String previousEntity = "";
-                for (String line = readLogLine(); line != null; line = readLogLine()) {
-                    int columnIndex = line.indexOf(':');
-                    String entityName = line.substring(0, columnIndex);
-                    String agmId = line.substring(columnIndex+2);
-                    log.debug("Deleting "+entityName+" with ID: "+agmId);
-                    if (!entityName.equals(previousEntity)) {
-                        log.info("Deleting entity: "+entityName);
-                        previousEntity = entityName;
-                    }
-                    AgmRestService service = AgmRestService.getCRUDService();
-                    try {
-                        service.delete(entityName, Integer.parseInt(agmId));
-                    } catch (RestClientException | ALMRestException  e) {
-                        log.error("Cannot delete "+entityName+" with ID: "+agmId);
-                    }
-                }
+            if (settings.isDeleteAll()) {
+                deleteAllData(reader, jobLog);
             } else {
-                log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
+                deleteJobLogData(jobLog);
             }
             if (settings.isAddUsers()) {
                 addUsers();
@@ -731,5 +710,109 @@ public class DataGenerator {
         } catch (RestClientException | ALMRestException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    static void askForDeletePermission() {
+        if (!settings.isForceDelete()) {
+            log.info("Type 'yes' and press <ENTER> if you wish to continue...");
+            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+            String input;
+            try {
+                input = in.readLine();
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+            if (!input.equals("yes")) {
+                System.exit(-1);
+            }
+        } else {
+            log.info("Delete forced; deleting now!");
+        }
+    }
+    static void deleteJobLogData(File jobLog) {
+        if (jobLog.exists()) {
+            log.info("Log from previous run found ("+jobLog.getName()+"), previously created data are going to be deleted...");
+            askForDeletePermission();
+            openLog();
+            String previousEntity = "";
+            for (String line = readLogLine(); line != null; line = readLogLine()) {
+                int columnIndex = line.indexOf(':');
+                String entityName = line.substring(0, columnIndex);
+                String agmId = line.substring(columnIndex+2);
+                log.debug("Deleting "+entityName+" with ID: "+agmId);
+                if (!entityName.equals(previousEntity)) {
+                    log.info("Deleting entity: "+entityName);
+                    previousEntity = entityName;
+                }
+                AgmRestService service = AgmRestService.getCRUDService();
+                try {
+                    service.delete(entityName, Integer.parseInt(agmId));
+                } catch (RestClientException | ALMRestException  e) {
+                    log.error("Cannot delete "+entityName+" with ID: "+agmId);
+                }
+            }
+        } else {
+            log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
+        }
+    }
+
+    static void deleteAllData(ExcelReader reader, File jobLog) {
+        log.info("#################################################################");
+        log.info("#################################################################");
+        log.info("## You asked to delete ALL data from the tenant! Are you sure? ##");
+        log.info("#################################################################");
+        log.info("#################################################################");
+        askForDeletePermission();
+        List<Sheet> sheets = reader.getAllEntitySheets();
+        ListIterator<Sheet> iterator = sheets.listIterator(sheets.size());
+        AgmRestService service = AgmRestService.getCRUDService();
+        while (iterator.hasPrevious()) {
+            Sheet sheet = iterator.previous();
+            String entityType = sheet.getSheetName();
+            if (entityType.equals("release-backlog-item")) {
+                log.debug("Skipping "+entityType);
+                continue;   // skip release backlog items (they are not entities in AgM)
+            }
+            log.info("Deleting entity: " + entityType);
+            Filter filter = new Filter(entityType);
+            org.hp.almjclient.model.marshallers.Entities entities;
+            try {
+                entities = service.readCollection(filter);
+            } catch (RestClientException | ALMRestException e) {
+                log.error("Cannot query for entities: "+entityType, e);
+                continue; // query failed; don't delete it
+            }
+            int previousResults = Integer.MAX_VALUE;
+            while (entities.getTotalResults() > 0 && entities.getTotalResults() < previousResults) {
+                previousResults = entities.getTotalResults();
+                List<Integer> ids = new ArrayList<>(entities.getTotalResults());
+                for (Entity entity : entities.getEntityList()) {
+                    Integer id;
+                    try {
+                        id = entity.getId();
+                        log.debug("Getting " + entityType + " with ID: " + id);
+                        if (id == 0) {
+                            log.debug("Skipping the entity with ID 0");  //todo hack!!!!
+                        } else {
+                            ids.add(id);
+                        }
+                    } catch (FieldNotFoundException e) {
+                        log.error("Cannot get id of entity "+entityType+" with index="+ids.size());
+                    }
+                }
+                try {
+                    service.delete(entityType, ids, true);
+                } catch (RestClientException | ALMRestException e) {
+                    log.error("Cannot delete "+ids.size()+" entities: "+entityType);
+                    break; // query failed; don't continue querying it
+                }
+                try {
+                    entities = service.readCollection(filter);
+                } catch (RestClientException | ALMRestException e) {
+                    log.error("Cannot query for entities: "+entityType, e);
+                }
+            }
+        }
+        jobLog.delete(); //todo delete the job log only if no query above failed
     }
 }

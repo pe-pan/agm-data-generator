@@ -3,6 +3,9 @@ Release Notes:
 
 Version 1.08:
 -------------
+Added features:
+  - Option to wipe out all data from the tenant (not only the previously generated)
+
 Technical enhancements
 
 Version 1.07:
