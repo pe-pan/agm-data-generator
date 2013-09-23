@@ -535,17 +535,20 @@ public class DataGenerator {
                     }
                 }
                 try {
-                    //todo serialize using JSON library
-                    String formData = "{\"users\":[{\"loginName\":\""+StringEscapeUtils.escapeHtml(user.getLogin())+
-                            "\", \"firstName\":\""+StringEscapeUtils.escapeHtml(user.getFirstName())+
-                            "\", \"lastName\":\""+StringEscapeUtils.escapeHtml(user.getLastName())+
-                            "\", \"phone\":\"1\", \"email\":\""+StringEscapeUtils.escapeHtml(user.getLogin())+
-                            "\", \"timezone\":\"Europe/Prague\"}]}";
+                    userJson = new JSONObject();
+                    userJson.put("firstName", StringEscapeUtils.escapeHtml(user.getFirstName()));
+                    userJson.put("lastName", StringEscapeUtils.escapeHtml(user.getLastName()));
+                    userJson.put("email", StringEscapeUtils.escapeHtml(user.getLogin()));
+                    userJson.put("loginName", StringEscapeUtils.escapeHtml(user.getLogin()));
+                    userJson.put("phone", "1");
+                    userJson.put("timezone", timezone);
+                    JSONObject usersJson = new JSONObject();
+                    usersJson.put("users", userJson);
                     ServiceResourceAdapter adapter = AgmRestService.getAdapter();
                     Map<String, String> headers = new HashMap<>(1);
                     headers.put("INTERNAL_DATA", "20120922");
                     adapter.addSessionCookie("AGM_STATE="+"20120922");
-                    adapter.putWithHeaders(String.class, settings.getRestUrl()+"/rest/api/portal/users", formData, headers, ServiceResourceAdapter.ContentType.JSON);
+                    adapter.putWithHeaders(String.class, settings.getRestUrl()+"/rest/api/portal/users", usersJson.toString(), headers, ServiceResourceAdapter.ContentType.JSON);
                 } catch (ALMRestException e) {
                     log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
                     String responseHtml = e.getResponse().getEntity(String.class);
