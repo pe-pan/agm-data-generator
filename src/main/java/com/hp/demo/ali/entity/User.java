@@ -16,14 +16,16 @@ public class User {
     private String password;
     private String firstName;
     private String lastName;
+    private String phone;
     private boolean portalUser;
 
-    public User(String id, String login, String password, String firstName, String lastName, boolean portalUser) {
+    public User(String id, String login, String password, String firstName, String lastName, String phone, boolean portalUser) {
         this.id = id;
         this.login = login;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.phone = phone;
         this.portalUser = portalUser;
     }
 
@@ -54,6 +56,10 @@ public class User {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public String getPhone() {
+        return phone;
     }
 
     public boolean isPortalUser() {

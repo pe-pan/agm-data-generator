@@ -317,8 +317,9 @@ public class DataGenerator {
             String password = EntityTools.getFieldValue(userEntity, "password");
             String firstName = EntityTools.getFieldValue(userEntity, "first name");
             String lastName = EntityTools.getFieldValue(userEntity, "last name");
+            String phone = EntityTools.getFieldValue(userEntity, "phone");
             boolean portalUser = "yes".equals(EntityTools.getFieldValue(userEntity, "portal user"));
-            User user = new User(id, login, password, firstName, lastName, portalUser);
+            User user = new User(id, login, password, firstName, lastName, phone, portalUser);
             User.addUser(user);
         }
         return users;
@@ -486,7 +487,7 @@ public class DataGenerator {
                 userJson.put("lastName", StringEscapeUtils.escapeHtml(user.getLastName()));
                 userJson.put("email", StringEscapeUtils.escapeHtml(user.getLogin()));
                 userJson.put("loginName", StringEscapeUtils.escapeHtml(user.getLogin()));
-                userJson.put("phone", "1");
+                userJson.put("phone", StringEscapeUtils.escapeHtml(user.getPhone()));
                 userJson.put("timezone", timezone);
                 JSONArray roles = new JSONArray();
                 roles.add("CUSTOMER_PORTAL_BASIC");
@@ -540,7 +541,7 @@ public class DataGenerator {
                     userJson.put("lastName", StringEscapeUtils.escapeHtml(user.getLastName()));
                     userJson.put("email", StringEscapeUtils.escapeHtml(user.getLogin()));
                     userJson.put("loginName", StringEscapeUtils.escapeHtml(user.getLogin()));
-                    userJson.put("phone", "1");
+                    userJson.put("phone", StringEscapeUtils.escapeHtml(user.getPhone()));
                     userJson.put("timezone", timezone);
                     JSONObject usersJson = new JSONObject();
                     usersJson.put("users", userJson);
