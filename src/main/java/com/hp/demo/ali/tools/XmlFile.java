@@ -65,6 +65,9 @@ public class XmlFile {
         try {
             XPathExpression expression = xpath.compile(xpathString);
             Node node = (Node) expression.evaluate(document, XPathConstants.NODE);
+            if (node == null) {
+                throw new IllegalStateException("In XML file "+document.getDocumentURI()+" cannot be found node on the path "+xpathString);
+            }
             String oldValue = node.getTextContent();
             node.setTextContent(value);
             return oldValue;

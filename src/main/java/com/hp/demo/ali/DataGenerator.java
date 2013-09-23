@@ -131,6 +131,7 @@ public class DataGenerator {
             printUsage();
             System.exit(-1);
         }
+        log.debug("Options: "+args);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         long startTime = System.currentTimeMillis();
         log.info("AgM data generator " + DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+getBuildTime()+")");
@@ -267,7 +268,7 @@ public class DataGenerator {
                 synchronizeAliDevBridge();
             }
         } catch (RuntimeException e) {
-            log.debug(e);
+            log.debug("Exception thrown:", e);
             throw e;
         } finally {
             long endTime = System.currentTimeMillis();

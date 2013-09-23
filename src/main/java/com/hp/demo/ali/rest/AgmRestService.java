@@ -23,7 +23,7 @@ import java.util.concurrent.CancellationException;
  * Created by panuska on 18.7.13.
  */
 public class AgmRestService {
-    private static Logger log = Logger.getLogger(RestClient.class.getName());
+    private static Logger log = Logger.getLogger(AgmRestService.class.getName());
     private static ServiceResourceAdapter adapter;
     private ProjectServicesFactory factory;
     private static KanbanStatusConfigurationService kanbanService;
