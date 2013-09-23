@@ -215,7 +215,7 @@ public class DataGenerator {
             }
 
             proxyConfigurator = new ProxyConfigurator();
-            proxyConfigurator.init(settings.getLoginUrl());
+            proxyConfigurator.init();
 
             User admin = User.getUser(settings.getAdmin());
             admin.setLogin(args[argIndex++]);

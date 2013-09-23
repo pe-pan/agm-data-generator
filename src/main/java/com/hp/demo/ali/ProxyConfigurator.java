@@ -13,6 +13,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Properties;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Created by panuska on 19.8.13.
@@ -30,11 +32,23 @@ public class ProxyConfigurator {
 
     public static final String PROXY_PROPERTIES_FILE_NAME = "proxy.properties";
 
-    public void init(String url) {
+    public void init() {
         proxyProperties = getProxyFileConfiguration();
         if (proxyProperties == null) {
             System.setProperty("java.net.useSystemProxies", "true");
-            proxyProperties = getSystemProxyConfiguration(url);
+            Settings settings = Settings.getSettings();
+            String loginUrl = settings.getLoginUrl();
+            String httpUrl;
+            String httpsUrl;
+            if (loginUrl.toLowerCase().startsWith("https")) {
+                httpUrl ="http"+loginUrl.substring("https".length());
+                httpsUrl = loginUrl;
+            } else {
+                httpUrl = loginUrl;
+                httpsUrl = "https"+loginUrl.substring("http".length());
+            }
+            String urls[] = new String[] { httpUrl, httpsUrl, settings.getSvnUrl(), settings.getHudsonUrl(), settings.getAliDevBridgeUrl() };
+            proxyProperties = getSystemProxyConfiguration(urls);
         } else {
             System.setProperty("java.net.useSystemProxies", "false");
             for (String key : proxyProperties.stringPropertyNames()) {
@@ -62,46 +76,51 @@ public class ProxyConfigurator {
         }
     }
 
-    private Properties getSystemProxyConfiguration(String url) {
+    private Properties getSystemProxyConfiguration(String[] urls) {
         log.debug("Getting system proxy");
-        String httpUrl;
-        String httpsUrl;
-        if (url.startsWith("https")) {
-            httpsUrl = url;
-            httpUrl = "http" + url.substring("https".length());
-        } else {
-            httpsUrl = "https" + url.substring("http".length());
-            httpUrl = url;
-        }
         Properties properties = new Properties();
-        InetSocketAddress address = getSystemProxy(httpUrl);
-        if (address != null) {
-            properties.put(HTTP_PROXY_HOST_KEY, address.getHostString());
-            properties.put(HTTP_PROXY_PORT_KEY, ""+address.getPort());
-            log.debug("HTTP proxy: " + address.getHostString() + ":" + address.getPort());
-        } else {
-            log.debug("No HTTP proxy");
+        SortedSet<String> nonProxyHosts = new TreeSet<>();
+        for (String url : urls) {
+            URI uri;
+            try {
+                uri = new URI(url);
+            } catch (URISyntaxException e) {
+                throw new IllegalStateException(e);
+            }
+            InetSocketAddress address = getSystemProxy(uri);
+            if (address != null) {
+                if (url.toLowerCase().startsWith("https")) {
+                    properties.put(HTTPS_PROXY_HOST_KEY, address.getHostString());
+                    properties.put(HTTPS_PROXY_PORT_KEY, ""+address.getPort());
+                    //todo verify that all previous URLs in this array are using the same proxy
+                    log.debug("HTTPS proxy: " + address.getHostString() + ":" + address.getPort());
+                } else {
+                    properties.put(HTTP_PROXY_HOST_KEY, address.getHostString());
+                    properties.put(HTTP_PROXY_PORT_KEY, ""+address.getPort());
+                    //todo verify that all previous URLs in this array are using the same proxy
+                    log.debug("HTTP proxy: " + address.getHostString() + ":" + address.getPort());
+                }
+            } else {
+                nonProxyHosts.add(uri.getHost());
+            }
         }
-
-        address = getSystemProxy(httpsUrl);
-        if (address != null) {
-            properties.put(HTTPS_PROXY_HOST_KEY, address.getHostString());
-            properties.put(HTTPS_PROXY_PORT_KEY, ""+address.getPort());
-            log.debug("HTTPS proxy: " + address.getHostString() + ":" + address.getPort());
+        if (nonProxyHosts.size() > 0) {
+            String nonProxyHostsString = nonProxyHosts.first();
+            nonProxyHosts.remove(nonProxyHostsString);
+            for (String nonProxyHost : nonProxyHosts) {
+                nonProxyHostsString = nonProxyHostsString + "|" + nonProxyHost;
+            }
+            properties.put(NO_PROXY_HOSTS_KEY, nonProxyHostsString);
+            log.debug("Non HTTP(S) proxy hosts: "+nonProxyHostsString);
         } else {
-            log.debug("No HTTPS proxy");
+            log.debug("No non HTTP(S) proxy hosts set");
         }
         return properties;
     }
 
-    private InetSocketAddress getSystemProxy(String url) {
+    private InetSocketAddress getSystemProxy(URI uri) {
         List<Proxy> proxyList;
-        try {
-            proxyList = ProxySelector.getDefault().select(new URI(url));
-        }
-        catch (URISyntaxException e) {
-            throw new IllegalStateException(e);
-        }
+        proxyList = ProxySelector.getDefault().select(uri);
         if (proxyList != null && proxyList.size() > 0) {
             Proxy proxy = proxyList.get(0);
             if (proxyList.size() > 1) {
