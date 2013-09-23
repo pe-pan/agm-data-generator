@@ -232,7 +232,9 @@ public class DataGenerator {
             if (settings.isDeleteAll()) {
                 deleteAllData(reader, jobLog);
             } else {
-                deleteJobLogData(jobLog);
+                if (settings.isGenerateProject()) {
+                    deleteJobLogData(jobLog);
+                }
             }
             if (settings.isAddUsers()) {
                 addUsers();
