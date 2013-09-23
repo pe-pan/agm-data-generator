@@ -27,6 +27,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.hp.almjclient.connection.ServiceResourceAdapter;
@@ -481,10 +482,10 @@ public class DataGenerator {
         for (User user : User.getUsers()) {
             if (user.isPortalUser()) {
                 JSONObject userJson = new JSONObject();
-                userJson.put("firstName", user.getFirstName());
-                userJson.put("lastName", user.getLastName());
-                userJson.put("email", user.getLogin());
-                userJson.put("loginName", user.getLogin());
+                userJson.put("firstName", StringEscapeUtils.escapeHtml(user.getFirstName()));
+                userJson.put("lastName", StringEscapeUtils.escapeHtml(user.getLastName()));
+                userJson.put("email", StringEscapeUtils.escapeHtml(user.getLogin()));
+                userJson.put("loginName", StringEscapeUtils.escapeHtml(user.getLogin()));
                 userJson.put("phone", "1");
                 userJson.put("timezone", timezone);
                 JSONArray roles = new JSONArray();
@@ -515,7 +516,7 @@ public class DataGenerator {
                         try {
                             log.debug("Trying to attach an existing user account: "+ user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
                             userJson = new JSONObject();
-                            userJson.put("loginName", user.getLogin());
+                            userJson.put("loginName", StringEscapeUtils.escapeHtml(user.getLogin()));
                             userJson.put("allowedServices", instanceIds);
                             roles = new JSONArray();
                             roles.add("CUSTOMER_PORTAL_BASIC");
@@ -535,10 +536,10 @@ public class DataGenerator {
                 }
                 try {
                     //todo serialize using JSON library
-                    String formData = "{\"users\":[{\"loginName\":\""+user.getLogin()+
-                            "\", \"firstName\":\""+user.getFirstName()+
-                            "\", \"lastName\":\""+user.getLastName()+
-                            "\", \"phone\":\"1\", \"email\":\""+user.getLogin()+
+                    String formData = "{\"users\":[{\"loginName\":\""+StringEscapeUtils.escapeHtml(user.getLogin())+
+                            "\", \"firstName\":\""+StringEscapeUtils.escapeHtml(user.getFirstName())+
+                            "\", \"lastName\":\""+StringEscapeUtils.escapeHtml(user.getLastName())+
+                            "\", \"phone\":\"1\", \"email\":\""+StringEscapeUtils.escapeHtml(user.getLogin())+
                             "\", \"timezone\":\"Europe/Prague\"}]}";
                     ServiceResourceAdapter adapter = AgmRestService.getAdapter();
                     Map<String, String> headers = new HashMap<>(1);
@@ -553,7 +554,7 @@ public class DataGenerator {
                 } catch (RestClientException e) {
                     log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
                 }
-                }
+            }
         }
     }
 
