@@ -655,8 +655,17 @@ public class DataGenerator {
     public static void configureDevBridgeBits() {  //todo rename; too similar to configureAliDevBridge method name
         log.info("Configuring ALI Dev Bridge bits...");
         try {
-            InputStream in = DataGenerator.class.getResourceAsStream("/wrapper-custom.conf");
-            OutputStream out = new FileOutputStream(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"wrapper"+File.separator+"wrapper-custom.conf", true);
+            final String fileName = "wrapper-custom.conf";
+            File file = new File(fileName);
+            InputStream in;
+            if (file.exists()) {
+                log.debug("File "+fileName+" found, using this one.");
+                in = new FileInputStream(file);
+            } else {
+                log.debug("No file "+fileName+" found, using the built-in one.");
+                in = DataGenerator.class.getResourceAsStream("/"+fileName);
+            }
+            OutputStream out = new FileOutputStream(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"wrapper"+File.separator+fileName, true);
             IOUtils.copy(in, out);
             in.close();
             out.close();
