@@ -4,8 +4,13 @@ import com.hp.demo.ali.tools.SheetTools;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * Created by panuska on 1/14/13.
@@ -315,9 +320,74 @@ public class Settings {
         this.deleteAll = deleteAll;
     }
 
+    public void setAdmin(String admin) {
+        this.admin = admin;
+    }
+
+    public void setAliDevBridgeUrl(String aliDevBridgeUrl) {
+        this.aliDevBridgeUrl = aliDevBridgeUrl;
+    }
+
+    public void setSvnUrl(String svnUrl) {
+        this.svnUrl = svnUrl;
+    }
+
+    public void setSvnUser(String svnUser) {
+        this.svnUser = svnUser;
+    }
+
+    public void setHudsonUrl(String hudsonUrl) {
+        this.hudsonUrl = hudsonUrl;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
+    public void setTemplateJobName(String templateJobName) {
+        this.templateJobName = templateJobName;
+    }
+
+    public void setBuildFolder(String buildFolder) {
+        this.buildFolder = buildFolder;
+    }
+
+    public void setHudsonFolder(String hudsonFolder) {
+        this.hudsonFolder = hudsonFolder;
+    }
+
+    public void setDevBridgeFolder(String devBridgeFolder) {
+        this.devBridgeFolder = devBridgeFolder;
+    }
+
+    public void setSvnAgentFolder(String svnAgentFolder) {
+        this.svnAgentFolder = svnAgentFolder;
+    }
+
     private static Settings settings = null;
     public static void initSettings(Sheet settingsSheet) {
         settings = new Settings(settingsSheet);
+        File file = new File("settings.properties");
+        if (file.exists()) {
+            Properties properties = new Properties();
+            try {
+                log.debug("Settings properties file found, loading");
+                properties.load(new FileInputStream(file));
+            } catch (IOException e) {
+                log.error("Cannot open file: "+file.getAbsolutePath(), e);
+                return;
+            }
+            for (String propertyName : properties.stringPropertyNames()) {
+                String methodName = "set"+propertyName;
+                String propertyValue = properties.getProperty(propertyName);
+                try {
+                    log.debug("Calling "+methodName+"("+propertyValue+")");
+                    settings.getClass().getMethod(methodName, String.class).invoke(settings, propertyValue);
+                } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    log.error("On "+Settings.class.getSimpleName()+" class, cannot call the method "+methodName, e);
+                }
+            }
+        }
     }
 
     public static Settings getSettings() {
