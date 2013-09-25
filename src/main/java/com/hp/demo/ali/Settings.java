@@ -53,6 +53,7 @@ public class Settings {
     private String accountName;
     private String tenantUrl;
     private boolean deleteAll;
+    private String hudsonServiceName;
 
     private Settings(Sheet settings) {
         log.info("Reading settings...");
@@ -90,6 +91,7 @@ public class Settings {
         forceDelete = "yes".equals(SheetTools.getStringValue(settings, 25, 2));
         addUsers = "yes".equals(SheetTools.getStringValue(settings, 26, 2));
         generateHistory = "yes".equals(SheetTools.getStringValue(settings, 27, 2));
+        hudsonServiceName = SheetTools.getStringValue(settings, 28, 2);
     }
 
     public boolean isGenerateProject() {
@@ -318,6 +320,14 @@ public class Settings {
 
     public void setDeleteAll(boolean deleteAll) {
         this.deleteAll = deleteAll;
+    }
+
+    public String getHudsonServiceName() {
+        return hudsonServiceName;
+    }
+
+    public void setHudsonServiceName(String hudsonServiceName) {
+        this.hudsonServiceName = hudsonServiceName;
     }
 
     public void setAdmin(String admin) {

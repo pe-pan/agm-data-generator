@@ -263,8 +263,6 @@ public class BuildGenerator {
         }
     }
 
-    private final String[] startHudsonService = {"cmd.exe", "/c", "sc", "start", "hudson"};
-    private final String[] stopHudsonService = {"cmd.exe", "/c", "sc", "stop", "hudson"};
     private void startProcess (String activity, String[] args) {
         try {
             log.debug("Executing "+ Arrays.toString(args));
@@ -288,6 +286,8 @@ public class BuildGenerator {
                 log.debug("Writing Hudson proxy configuration "+content+"into: "+file.getAbsolutePath());
                 FileUtils.write(file, content);
                 log.info("New proxy settings written; restarting Hudson service");
+                final String[] startHudsonService = {"cmd.exe", "/c", "sc", "start", settings.getHudsonServiceName()};
+                final String[] stopHudsonService = {"cmd.exe", "/c", "sc", "stop", settings.getHudsonServiceName()};
                 startProcess("Stopping", stopHudsonService);
                 startProcess("Starting", startHudsonService);
             } else {
