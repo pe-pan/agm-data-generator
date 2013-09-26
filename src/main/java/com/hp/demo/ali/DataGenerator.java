@@ -586,7 +586,7 @@ public class DataGenerator {
                 log.debug("Cannot remove ALI Dev Bridge service; code " + devBridge.exitValue());
             }
         } catch (IOException e) {
-            log.debug("Cannot install or start ALI Dev Bridge service");
+            log.debug("Cannot stop or remove ALI Dev Bridge service", e);
         } catch (InterruptedException e) {
             log.error("Process ALI Dev Bridge interrupted", e);
         }
@@ -644,7 +644,7 @@ public class DataGenerator {
                 }
             }
         } catch (IOException e) {
-            log.error("Cannot install or start ALI Dev Bridge service");
+            log.error("Cannot install or start ALI Dev Bridge service", e);
             throw new IllegalStateException(e);
         } catch (InterruptedException e) {
             log.error("Process ALI Dev Bridge interrupted", e);
