@@ -57,6 +57,7 @@ public class Settings {
 
     private Settings(Sheet settings) {
         log.info("Reading settings...");
+        //todo load Excel settings the same way as the settings from a text file (through reflection API)
         generateProject = "yes".equals(SheetTools.getStringValue(settings, 2, 2));
         environment = SheetTools.getStringValue(settings, 3, 2);
         loginUrl = SheetTools.getStringValue(settings, 4, 2);
