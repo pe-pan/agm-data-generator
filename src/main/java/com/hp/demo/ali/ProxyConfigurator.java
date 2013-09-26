@@ -100,7 +100,7 @@ public class ProxyConfigurator {
                     //todo verify that all previous URLs in this array are using the same proxy
                     log.debug("HTTP proxy: " + address.getHostString() + ":" + address.getPort());
                 }
-            } else {
+            } else {  //todo DEFECT -> this does not find the non-proxy hosts (even though specified in IE Internet settings)
                 nonProxyHosts.add(uri.getHost());
             }
         }
