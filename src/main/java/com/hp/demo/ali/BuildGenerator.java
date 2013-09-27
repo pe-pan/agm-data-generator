@@ -280,8 +280,14 @@ public class BuildGenerator {
         String content = proxyConfigurator.getHudsonProxyConfiguration();
         File file = new File(settings.getHudsonFolder()+File.separator+"proxy.xml");
 
+        String originalContent;
         try {
-            String originalContent = FileUtils.readFileToString(file);
+            originalContent = FileUtils.readFileToString(file);
+        } catch (IOException e) {
+            log.debug("Cannot read Hudson proxy configuration from: " + file.getAbsolutePath(), e);
+            originalContent = "";
+        }
+        try {
             if (!content.equals(originalContent)) {
                 log.debug("Writing Hudson proxy configuration "+content+"into: "+file.getAbsolutePath());
                 FileUtils.write(file, content);
@@ -294,7 +300,7 @@ public class BuildGenerator {
                 log.debug("Identical Hudson proxy settings already exists; nothing necessary to be written");
             }
         } catch (IOException e) {
-            log.error("Cannot read/write Hudson proxy configuration into: "+file.getAbsolutePath(), e);
+            log.error("Cannot write Hudson proxy configuration into: "+file.getAbsolutePath(), e);
         }
     }
 
