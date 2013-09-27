@@ -4,9 +4,17 @@ Release Notes:
 Version 1.08:
 -------------
 Added features:
+  - Accommodating recent model changes (product-id -> products-id)
   - Option to wipe out all data from the tenant (not only the previously generated)
 
 Technical enhancements
+  - Support for settings.properties file (having higher priority over Excel Settings sheet)
+  - Support for custom ALI Dev Bridge settings
+  - Support for Jenkins (as a build-system)
+
+Bug fixes:
+  - User names may contain non-ASCII characters now
+  - Previously generated data (from the log) are being deleted only when re-generating them
 
 Version 1.07:
 -------------
