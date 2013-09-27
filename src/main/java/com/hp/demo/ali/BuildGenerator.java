@@ -112,12 +112,12 @@ public class BuildGenerator {
                     new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"subversion.credentials"),
                     new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"subversion.credentials"));
             XmlFile file = new XmlFile(new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"config.xml"));
-            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almLocation", settings.getRestUrl());
-            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almDomain", settings.getDomain());
-            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almProject", settings.getProject());
-            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almUsername", User.getUser(settings.getAdmin()).getLogin());
-            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almPassword", Scrambler.scramble(User.getUser(settings.getAdmin()).getPassword()));
-            file.setNodeValue("/project/project-properties/entry/external-property/originalValue[@class='com.hp.alm.ali.hudson.BuildRecorder']/almBuildServer", BuildServerHandler.getBuildServerName());
+            file.setNodeValue("//almLocation", settings.getRestUrl());
+            file.setNodeValue("//almDomain", settings.getDomain());
+            file.setNodeValue("//almProject", settings.getProject());
+            file.setNodeValue("//almUsername", User.getUser(settings.getAdmin()).getLogin());
+            file.setNodeValue("//almPassword", Scrambler.scramble(User.getUser(settings.getAdmin()).getPassword()));
+            file.setNodeValue("//almBuildServer", BuildServerHandler.getBuildServerName());
             file.save(new File(settings.getBuildFolder() + File.separator + settings.getJobName() + File.separator + "config.xml"));
 
             FileUtils.writeStringToFile(
