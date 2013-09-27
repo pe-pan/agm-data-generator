@@ -256,7 +256,7 @@ public class BuildGenerator {
         RestClient client = new RestClient();
         log.debug("Reloading from disk (just generated data)");
         try {
-            client.doGet(settings.getHudsonUrl()+ "reload");
+            client.doPost(settings.getHudsonUrl() + "reload", (String) null);
         } catch (IllegalStateException e) {
             log.debug("Reload exception caught...");
             //todo reload returns 503 (exception) -> check it's the correct one
