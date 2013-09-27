@@ -190,7 +190,7 @@ public class ProxyConfigurator {
                 StringBuilder content = new StringBuilder();
                 content.append("<?xml version='1.0' encoding='UTF-8'?>").append(System.lineSeparator()).
                         append("<proxy>").append(System.lineSeparator()).
-                        append("  <name>").append(httpProxyHost).append("/<name>").append(System.lineSeparator());
+                        append("  <name>").append(httpProxyHost).append("</name>").append(System.lineSeparator());
                 if (httpProxyPort != null) {
                     content.append("  <port>").append(httpProxyPort).append("</port>").append(System.lineSeparator());
                 }
