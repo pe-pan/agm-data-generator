@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -20,8 +21,11 @@ public class RowIterator<E> implements Iterable, Iterator {
 
     private String[] buffer;
 
+    private FormulaEvaluator evaluator;
+
     RowIterator (Sheet sheet) {
         iterator = sheet.iterator();
+        evaluator = sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
     }
 
     /**
@@ -37,6 +41,7 @@ public class RowIterator<E> implements Iterable, Iterator {
         // transform iterator to list
         while (cellIterator.hasNext()) {
             Cell cell =  cellIterator.next();
+            cell = evaluator.evaluateInCell(cell);
             cells.add(cell.getColumnIndex(), formatter.formatCellValue(cell).trim());
         }
         // clean the ending "empty" columns
@@ -80,6 +85,7 @@ public class RowIterator<E> implements Iterable, Iterator {
             if (cell == null) {
                 array[i] = buffer[i];
             } else {
+                cell = evaluator.evaluateInCell(cell);
                 array[i] = formatter.formatCellValue(cell).trim();
             }
             buffer[i] = array[i]; //remember the value in buffer

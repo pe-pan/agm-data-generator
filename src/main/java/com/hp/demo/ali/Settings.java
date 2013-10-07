@@ -61,7 +61,11 @@ public class Settings {
 
     private static DataFormatter formatter = new DataFormatter(true);
 
-    private Settings() {
+    private static Sheet settingsSheet;
+    private static FormulaEvaluator evaluator;
+    private Settings(Sheet settingsSheet) {
+        this.settingsSheet = settingsSheet;
+        this.evaluator = this.settingsSheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
     }
 
     public boolean isGenerateProject() {
@@ -433,9 +437,8 @@ public class Settings {
 
     private static Settings settings = null;
     public static void initSettings(Sheet settings) {
-        Settings.settings = new Settings();
+        Settings.settings = new Settings(settings);
         log.info("Reading settings...");
-        FormulaEvaluator evaluator = settings.getWorkbook().getCreationHelper().createFormulaEvaluator();
 
         // initialize from Excel file
         for (Row row : settings) {
@@ -470,6 +473,23 @@ public class Settings {
             for (String propertyName : properties.stringPropertyNames()) {
                 String propertyValue = properties.getProperty(propertyName);
                 setProperty(propertyName, propertyValue);
+                setExcelProperty(propertyName, propertyValue);
+            }
+        }
+    }
+
+    private static void setExcelProperty(String propertyName, String propertyValue) {
+        for (Row row : settingsSheet) {
+            for (Cell cell : row) {
+                cell  = evaluator.evaluateInCell(cell);
+                String value = formatter.formatCellValue(cell).trim();
+                if (propertyName.equals(value)) {
+                    Cell newCell = row.getCell(cell.getColumnIndex()+1);  //on the very same row, take the next cell
+                    if (newCell == null) {
+                        newCell = row.createCell(cell.getColumnIndex()+1);
+                    }
+                    newCell.setCellValue(propertyValue);             //and set its value
+                }
             }
         }
     }
