@@ -1,6 +1,5 @@
 package com.hp.demo.ali;
 
-import com.hp.demo.ali.agm.BuildServerHandler;
 import com.hp.demo.ali.entity.Entity;
 import com.hp.demo.ali.entity.User;
 import com.hp.demo.ali.excel.EntityIterator;
@@ -117,7 +116,7 @@ public class BuildGenerator {
             file.setNodeValue("//almProject", settings.getProject());
             file.setNodeValue("//almUsername", User.getUser(settings.getAdmin()).getLogin());
             file.setNodeValue("//almPassword", Scrambler.scramble(User.getUser(settings.getAdmin()).getPassword()));
-            file.setNodeValue("//almBuildServer", BuildServerHandler.getBuildServerName());
+            file.setNodeValue("//almBuildServer", settings.getBuildServerName());
             file.save(new File(settings.getBuildFolder() + File.separator + settings.getJobName() + File.separator + "config.xml"));
 
             FileUtils.writeStringToFile(

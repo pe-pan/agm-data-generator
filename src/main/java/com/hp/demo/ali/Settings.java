@@ -58,6 +58,7 @@ public class Settings {
     private String tenantUrl;
     private boolean deleteAll;
     private String hudsonServiceName;
+    private String buildServerName;
 
     private static DataFormatter formatter = new DataFormatter(true);
 
@@ -348,6 +349,14 @@ public class Settings {
 
     public void setHudsonServiceName(String hudsonServiceName) {
         this.hudsonServiceName = hudsonServiceName;
+    }
+
+    public String getBuildServerName() {
+        return buildServerName;
+    }
+
+    public void setBuildServerName(String buildServerName) {
+        this.buildServerName = buildServerName;
     }
 
     public void setAdmin(String admin) {
