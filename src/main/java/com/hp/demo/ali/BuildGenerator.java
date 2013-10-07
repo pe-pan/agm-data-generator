@@ -105,7 +105,7 @@ public class BuildGenerator {
                     mender.alterRepository(fromRevision, toRevision, currentBuildDate.getTime() - nextBuild, currentBuildDate.getTime(), requirements, defects, unassigned, teamMembers);
                 }
                 FileUtils.write(new File(outputFolder + File.separator + "changelog.xml"), mender.getRevisionsLog(fromRevision, toRevision - 1));
-                FileUtils.write(new File(outputFolder + File.separator + "revision.txt"), settings.getSvnUrl()+"/trunk/"+(toRevision-1));  //todo /trunk/ is hard-coded -> should be taken from Excel/scm-branch/path
+                FileUtils.write(new File(outputFolder + File.separator + "revision.txt"), settings.getSvnUrl()+settings.getBranchPath()+"/"+(toRevision-1));
             }
             FileUtils.copyFile(  // the new build needs to know SVN credentials
                     new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"subversion.credentials"),

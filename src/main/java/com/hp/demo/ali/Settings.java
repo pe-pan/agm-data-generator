@@ -59,6 +59,7 @@ public class Settings {
     private boolean deleteAll;
     private String hudsonServiceName;
     private String buildServerName;
+    private String branchPath;
 
     private static DataFormatter formatter = new DataFormatter(true);
 
@@ -357,6 +358,14 @@ public class Settings {
 
     public void setBuildServerName(String buildServerName) {
         this.buildServerName = buildServerName;
+    }
+
+    public String getBranchPath() {
+        return branchPath;
+    }
+
+    public void setBranchPath(String branchPath) {
+        this.branchPath = branchPath;
     }
 
     public void setAdmin(String admin) {
