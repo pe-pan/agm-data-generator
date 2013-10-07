@@ -159,7 +159,7 @@ public class DataGenerator {
                         settings.setGenerateProject(false);
                         settings.setGenerateHistory(false);
                         settings.setGenerateBuilds(false);
-                        settings.setMeldRepository(false);
+                        settings.setAlterRepository(false);
                         for (int j = "--generate-".length(); j < args[argIndex].length(); j++) {
                             switch (args[argIndex].charAt(j)) {
                                 case 'u' :
@@ -173,7 +173,7 @@ public class DataGenerator {
                                     break;
                                 case 'b' :
                                     settings.setGenerateBuilds(true);
-                                    settings.setMeldRepository(true);
+                                    settings.setAlterRepository(true);
                                     break;
                                 default:
                                     System.out.println("Unknown parameter when using option generate: "+args[argIndex].charAt(j));
@@ -568,7 +568,7 @@ public class DataGenerator {
 
     public static void stopDevBridge() {
         log.info("Stopping ALI Dev Bridge...");
-        String devBridgeScript = settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"bin\\DevBridge.bat";   // todo this is Windows only!
+        String devBridgeScript = settings.getAliDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"bin\\DevBridge.bat";   // todo this is Windows only!
         Process devBridge;
         try {
             devBridge = Runtime.getRuntime().exec(devBridgeScript+" stop");
@@ -594,22 +594,22 @@ public class DataGenerator {
     }
 
     public static void replaceDevBridgeBits(DevBridgeDownloader downloader) {
-        log.debug("Deleting old ALI Dev Bridge folder: "+settings.getDevBridgeFolder());
+        log.debug("Deleting old ALI Dev Bridge folder: "+settings.getAliDevBridgeFolder());
         try {
-            FileUtils.deleteDirectory(new File(settings.getDevBridgeFolder()));
+            FileUtils.deleteDirectory(new File(settings.getAliDevBridgeFolder()));
         } catch (IOException e) {
-            log.debug("File " + settings.getDevBridgeFolder() + " cannot be deleted ", e);
+            log.debug("File " + settings.getAliDevBridgeFolder() + " cannot be deleted ", e);
         }
-        log.debug("Unpacking downloaded ALI Dev Bridge "+downloader.getFileName()+" into "+settings.getDevBridgeFolder());
+        log.debug("Unpacking downloaded ALI Dev Bridge "+downloader.getFileName()+" into "+settings.getAliDevBridgeFolder());
         Unzip u = new Unzip();
         u.setSrc(new File(downloader.getFileName()));
-        u.setDest(new File(settings.getDevBridgeFolder()));
+        u.setDest(new File(settings.getAliDevBridgeFolder()));
         u.execute();
     }
 
     public static void startDevBridge() {
         log.info("Starting ALI Dev Bridge...");
-        String devBridgeScript = settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"bin\\DevBridge.bat";
+        String devBridgeScript = settings.getAliDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"bin\\DevBridge.bat";
         Process devBridge;
         try {
             devBridge = Runtime.getRuntime().exec(devBridgeScript+" install");
@@ -665,17 +665,17 @@ public class DataGenerator {
                 log.debug("No file "+fileName+" found, using the built-in one.");
                 in = DataGenerator.class.getResourceAsStream("/"+fileName);
             }
-            OutputStream out = new FileOutputStream(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"wrapper"+File.separator+fileName, true);
+            OutputStream out = new FileOutputStream(settings.getAliDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"wrapper"+File.separator+fileName, true);
             IOUtils.copy(in, out);
             in.close();
             out.close();
 
-            Collection<File> descriptors = FileUtils.listFiles(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"deploy"), new String[] {"xml"}, false);
+            Collection<File> descriptors = FileUtils.listFiles(new File(settings.getAliDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"deploy"), new String[] {"xml"}, false);
             assert descriptors.size() == 1;
             File tenantDescriptor = descriptors.iterator().next();
             String tenantDescriptorName = tenantDescriptor.getName().substring(0, tenantDescriptor.getName().length() - 4);
             CharSequence content = proxyConfigurator.getDevBridgeProxyConfiguration();
-            FileUtils.write(new File(settings.getDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"tenants\\"+tenantDescriptorName+"\\conf\\connection.properties"),
+            FileUtils.write(new File(settings.getAliDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"tenants\\"+tenantDescriptorName+"\\conf\\connection.properties"),
                     content);
         } catch (IOException e) {
             log.error("Cannot configure installed ALI Dev Bridge bits", e);

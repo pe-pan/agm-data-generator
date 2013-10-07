@@ -1,13 +1,18 @@
 package com.hp.demo.ali;
 
-import com.hp.demo.ali.tools.SheetTools;
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -19,13 +24,12 @@ public class Settings {
 
     private static Logger log = Logger.getLogger(Settings.class.getName());
     private boolean generateProject;
-    private String environment;
     private String loginUrl;
     private String restUrl;
     private String tenantId;
     private String admin;
     private String aliDevBridgeUrl;
-    private boolean meldRepository;
+    private boolean alterRepository;
     private String svnUrl;
     private String svnUser;
     private boolean generateBuilds;
@@ -40,7 +44,7 @@ public class Settings {
     private int firstDefectNumber;
     private int firstRequirementNumber;
     private String portalUrl;
-    private String devBridgeFolder;
+    private String aliDevBridgeFolder;
     private String svnAgentFolder;
     private boolean addUsers;
     private String Host;
@@ -55,44 +59,9 @@ public class Settings {
     private boolean deleteAll;
     private String hudsonServiceName;
 
-    private Settings(Sheet settings) {
-        log.info("Reading settings...");
-        //todo load Excel settings the same way as the settings from a text file (through reflection API)
-        generateProject = "yes".equals(SheetTools.getStringValue(settings, 2, 2));
-        environment = SheetTools.getStringValue(settings, 3, 2);
-        loginUrl = SheetTools.getStringValue(settings, 4, 2);
-        restUrl = SheetTools.getStringValue(settings, 5, 2);
-        tenantId = SheetTools.getStringValue(settings, 6, 2);
-        admin = SheetTools.getStringValue(settings, 7, 2);
-        meldRepository = "yes".equals(SheetTools.getStringValue(settings, 8, 2));
-        svnUrl = SheetTools.getStringValue(settings, 9, 2);
-        svnUser = SheetTools.getStringValue(settings, 10, 2);
-        generateBuilds = "yes".equals(SheetTools.getStringValue(settings, 11, 2));
-        hudsonUrl = SheetTools.getStringValue(settings, 12, 2);
-        jobName = SheetTools.getStringValue(settings, 13, 2);
-        templateJobName = SheetTools.getStringValue(settings, 14, 2);
-        buildFolder = SheetTools.getStringValue(settings, 15, 2);
-        hudsonFolder = SheetTools.getStringValue(settings, 16, 2);
-        try {
-            long days = SheetTools.getLongValue(settings, 17, 2);
-            firstBuildDate = new Date(System.currentTimeMillis() + days*24*60*60*1000);
-            log.debug("Setting first build date to: "+firstBuildDate.toString());
-        } catch (NumberFormatException e) {
-            log.debug("First build date is not a relative number to todays'; trying if it's absolute date");
-            firstBuildDate = SheetTools.getDateValue(settings, 17, 2, new SimpleDateFormat("dd/MM/yyyy HH:mm"));
-            log.debug("First build date is absolute: "+firstBuildDate.toString());
-        }
-        firstBuildNumber = SheetTools.getIntValue(settings, 18, 2);
-        firstSvnRevision = SheetTools.getLongValue(settings, 19, 2);
-        firstDefectNumber = SheetTools.getIntValue(settings, 20, 2);
-        firstRequirementNumber = SheetTools.getIntValue(settings, 21, 2);
-        aliDevBridgeUrl = SheetTools.getStringValue(settings, 22, 2);
-        devBridgeFolder = SheetTools.getStringValue(settings, 23, 2);
-        svnAgentFolder = SheetTools.getStringValue(settings, 24, 2);
-        forceDelete = "yes".equals(SheetTools.getStringValue(settings, 25, 2));
-        addUsers = "yes".equals(SheetTools.getStringValue(settings, 26, 2));
-        generateHistory = "yes".equals(SheetTools.getStringValue(settings, 27, 2));
-        hudsonServiceName = SheetTools.getStringValue(settings, 28, 2);
+    private static DataFormatter formatter = new DataFormatter(true);
+
+    private Settings() {
     }
 
     public boolean isGenerateProject() {
@@ -103,8 +72,8 @@ public class Settings {
         this.generateProject = generateProject;
     }
 
-    public String getEnvironment() {
-        return environment;
+    public void setGenerateProject(String generateProject) {
+        this.generateProject = "yes".equals(generateProject);
     }
 
     public String getLoginUrl() {
@@ -142,12 +111,20 @@ public class Settings {
         return aliDevBridgeUrl;
     }
 
-    public boolean isMeldRepository() {
-        return meldRepository;
+    public boolean isAlterRepository() {
+        return alterRepository;
     }
 
-    public void setMeldRepository(boolean meldRepository) {
-        this.meldRepository = meldRepository;
+    public void setAlterRepository(boolean alterRepository) {
+        this.alterRepository = alterRepository;
+    }
+
+    public void setAlterRepository(String alterRepository) {
+        this.alterRepository = "yes".equals(alterRepository);
+    }
+
+    public void setMeldRepository(String meldRepository) {
+        this.alterRepository = "yes".equals(meldRepository);
     }
 
     public String getSvnUrl() {
@@ -164,6 +141,10 @@ public class Settings {
 
     public void setGenerateBuilds(boolean generateBuilds) {
         this.generateBuilds = generateBuilds;
+    }
+
+    public void setGenerateBuilds(String generateBuilds) {
+        this.generateBuilds = "yes".equals(generateBuilds);
     }
 
     public String getHudsonUrl() {
@@ -210,8 +191,26 @@ public class Settings {
         this.firstDefectNumber = firstDefectNumber;
     }
 
+    public void setFirstDefectNumber(String firstDefectNumber) {
+        try {
+            this.firstDefectNumber = Integer.parseInt(firstDefectNumber);
+        } catch (NumberFormatException e) {
+            log.error("Cannot parse this string into an int: "+firstDefectNumber, e);
+            this.firstDefectNumber = 0;
+        }
+    }
+
     public void setFirstRequirementNumber(int firstRequirementNumber) {
         this.firstRequirementNumber = firstRequirementNumber;
+    }
+
+    public void setFirstRequirementNumber(String firstRequirementNumber) {
+        try {
+            this.firstRequirementNumber = Integer.parseInt(firstRequirementNumber);
+        } catch (NumberFormatException e) {
+            log.error("Cannot parse this string into an int: "+firstRequirementNumber, e);
+            this.firstRequirementNumber = 0;
+        }
     }
 
     public String getPortalUrl() {
@@ -240,8 +239,8 @@ public class Settings {
         this.instanceId = instanceId;
     }
 
-    public String getDevBridgeFolder() {
-        return devBridgeFolder;
+    public String getAliDevBridgeFolder() {
+        return aliDevBridgeFolder;
     }
 
     public String getSvnAgentFolder() {
@@ -254,6 +253,10 @@ public class Settings {
 
     public void setAddUsers(boolean addUsers) {
         this.addUsers = addUsers;
+    }
+
+    public void setAddUsers(String addUsers) {
+        this.addUsers = "yes".equals(addUsers);
     }
 
     public String getHost() {
@@ -291,6 +294,10 @@ public class Settings {
         this.generateHistory = generateHistory;
     }
 
+    public void setGenerateHistory(String generateHistory) {
+        this.generateHistory = "yes".equals(generateHistory);
+    }
+
     public String getSolutionName() {
         return solutionName;
     }
@@ -307,6 +314,10 @@ public class Settings {
         this.forceDelete = forceDelete;
     }
 
+    public void setForceDelete(String forceDelete) {
+        this.forceDelete = "yes".equals(forceDelete);
+    }
+
     public String getTenantUrl() {
         return tenantUrl;
     }
@@ -321,6 +332,10 @@ public class Settings {
 
     public void setDeleteAll(boolean deleteAll) {
         this.deleteAll = deleteAll;
+    }
+
+    public void setDeleteAll(String deleteAll) {
+        this.deleteAll = "yes".equals(deleteAll);
     }
 
     public String getHudsonServiceName() {
@@ -367,17 +382,81 @@ public class Settings {
         this.hudsonFolder = hudsonFolder;
     }
 
-    public void setDevBridgeFolder(String devBridgeFolder) {
-        this.devBridgeFolder = devBridgeFolder;
+    public void setAliDevBridgeFolder(String aliDevBridgeFolder) {
+        this.aliDevBridgeFolder = aliDevBridgeFolder;
     }
 
     public void setSvnAgentFolder(String svnAgentFolder) {
         this.svnAgentFolder = svnAgentFolder;
     }
 
+    public void setFirstBuildDate(Date firstBuildDate) {
+        this.firstBuildDate = firstBuildDate;
+    }
+
+    public void setFirstBuildDate(String firstBuildDate) {
+        try {
+            long days = Long.parseLong(firstBuildDate);
+            this.firstBuildDate = new Date(System.currentTimeMillis() + days*24*60*60*1000);
+            log.debug("Setting first build date to: "+this.firstBuildDate.toString());
+        } catch (NumberFormatException e) {
+            log.debug("First build date is not a relative number to todays'; trying if it's an absolute date");
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            try {
+                this.firstBuildDate = sdf.parse(firstBuildDate);
+                log.debug("First build date is absolute: "+this.firstBuildDate.toString());
+            } catch (ParseException e1) {
+                log.error("FirstBuildDate is not a relative number to todays'; nor it is an absolute date in this format: "+sdf.toPattern());
+                this.firstBuildDate = new Date();
+                log.debug("Setting to now: "+this.firstBuildDate.toString());
+            }
+        }
+    }
+
+    public void setFirstBuildNumber(String firstBuildNumber) {
+        try {
+            this.firstBuildNumber = Integer.parseInt(firstBuildNumber);
+        } catch (NumberFormatException e) {
+            log.error("Cannot parse this string into an int: "+firstBuildNumber, e);
+            this.firstBuildNumber = 0;
+        }
+    }
+
+    public void setFirstSvnRevision(String firstSvnRevision) {
+        try {
+            this.firstSvnRevision = Long.parseLong(firstSvnRevision);
+        } catch (NumberFormatException e) {
+            log.error("Cannot parse this string into a long: "+firstSvnRevision, e);
+            this.firstSvnRevision = 0;
+        }
+    }
+
     private static Settings settings = null;
-    public static void initSettings(Sheet settingsSheet) {
-        settings = new Settings(settingsSheet);
+    public static void initSettings(Sheet settings) {
+        Settings.settings = new Settings();
+        log.info("Reading settings...");
+        FormulaEvaluator evaluator = settings.getWorkbook().getCreationHelper().createFormulaEvaluator();
+
+        // initialize from Excel file
+        for (Row row : settings) {
+            Cell cell = row.getCell(1);
+            if (cell == null) continue;  // skip an empty row
+            cell = evaluator.evaluateInCell(cell);
+            String propertyName = formatter.formatCellValue(cell).trim();
+            if (propertyName.length() == 0) continue; // skip an empty row
+
+            cell  = row.getCell(2);
+            if (cell == null) {
+                log.error("No value found for property called "+propertyName);
+                continue;
+            }
+            cell  = evaluator.evaluateInCell(cell);
+            String propertyValue = formatter.formatCellValue(cell).trim();
+
+            setProperty(propertyName, propertyValue);
+        }
+
+        // initialize from text file
         File file = new File("settings.properties");
         if (file.exists()) {
             Properties properties = new Properties();
@@ -389,15 +468,24 @@ public class Settings {
                 return;
             }
             for (String propertyName : properties.stringPropertyNames()) {
-                String methodName = "set"+propertyName;
                 String propertyValue = properties.getProperty(propertyName);
-                try {
-                    log.debug("Calling "+methodName+"("+propertyValue+")");
-                    settings.getClass().getMethod(methodName, String.class).invoke(settings, propertyValue);
-                } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    log.error("On "+Settings.class.getSimpleName()+" class, cannot call the method "+methodName, e);
-                }
+                setProperty(propertyName, propertyValue);
             }
+        }
+    }
+
+    private static void setProperty(String propertyName, String propertyValue) {
+        String methodName = "set"+propertyName;
+        try {
+            log.debug("Calling " + methodName + "(" + propertyValue + ")");
+            Method method = Settings.class.getMethod(methodName, String.class);
+            if (method != null) {
+                method.invoke(settings, propertyValue);
+            } else {
+                log.error("On "+Settings.class.getSimpleName()+" class, this method does not exist: "+methodName);
+            }
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            log.error("On "+Settings.class.getSimpleName()+" class, cannot call the method "+methodName, e);
         }
     }
 

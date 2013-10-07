@@ -102,7 +102,7 @@ public class BuildGenerator {
                 File newMavenBuildFile = new File(outputFolder + File.separator + MAVEN_XML_PREF + buildId.toString() + ".xml");
                 mavenBuildFile.renameTo(newMavenBuildFile);
 
-                if (settings.isMeldRepository()) {
+                if (settings.isAlterRepository()) {
                     mender.alterRepository(fromRevision, toRevision, currentBuildDate.getTime() - nextBuild, currentBuildDate.getTime(), requirements, defects, unassigned, teamMembers);
                 }
                 FileUtils.write(new File(outputFolder + File.separator + "changelog.xml"), mender.getRevisionsLog(fromRevision, toRevision - 1));
