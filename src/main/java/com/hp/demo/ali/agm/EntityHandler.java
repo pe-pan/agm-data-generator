@@ -1,6 +1,6 @@
 package com.hp.demo.ali.agm;
 
-import com.hp.demo.ali.DataGenerator;
+import com.hp.demo.ali.JobLogger;
 import com.hp.demo.ali.excel.AgmEntityIterator;
 import com.hp.demo.ali.rest.AgmRestService;
 import org.apache.log4j.Logger;
@@ -36,7 +36,7 @@ public class EntityHandler extends AbstractSheetHandler {
             log.debug("Created "+response);
             String agmId = response.getId().toString();
             AgmEntityIterator.putReference(sheetName + "#" + excelId, agmId);
-            DataGenerator.writeLogLine(sheetName, agmId);
+            JobLogger.writeLogLine(sheetName, agmId);
             return response;
         } catch (RestClientException | ALMRestException e) {
             throw new IllegalStateException(e);
