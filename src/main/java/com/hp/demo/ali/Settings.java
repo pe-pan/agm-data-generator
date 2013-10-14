@@ -1,5 +1,6 @@
 package com.hp.demo.ali;
 
+import com.hp.demo.ali.excel.ExcelReader;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -63,11 +64,11 @@ public class Settings {
 
     private static DataFormatter formatter = new DataFormatter(true);
 
-    private static Sheet settingsSheet;
+    private static Sheet sheet;
     private static FormulaEvaluator evaluator;
-    private Settings(Sheet settingsSheet) {
-        this.settingsSheet = settingsSheet;
-        this.evaluator = this.settingsSheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
+    private Settings(Sheet sheet) {
+        this.sheet = sheet;
+        this.evaluator = this.sheet.getWorkbook().getCreationHelper().createFormulaEvaluator();
     }
 
     public boolean isGenerateProject() {
@@ -454,12 +455,13 @@ public class Settings {
     }
 
     private static Settings settings = null;
-    public static void initSettings(Sheet settings) {
-        Settings.settings = new Settings(settings);
+    public static void initSettings(ExcelReader reader) {
+        Sheet sheet = reader.getSheet("Settings");
+        Settings.settings = new Settings(sheet);
         log.info("Reading settings...");
 
         // initialize from Excel file
-        for (Row row : settings) {
+        for (Row row : sheet) {
             Cell cell = row.getCell(1);
             if (cell == null) continue;  // skip an empty row
             cell = evaluator.evaluateInCell(cell);
@@ -497,7 +499,7 @@ public class Settings {
     }
 
     private static void setExcelProperty(String propertyName, String propertyValue) {
-        for (Row row : settingsSheet) {
+        for (Row row : sheet) {
             for (Cell cell : row) {
                 cell  = evaluator.evaluateInCell(cell);
                 String value = formatter.formatCellValue(cell).trim();

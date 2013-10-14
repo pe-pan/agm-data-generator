@@ -149,7 +149,7 @@ public class DataGenerator {
                 argIndex = 0;
             }
             readUsers(reader);
-            Settings.initSettings(reader.getSheet("Settings"));
+            Settings.initSettings(reader);
             settings = Settings.getSettings();
             for (int i = 0; i < 7; i++) {   // todo 7 is the current number of optional arguments (user credentials are not optional); make it more robust
                 if (args.length > 2+argIndex) {
@@ -254,11 +254,10 @@ public class DataGenerator {
                 historyGenerator.generate();
             }
             if (settings.isGenerateBuilds()) {
-                List<Long>skippedRevisions = readSkippedRevisions(reader.getSheet("Skip-Revisions"));
-                BuildGenerator buildGenerator = new BuildGenerator(settings);
+                BuildGenerator buildGenerator = new BuildGenerator(reader);
                 buildGenerator.deleteJob();
                 buildGenerator.configureHudson(proxyConfigurator);
-                buildGenerator.generate(reader.getSheet("Builds"), skippedRevisions);
+                buildGenerator.generate();
                 buildGenerator.createJob();
             }
             if (settings.isGenerateProject() || settings.isGenerateBuilds()) {
@@ -323,17 +322,6 @@ public class DataGenerator {
             User.addUser(user);
         }
         return users;
-    }
-
-    static List<Long> readSkippedRevisions(Sheet sheet) {
-        EntityIterator<com.hp.demo.ali.entity.Entity> iterator = new EntityIterator<>(sheet);
-        List<Long> revisions = new LinkedList<>();
-        while (iterator.hasNext()) {
-            com.hp.demo.ali.entity.Entity entity =  iterator.next();
-            long revision = EntityTools.getFieldLongValue(entity, "revisions to skip");
-            revisions.add(revision);
-        }
-        return revisions;
     }
 
     static File jobLog = null;

@@ -3,6 +3,7 @@ package com.hp.demo.ali;
 import com.hp.demo.ali.entity.Entity;
 import com.hp.demo.ali.entity.User;
 import com.hp.demo.ali.excel.EntityIterator;
+import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.svn.RepositoryMender;
 import com.hp.demo.ali.tools.EntityTools;
@@ -11,7 +12,6 @@ import com.hp.demo.ali.tools.XmlFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -41,9 +41,11 @@ public class BuildGenerator {
     private long startingRevision;
 
     private RepositoryMender mender;
+    private ExcelReader reader;
 
-    public BuildGenerator(Settings settings) {
-        this.settings = settings;
+    public BuildGenerator(ExcelReader reader) {
+        this.reader = reader;
+        this.settings = Settings.getSettings();
         currentBuildDate = settings.getFirstBuildDate();
         currentBuildNumber = settings.getFirstBuildNumber();
         startingRevision = settings.getFirstSvnRevision();
@@ -65,10 +67,11 @@ public class BuildGenerator {
         }
     }
 
-    public void generate(Sheet sheet, List<Long> skipRevisions) {
+    public void generate() {
         log.info("Generating builds...");
-        EntityIterator<Entity> iterator = new EntityIterator<>(sheet);
+        EntityIterator<Entity> iterator = new EntityIterator<>(reader.getSheet("Builds"));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-'00'");
+        List<Long> skipRevisions = readSkippedRevisions();
         try {
             while (iterator.hasNext()) {
                 Entity entity = iterator.next();
@@ -158,6 +161,17 @@ public class BuildGenerator {
                 throw new IllegalStateException(e);
             }
         }
+    }
+
+    private List<Long> readSkippedRevisions() {
+        EntityIterator<com.hp.demo.ali.entity.Entity> iterator = new EntityIterator<>(reader.getSheet("Skip-Revisions"));
+        List<Long> revisions = new LinkedList<>();
+        while (iterator.hasNext()) {
+            com.hp.demo.ali.entity.Entity entity =  iterator.next();
+            long revision = EntityTools.getFieldLongValue(entity, "revisions to skip");
+            revisions.add(revision);
+        }
+        return revisions;
     }
 
     private long[] getRevisionSubSet(List<Long> skipRevisions, long fromRevision, long toRevision) {
