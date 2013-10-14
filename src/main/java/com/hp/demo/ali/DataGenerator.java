@@ -83,8 +83,8 @@ public class DataGenerator {
                 " | Usage:                                                                     |"+System.lineSeparator()+
                 " |   java -jar agm-data-generator.jar [excel-configuration-file.xlsx]         |"+System.lineSeparator()+
                 " |   [--generate-[u][p][h][b]] [URL] [--solution-name=solution_name]          |"+System.lineSeparator()+
-                " |   [--account-name=account_name] [--tenant-url=tenant_url] [--force-delete] |"+System.lineSeparator()+
-                " |   admin_name admin_password                                                |"+System.lineSeparator()+
+                " |   [--account-name=account_name] [--tenant-url=tenant_url] [--delete-all]   |"+System.lineSeparator()+
+                " |   [--force-delete] admin_name admin_password                               |"+System.lineSeparator()+
                 " |----------------------------------------------------------------------------|"+System.lineSeparator()+
                 " |     excel-configuration-file.xlsx                                          |"+System.lineSeparator()+
                 " |       - data to generate the project from                                  |"+System.lineSeparator()+
