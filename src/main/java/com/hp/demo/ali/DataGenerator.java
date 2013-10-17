@@ -462,6 +462,7 @@ public class DataGenerator {
                 try {
                     portalClient.setCustomHeader("csrf.token", token);
                     response = portalClient.doPost(settings.getPortalUrl()+"/portal2/service/users", userJson.toString(), ContentType.JSON_JSON);
+                    log.info("New user added");
                     token = JsonPath.read(response.getResponse(), "$.csrftoken");
                 } catch (IllegalRestStateException e) {
                     int responseCode = e.getResponseCode();
@@ -479,6 +480,7 @@ public class DataGenerator {
 
                             portalClient.setCustomHeader("csrf.token", token);
                             response = portalClient.doPut(settings.getPortalUrl()+"/portal2/service/users/attach/"+ URLEncoder.encode(user.getLogin()), userJson.toString(), ContentType.JSON_JSON);
+                            log.info("Existing user attached");
                             token = JsonPath.read(response.getResponse(), "$.csrftoken");
                         } catch (IllegalRestStateException e2) {
                             log.error("Cannot add user to portal: "+user.getFirstName()+" "+user.getLastName());
@@ -506,6 +508,7 @@ public class DataGenerator {
                     headers.put("INTERNAL_DATA", "20120922");
                     adapter.addSessionCookie("AGM_STATE="+"20120922");
                     adapter.putWithHeaders(String.class, settings.getRestUrl()+"/rest/api/portal/users", usersJson.toString(), headers, ServiceResourceAdapter.ContentType.JSON);
+                    log.info("User added to the tenant");
                 } catch (ALMRestException e) {
                     log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
                     String responseHtml = e.getResponse().getEntity(String.class);
