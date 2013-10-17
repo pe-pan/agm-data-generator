@@ -39,6 +39,7 @@ import org.w3c.dom.Element;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.jar.Attributes;
@@ -420,6 +421,21 @@ public class DataGenerator {
         String owningAccountId = JsonPath.read(response.getResponse(), "$.owningAccountId").toString();
         String owningAccountName = JsonPath.read(response.getResponse(), "$.owningAccountName");
         String owningAccountSaasId = JsonPath.read(response.getResponse(), "$.owningAccountSaasId").toString();
+
+        String accountName = settings.getAccountName();
+        if (accountName != null) {
+            List<net.minidev.json.JSONObject> accounts = JsonPath.read(response.getResponse(), "$.accountsAndServices[?(@.accountName == '"+accountName+"')]");
+            if (accounts.size() == 0) {
+                throw new IllegalArgumentException("The provided account name does not exist: "+accountName);
+            }
+
+            String nextAccountId = accounts.get(0).get("accountId").toString();
+            portalClient.setCustomHeader("csrf.token", token);
+            JSONObject accountId = new JSONObject();
+            accountId.put("id", owningAccountId);
+            accountId.put("nextAccountId", nextAccountId);
+            portalClient.doPut(settings.getPortalUrl()+"/portal2/service/accounts/updateCurrentAccount/"+owningAccountId, accountId.toString(), ContentType.JSON_JSON);
+        }
         for (User user : User.getUsers()) {
             if (user.isPortalUser()) {
                 JSONObject userJson = new JSONObject();
@@ -459,12 +475,10 @@ public class DataGenerator {
                             userJson = new JSONObject();
                             userJson.put("loginName", StringEscapeUtils.escapeHtml(user.getLogin()));
                             userJson.put("allowedServices", instanceIds);
-                            roles = new JSONArray();
-                            roles.add("CUSTOMER_PORTAL_BASIC");
-                            userJson.put("roles", roles);
+                            userJson.put("roles", "CUSTOMER_PORTAL_BASIC");
 
                             portalClient.setCustomHeader("csrf.token", token);
-                            response = portalClient.doPut(settings.getPortalUrl()+"/portal2/service/users/attach/"+user.getLogin(), userJson.toString(), ContentType.JSON_JSON);
+                            response = portalClient.doPut(settings.getPortalUrl()+"/portal2/service/users/attach/"+ URLEncoder.encode(user.getLogin()), userJson.toString(), ContentType.JSON_JSON);
                             token = JsonPath.read(response.getResponse(), "$.csrftoken");
                         } catch (IllegalRestStateException e2) {
                             log.error("Cannot add user to portal: "+user.getFirstName()+" "+user.getLastName());
@@ -483,8 +497,10 @@ public class DataGenerator {
                     userJson.put("loginName", StringEscapeUtils.escapeHtml(user.getLogin()));
                     userJson.put("phone", StringEscapeUtils.escapeHtml(user.getPhone()));
                     userJson.put("timezone", timezone);
+                    JSONArray users = new JSONArray();
+                    users.add(userJson);
                     JSONObject usersJson = new JSONObject();
-                    usersJson.put("users", userJson);
+                    usersJson.put("users", users);
                     ServiceResourceAdapter adapter = AgmRestService.getAdapter();
                     Map<String, String> headers = new HashMap<>(1);
                     headers.put("INTERNAL_DATA", "20120922");
