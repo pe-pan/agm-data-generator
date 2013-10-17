@@ -39,6 +39,7 @@ import org.w3c.dom.Element;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -448,7 +449,7 @@ public class DataGenerator {
                 JSONArray roles = new JSONArray();
                 roles.add("CUSTOMER_PORTAL_BASIC");
                 userJson.put("roles", roles);
-                userJson.put("acceptNotification", true);
+                userJson.put("acceptNotification", false);
                 userJson.put("status", true);
                 userJson.put("id", null);
                 JSONArray instanceIds = new JSONArray();
@@ -467,7 +468,7 @@ public class DataGenerator {
                 } catch (IllegalRestStateException e) {
                     int responseCode = e.getResponseCode();
                     String errorMessage = JsonPath.read(e.getErrorStream(), "$.errorMessage");
-                    if (responseCode == 409) {
+                    if (responseCode == HttpURLConnection.HTTP_CONFLICT) {
                         // perhaps, it was not added as it already exists -> trying to attach it as an existing user account
                         log.info(errorMessage);
                         token = JsonPath.read(e.getErrorStream(), "$.csrftoken");
