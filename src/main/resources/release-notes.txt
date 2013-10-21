@@ -1,13 +1,14 @@
 Release Notes:
 ==============
 
+[27/Sep/2013]
 Version 1.08:
 -------------
 Added features:
   - Accommodating recent model changes (product-id -> products-id)
   - Option to wipe out all data from the tenant (not only the previously generated)
 
-Technical enhancements
+Technical enhancements:
   - Support for settings.properties file (having higher priority over Excel Settings sheet)
   - Support for custom ALI Dev Bridge settings
   - Support for Jenkins (as a build-system)
@@ -16,16 +17,19 @@ Bug fixes:
   - User names may contain non-ASCII characters now
   - Previously generated data (from the log) are being deleted only when re-generating them
 
+[20/Aug/2013]
 Version 1.07:
 -------------
 Added features:
   - Proxy configuration support
   - Option to specify tenant URL (omit account and solution names then)
 
+[12/Aug/2013]
 Version 1.06:
 -------------
 Bug fixes
 
+[30/Jul/2013]
 Version 1.05:
 -------------
 Generated data changes:
@@ -44,6 +48,7 @@ Bug fixes:
 
 Technical enhancements and additional bug fixes
 
+[12/Jul/2013]
 Version 1.04:
 -------------
 Added features:
@@ -53,6 +58,7 @@ Added features:
 
 Technical enhancements and bug fixes
 
+[23/May/2013]
 Version 1.03:
 -------------
 Generated data changes:
@@ -62,6 +68,7 @@ Added features:
   - Support for multiple solutions
   - Deleting previously generated data can be forced
 
+[15/May/2013]
 Version 1.02:
 -------------
 Generated data changes:
@@ -72,6 +79,7 @@ Generated data changes:
 
 Technical enhancements and bug fixes
 
+[30/Apr/2013]
 Version 1.01:
 -------------
 Added features:
@@ -85,6 +93,7 @@ Technical enhancements:
   - AgM REST Client library is used
   - Excel sheet is built-in in the tool itself
 
+[8/Mar/2013]
 Version 1.00:
 -------------
 Introduced features:
