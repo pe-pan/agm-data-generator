@@ -108,6 +108,8 @@ public class RestClient {
                 conn.setDoInput(true);
                 conn.setAllowUserInteraction(false);
                 conn.setInstanceFollowRedirects(false);
+                conn.setReadTimeout(60*1000);
+                conn.setConnectTimeout(60*1000);
                 String methodName = redirect ? "GET" : method.toString();
                 log.debug("Doing "+methodName);
                 conn.setRequestMethod(methodName);
