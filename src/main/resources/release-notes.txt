@@ -1,6 +1,16 @@
 Release Notes:
 ==============
 
+[21/Oct/2013]
+Version 1.09:
+-------------
+Technical enhancements:
+  - Support of formulas in data.xlsx file
+  - Static settings.properties (having priority over Settings from data.xlsx file)
+
+Bug fixes:
+  - Demo users cannot be added when populating under a user having two accounts while only one has the appropriate permissions
+
 [27/Sep/2013]
 Version 1.08:
 -------------
