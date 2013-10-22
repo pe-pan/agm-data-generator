@@ -101,12 +101,12 @@ public class JobLogger {
             deleteAllData();
         } else {
             if (settings.isGenerateProject()) {
-                deleteJobLogData(jobLog);
+                deleteJobLogData();
             }
         }
     }
 
-    void deleteJobLogData(File jobLog) {
+    void deleteJobLogData() {
         if (jobLog.exists()) {
             log.info("Log from previous run found ("+jobLog.getName()+"), previously created data are going to be deleted...");
             askForDeletePermission();
