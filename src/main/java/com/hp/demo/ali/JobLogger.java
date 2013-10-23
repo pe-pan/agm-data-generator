@@ -184,7 +184,9 @@ public class JobLogger {
                 }
             }
             try {
-                service.delete(entityType, ids, true);
+                if (ids.size() > 0) {
+                    service.delete(entityType, ids, true);
+                }
             } catch (RestClientException | ALMRestException e) {
                 log.error("Cannot delete "+ids.size()+" entities: "+entityType);
                 break; // query failed; don't continue querying it
