@@ -142,7 +142,6 @@ public class JobLogger {
         askForDeletePermission();
         List<Sheet> sheets = reader.getAllEntitySheets();
         ListIterator<Sheet> iterator = sheets.listIterator(sheets.size());
-        AgmRestService service = AgmRestService.getCRUDService();
         while (iterator.hasPrevious()) {
             Sheet sheet = iterator.previous();
             String entityType = sheet.getSheetName();
@@ -150,46 +149,51 @@ public class JobLogger {
                 log.debug("Skipping "+entityType);
                 continue;   // skip release backlog items (they are not entities in AgM)
             }
-            log.info("Deleting entity: " + entityType);
-            Filter filter = new Filter(entityType);
-            org.hp.almjclient.model.marshallers.Entities entities;
+            deleteEntities(entityType);
+        }
+        jobLog.delete(); //todo delete the job log only if no query above failed
+    }
+
+    private void deleteEntities(String entityType) {
+        log.info("Deleting entity: " + entityType);
+        Filter filter = new Filter(entityType);
+        org.hp.almjclient.model.marshallers.Entities entities;
+        AgmRestService service = AgmRestService.getCRUDService();
+        try {
+            entities = service.readCollection(filter);
+        } catch (RestClientException | ALMRestException e) {
+            log.error("Cannot query for entities: "+entityType, e);
+            return; // query failed; don't delete it
+        }
+        int previousResults = Integer.MAX_VALUE;
+        while (entities.getTotalResults() > 0 && entities.getTotalResults() < previousResults) {
+            previousResults = entities.getTotalResults();
+            List<Integer> ids = new ArrayList<>(entities.getTotalResults());
+            for (Entity entity : entities.getEntityList()) {
+                Integer id;
+                try {
+                    id = entity.getId();
+                    log.debug("Getting " + entityType + " with ID: " + id);
+                    if (id == 0) {
+                        log.debug("Skipping the entity with ID 0");  //todo hack!!!!
+                    } else {
+                        ids.add(id);
+                    }
+                } catch (FieldNotFoundException e) {
+                    log.error("Cannot get id of entity "+entityType+" with index="+ids.size());
+                }
+            }
+            try {
+                service.delete(entityType, ids, true);
+            } catch (RestClientException | ALMRestException e) {
+                log.error("Cannot delete "+ids.size()+" entities: "+entityType);
+                break; // query failed; don't continue querying it
+            }
             try {
                 entities = service.readCollection(filter);
             } catch (RestClientException | ALMRestException e) {
                 log.error("Cannot query for entities: "+entityType, e);
-                continue; // query failed; don't delete it
-            }
-            int previousResults = Integer.MAX_VALUE;
-            while (entities.getTotalResults() > 0 && entities.getTotalResults() < previousResults) {
-                previousResults = entities.getTotalResults();
-                List<Integer> ids = new ArrayList<>(entities.getTotalResults());
-                for (Entity entity : entities.getEntityList()) {
-                    Integer id;
-                    try {
-                        id = entity.getId();
-                        log.debug("Getting " + entityType + " with ID: " + id);
-                        if (id == 0) {
-                            log.debug("Skipping the entity with ID 0");  //todo hack!!!!
-                        } else {
-                            ids.add(id);
-                        }
-                    } catch (FieldNotFoundException e) {
-                        log.error("Cannot get id of entity "+entityType+" with index="+ids.size());
-                    }
-                }
-                try {
-                    service.delete(entityType, ids, true);
-                } catch (RestClientException | ALMRestException e) {
-                    log.error("Cannot delete "+ids.size()+" entities: "+entityType);
-                    break; // query failed; don't continue querying it
-                }
-                try {
-                    entities = service.readCollection(filter);
-                } catch (RestClientException | ALMRestException e) {
-                    log.error("Cannot query for entities: "+entityType, e);
-                }
             }
         }
-        jobLog.delete(); //todo delete the job log only if no query above failed
     }
 }
