@@ -132,7 +132,7 @@ public class DataGenerator {
             printUsage();
             System.exit(-1);
         }
-        log.debug("Options: "+args);
+        log.debug("Options: "+Arrays.toString(args));
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         long startTime = System.currentTimeMillis();
         log.info("AgM data generator " + DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+getBuildTime()+")");
