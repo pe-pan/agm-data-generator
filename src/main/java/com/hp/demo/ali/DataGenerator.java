@@ -363,7 +363,6 @@ public class DataGenerator {
             System.exit(-1);
             throw e;        //will never be executed
         }
-        settings.setHost(tenantProperties[0]);
         settings.setDomain(tenantProperties[1]);
         settings.setProject(tenantProperties[2]);
         settings.setTenantId(tenantProperties[3]);

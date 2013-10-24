@@ -48,7 +48,6 @@ public class Settings {
     private String aliDevBridgeFolder;
     private String svnAgentFolder;
     private boolean addUsers;
-    private String Host;
     private String domain;
     private String project;
     private boolean generateHistory;
@@ -264,15 +263,6 @@ public class Settings {
 
     public void setAddUsers(String addUsers) {
         this.addUsers = "yes".equals(addUsers);
-    }
-
-    public String getHost() {
-        return Host;
-    }
-
-    public void setHost(String host) {
-        log.debug("Setting host: "+host);
-        this.Host = host;
     }
 
     public String getDomain() {
