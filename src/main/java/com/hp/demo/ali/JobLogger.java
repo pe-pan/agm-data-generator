@@ -121,11 +121,16 @@ public class JobLogger {
                     log.info("Deleting entity: "+entityName);
                     previousEntity = entityName;
                 }
-                AgmRestService service = AgmRestService.getCRUDService();
-                try {
-                    service.delete(entityName, Integer.parseInt(agmId));
-                } catch (RestClientException | ALMRestException e) {
-                    log.error("Cannot delete "+entityName+" with ID: "+agmId);
+                if ("release".equals(entityName) && settings.isKeepRelease()) {
+                    log.info("Keeping release with ID: "+agmId);
+                    settings.setReleaseId(agmId);
+                } else {
+                    AgmRestService service = AgmRestService.getCRUDService();
+                    try {
+                        service.delete(entityName, Integer.parseInt(agmId));
+                    } catch (RestClientException | ALMRestException e) {
+                        log.error("Cannot delete "+entityName+" with ID: "+agmId);
+                    }
                 }
             }
         } else {
@@ -177,7 +182,12 @@ public class JobLogger {
                     if (id == 0) {
                         log.debug("Skipping the entity with ID 0");  //todo hack!!!!
                     } else {
-                        ids.add(id);
+                        if ("release".equals(entityType) && settings.isKeepRelease() && settings.getReleaseName().equals(entity.getFieldValue("name").getValue())) {
+                            log.info("Keeping release with ID: "+id);
+                            settings.setReleaseId(id);
+                        } else {
+                            ids.add(id);
+                        }
                     }
                 } catch (FieldNotFoundException e) {
                     log.error("Cannot get id of entity "+entityType+" with index="+ids.size());

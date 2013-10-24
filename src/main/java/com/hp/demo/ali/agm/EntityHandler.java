@@ -30,10 +30,7 @@ public class EntityHandler extends AbstractSheetHandler {
     public Entity row(Entity entity) {
         try {
             String excelId = entity.getFieldValue("id").getValue();
-            entity.removeField("id");      // remove the original Entity ID (the one written in Excel); if not removed here, it'll lead to NumberFormatException on the row below
-            log.debug("Creating " + entity);
-            Entity response = AgmRestService.getCRUDService().create(entity);
-            log.debug("Created "+response);
+            Entity response = createEntity(entity);
             String agmId = response.getId().toString();
             AgmEntityIterator.putReference(sheetName + "#" + excelId, agmId);
             JobLogger.writeLogLine(sheetName, agmId);
@@ -41,5 +38,13 @@ public class EntityHandler extends AbstractSheetHandler {
         } catch (RestClientException | ALMRestException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    protected Entity createEntity(Entity entity) throws ALMRestException, RestClientException {
+        entity.removeField("id");      // remove the original Entity ID (the one written in Excel); if not removed here, it'll lead to NumberFormatException on the row below
+        log.debug("Creating " + entity);
+        Entity response = AgmRestService.getCRUDService().create(entity);
+        log.debug("Created "+response);
+        return response;
     }
 }

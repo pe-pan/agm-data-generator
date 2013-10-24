@@ -72,4 +72,18 @@ public class ReleaseHandler extends EntityHandler {
         entities = CRUDService.readCollection(filter);
         return entities;
     }
+
+    @Override
+    protected Entity createEntity(Entity entity) throws ALMRestException, RestClientException {
+        Integer releaseId = Settings.getSettings().getReleaseId(); //todo it can handle only one release
+        if (releaseId != null) {
+            entity.setId(releaseId);
+            log.debug("Updating " + entity);
+            Entity response = AgmRestService.getCRUDService().update(entity);
+            log.debug("Updated "+response);
+            return response;
+        } else {
+            return super.createEntity(entity);
+        }
+    }
 }

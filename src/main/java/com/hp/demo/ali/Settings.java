@@ -60,6 +60,9 @@ public class Settings {
     private String hudsonServiceName;
     private String buildServerName;
     private String branchPath;
+    private boolean keepRelease;
+    private String releaseName;
+    private Integer releaseId;
 
     private static DataFormatter formatter = new DataFormatter(true);
 
@@ -357,6 +360,43 @@ public class Settings {
 
     public void setBranchPath(String branchPath) {
         this.branchPath = branchPath;
+    }
+
+    public boolean isKeepRelease() {
+        return keepRelease;
+    }
+
+    public void setKeepRelease(boolean keepRelease) {
+        this.keepRelease = keepRelease;
+    }
+
+    public void setKeepRelease(String keepRelease) {
+        this.keepRelease = "yes".equals(keepRelease);
+    }
+
+    public String getReleaseName() {
+        return releaseName;
+    }
+
+    public void setReleaseName(String releaseName) {
+        this.releaseName = releaseName;
+    }
+
+    public Integer getReleaseId() {
+        return releaseId;
+    }
+
+    public void setReleaseId(String releaseId) {
+        try {
+            this.releaseId = Integer.parseInt(releaseId);
+        } catch (NumberFormatException e) {
+            log.error("Cannot parse this string into an int: "+releaseId, e);
+            this.releaseId = null;
+        }
+    }
+
+    public void setReleaseId(Integer releaseId) {
+        this.releaseId = releaseId;
     }
 
     public void setAdmin(String admin) {
