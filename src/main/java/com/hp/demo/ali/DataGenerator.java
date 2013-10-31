@@ -107,7 +107,7 @@ public class DataGenerator {
                 " |       - the logged-in account is used when nothing specified               |"+System.lineSeparator()+
                 " |     --tenant-url=                                                          |"+System.lineSeparator()+
                 " |       - URL where the tenant is accessible                                 |"+System.lineSeparator()+
-                " |       - supresses solution-name and account-name options (if provided)     |"+System.lineSeparator()+
+                " |       - suppresses solution-name and account-name options (if provided)    |"+System.lineSeparator()+
                 " |       - users cannot be added when providing this option                   |"+System.lineSeparator()+
                 " |     --delete-all                                                           |"+System.lineSeparator()+
                 " |       - deletes all data from the tenant regardless previous runs          |"+System.lineSeparator()+
