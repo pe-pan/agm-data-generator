@@ -186,6 +186,7 @@ public class ProxyConfigurator {
         if (proxyProperties != null && proxyProperties.size() > 0) {
             String httpProxyPort = proxyProperties.getProperty(HTTP_PROXY_PORT_KEY);
             String httpProxyHost = proxyProperties.getProperty(HTTP_PROXY_HOST_KEY);
+            String nonProxyHosts = proxyProperties.getProperty(NO_PROXY_HOSTS_KEY);
             if (httpProxyHost != null) {
                 StringBuilder content = new StringBuilder();
                 content.append("<?xml version='1.0' encoding='UTF-8'?>").append(System.lineSeparator()).
@@ -193,6 +194,10 @@ public class ProxyConfigurator {
                         append("  <name>").append(httpProxyHost).append("</name>").append(System.lineSeparator());
                 if (httpProxyPort != null) {
                     content.append("  <port>").append(httpProxyPort).append("</port>").append(System.lineSeparator());
+                }
+                if (nonProxyHosts != null) {
+                    nonProxyHosts = nonProxyHosts.replace("|", System.lineSeparator());
+                    content.append("  <noProxyHost>").append(nonProxyHosts).append("</noProxyHost>").append(System.lineSeparator());
                 }
                 content.append("</proxy>").append(System.lineSeparator());
                 return content.toString();
