@@ -160,7 +160,6 @@ public class DataGenerator {
                         settings.setGenerateProject(false);
                         settings.setGenerateHistory(false);
                         settings.setGenerateBuilds(false);
-                        settings.setAlterRepository(false);
                         for (int j = "--generate-".length(); j < args[argIndex].length(); j++) {
                             switch (args[argIndex].charAt(j)) {
                                 case 'u' :
@@ -174,7 +173,6 @@ public class DataGenerator {
                                     break;
                                 case 'b' :
                                     settings.setGenerateBuilds(true);
-                                    settings.setAlterRepository(true);
                                     break;
                                 default:
                                     System.out.println("Unknown parameter when using option generate: "+args[argIndex].charAt(j));
