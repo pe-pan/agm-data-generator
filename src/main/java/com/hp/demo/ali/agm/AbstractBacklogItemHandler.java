@@ -30,7 +30,9 @@ public abstract class AbstractBacklogItemHandler extends EntityHandler {
     protected void _findBacklogItem(String agmId) throws ALMRestException, RestClientException {
         Filter filter = new Filter("release-backlog-item");
         filter.addQueryClause("entity-id", agmId);
+        filter.addQueryClause("entity-type", sheetName);        // a user story may have the same ID as a defect
         Entities entities = CRUDService.readCollection(filter);
+        assert entities.getTotalResults() == 1;
         _backlogItem = entities.getEntityList().get(0);
         _backlogItemId = _backlogItem.getId().toString();
     }
