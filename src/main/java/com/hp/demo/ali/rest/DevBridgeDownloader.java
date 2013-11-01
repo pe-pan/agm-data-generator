@@ -1,7 +1,6 @@
 package com.hp.demo.ali.rest;
 
-import com.hp.demo.ali.Settings;
-import org.apache.commons.io.FileUtils;
+import com.hp.demo.ali.Migrator;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -18,7 +17,7 @@ public class DevBridgeDownloader implements AsyncHandler {
 
     private final RestClient client; // to synchronize closing the connection
     private boolean downloaded = false;
-    private String fileName = null;
+    private File file = null;
 
     public DevBridgeDownloader(RestClient client) {
         this.client = client;
@@ -33,12 +32,12 @@ public class DevBridgeDownloader implements AsyncHandler {
     public void run() {
         try {
             String header = conn.getHeaderField("Content-Disposition");
-            fileName = header.substring(header.indexOf("; filename=")+"; filename=".length());
-            log.info("Downloading "+fileName+"...");
+            file = new File(Migrator.TMP_DIR, header.substring(header.indexOf("; filename=")+"; filename=".length()));
+            log.info("Downloading "+ file +"...");
             int size;
             FileOutputStream outFile = null;
             try {
-                outFile = new FileOutputStream(fileName);
+                outFile = new FileOutputStream(file);
                 size = IOUtils.copy(conn.getInputStream(), outFile);
                 outFile.flush();
                 outFile.close();
@@ -50,7 +49,7 @@ public class DevBridgeDownloader implements AsyncHandler {
                     conn.disconnect();
                 }
             }
-            log.info("File "+fileName+" of "+size+" bytes successfully downloaded");
+            log.info("File "+ file +" of "+size+" bytes successfully downloaded");
         } finally {
             synchronized (this) {
                 downloaded = true;
@@ -74,7 +73,7 @@ public class DevBridgeDownloader implements AsyncHandler {
         return downloaded;
     }
 
-    public String getFileName() {
-        return fileName;
+    public File getFile() {
+        return file;
     }
 }

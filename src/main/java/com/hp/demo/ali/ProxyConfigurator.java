@@ -59,7 +59,7 @@ public class ProxyConfigurator {
     }
 
     private Properties getProxyFileConfiguration() {
-        File file = new File(PROXY_PROPERTIES_FILE_NAME);
+        File file = new File(Migrator.CONF_DIR, Migrator.PROXY_PROPERTIES_FILE);
         if (file.exists()) {
             Properties properties = new Properties();
             log.debug("Reading proxy properties from " + file.getAbsolutePath());

@@ -137,6 +137,7 @@ public class DataGenerator {
         long startTime = System.currentTimeMillis();
         log.info("AgM data generator " + DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+getBuildTime()+")");
         log.info("Starting at: "+sdf.format(new Date(startTime)));
+        Migrator.migrate();
         try {
             int argIndex;
             ExcelReader reader;
@@ -557,9 +558,9 @@ public class DataGenerator {
         } catch (IOException e) {
             log.debug("File " + settings.getAliDevBridgeFolder() + " cannot be deleted ", e);
         }
-        log.debug("Unpacking downloaded ALI Dev Bridge "+downloader.getFileName()+" into "+settings.getAliDevBridgeFolder());
+        log.debug("Unpacking downloaded ALI Dev Bridge "+downloader.getFile()+" into "+settings.getAliDevBridgeFolder());
         Unzip u = new Unzip();
-        u.setSrc(new File(downloader.getFileName()));
+        u.setSrc(downloader.getFile());
         u.setDest(new File(settings.getAliDevBridgeFolder()));
         u.execute();
     }
@@ -612,8 +613,8 @@ public class DataGenerator {
     public static void configureDevBridgeBits() {  //todo rename; too similar to configureAliDevBridge method name
         log.info("Configuring ALI Dev Bridge bits...");
         try {
-            final String fileName = "wrapper-custom.conf";
-            File file = new File(fileName);
+            final String fileName = Migrator.WRAPPER_CUSTOM_CONF_FILE;
+            File file = new File(Migrator.CONF_DIR, fileName);
             InputStream in;
             if (file.exists()) {
                 log.debug("File "+fileName+" found, using this one.");

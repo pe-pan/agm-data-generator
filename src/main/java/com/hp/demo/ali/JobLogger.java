@@ -35,7 +35,7 @@ public class JobLogger {
     public JobLogger(ExcelReader reader) {
         this.reader = reader;
         this.settings = Settings.getSettings();
-        this.jobLog = new File("job-"+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+".log");  //todo hack; make it non-static
+        this.jobLog = new File(Migrator.JOBS_DIR, Migrator.JOB_PREFIX+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+Migrator.JOB_SUFFIX);  //todo hack; make it non-static
     }
 
     public static void writeLogLine(String entityName, String entityId) {   //todo hack; make it non-static (e.g. use context to register/retrieve common objects like JobLogger is)
@@ -59,8 +59,8 @@ public class JobLogger {
             }
             logReader.close();
             log.debug("Renaming job log file...");
-            String bakFileName = jobLog.getName()+".bak";
-            File bakFile = new File(bakFileName);
+            String bakFileName = jobLog.getName()+Migrator.JOB_BACKUP_SUFIX;
+            File bakFile = new File(Migrator.JOBS_DIR, bakFileName);
             bakFile.delete();
             jobLog.renameTo(bakFile);
         } catch (IOException e) {

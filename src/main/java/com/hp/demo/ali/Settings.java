@@ -510,7 +510,7 @@ public class Settings {
         }
 
         // initialize from text file
-        File file = new File("settings.properties");
+        File file = new File(Migrator.CONF_DIR, Migrator.SETTINGS_PROPERTIES_FILE);
         if (file.exists()) {
             Properties properties = new Properties();
             try {
