@@ -3,8 +3,8 @@ package com.hp.demo.ali.rest;
 import com.hp.demo.ali.Settings;
 import com.hp.demo.ali.entity.User;
 import com.jayway.jsonpath.JsonPath;
+import net.minidev.json.JSONObject;
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
 
 import java.util.List;
 import java.util.regex.Matcher;

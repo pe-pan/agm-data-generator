@@ -23,6 +23,8 @@ import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.tools.EntityTools;
 import com.hp.demo.ali.tools.XmlFile;
 import com.jayway.jsonpath.JsonPath;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -33,8 +35,6 @@ import org.hp.almjclient.connection.ServiceResourceAdapter;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.w3c.dom.Element;
 
 import javax.xml.bind.JAXBException;
