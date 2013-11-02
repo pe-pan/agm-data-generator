@@ -288,7 +288,7 @@ public class BuildGenerator {
             jobJson = jobJson.replace("__ALM_USERNAME__", User.getUser(settings.getAdmin()).getLogin());
             jobJson = jobJson.replace("__ALM_PASSWORD__", User.getUser(settings.getAdmin()).getPassword());
             jobJson = jobJson.replace("__ALM_BUILD_SERVER__", settings.getBuildServerName());
-            log.debug("Processed "+jobJsonFileName+ "file: \n"+jobJson);
+            log.debug("Processed "+jobJsonFileName+" file: \n"+jobJson);
 
             data = new String[][]{
                     {"json", jobJson },
