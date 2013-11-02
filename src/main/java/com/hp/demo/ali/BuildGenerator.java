@@ -4,11 +4,13 @@ import com.hp.demo.ali.entity.Entity;
 import com.hp.demo.ali.entity.User;
 import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
+import com.hp.demo.ali.rest.IllegalRestStateException;
 import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.svn.RepositoryMender;
 import com.hp.demo.ali.tools.EntityTools;
-import com.hp.demo.ali.tools.Scrambler;
+import com.hp.demo.ali.tools.ResourceTools;
 import com.hp.demo.ali.tools.XmlFile;
+import net.minidev.json.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -113,14 +115,6 @@ public class BuildGenerator {
             FileUtils.copyFile(  // the new build needs to know SVN credentials
                     new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"subversion.credentials"),
                     new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"subversion.credentials"));
-            XmlFile file = new XmlFile(new File(settings.getBuildFolder()+File.separator+settings.getTemplateJobName()+File.separator+"config.xml"));
-            file.setNodeValue("//almLocation", settings.getRestUrl());
-            file.setNodeValue("//almDomain", settings.getDomain());
-            file.setNodeValue("//almProject", settings.getProject());
-            file.setNodeValue("//almUsername", User.getUser(settings.getAdmin()).getLogin());
-            file.setNodeValue("//almPassword", Scrambler.scramble(User.getUser(settings.getAdmin()).getPassword()));
-            file.setNodeValue("//almBuildServer", settings.getBuildServerName());
-            file.save(new File(settings.getBuildFolder() + File.separator + settings.getJobName() + File.separator + "config.xml"));
 
             FileUtils.writeStringToFile(
                     new File(settings.getBuildFolder()+File.separator+settings.getJobName()+File.separator+"nextBuildNumber"),
@@ -267,12 +261,41 @@ public class BuildGenerator {
     public void createJob() {
         log.info("Creating job " + settings.getJobName() + " at Hudson...");
         RestClient client = new RestClient();
-        log.debug("Reloading from disk (just generated data)");
         try {
-            client.doPost(settings.getHudsonUrl() + "reload", (String) null);
-        } catch (IllegalStateException e) {
-            log.debug("Reload exception caught...");
-            //todo reload returns 503 (exception) -> check it's the correct one
+            JSONObject job = new JSONObject();
+            job.put("name", settings.getJobName());
+            job.put("mode", "copy");
+            job.put("from", settings.getTemplateJobName());
+            job.put("Submit", "OK");
+
+            String [] [] data = new String[][] {
+                    {"json", job.toJSONString() },
+                    {"name", settings.getJobName()},
+                    {"mode", "copy"},
+                    {"from", settings.getTemplateJobName() }
+            };
+            client.doPost(settings.getHudsonUrl() + "view/All/createItem", data);
+
+            String jobJsonFileName = settings.getBuildServerName()+"-job.json";
+            String jobJson = ResourceTools.getCustomResourceContent(new File(Migrator.CONF_DIR, jobJsonFileName));
+
+            log.debug("Loaded "+jobJsonFileName+" file: \n"+jobJson);
+            jobJson = jobJson.replace("__JOB_NAME__", settings.getJobName());
+            jobJson = jobJson.replace("__SVN_URL__", settings.getSvnUrl()+settings.getBranchPath());
+            jobJson = jobJson.replace("__ALM_LOCATION__", settings.getRestUrl());
+            jobJson = jobJson.replace("__ALM_DOMAIN__", settings.getDomain());
+            jobJson = jobJson.replace("__ALM_PROJECT__", settings.getProject());
+            jobJson = jobJson.replace("__ALM_USERNAME__", User.getUser(settings.getAdmin()).getLogin());
+            jobJson = jobJson.replace("__ALM_PASSWORD__", User.getUser(settings.getAdmin()).getPassword());
+            jobJson = jobJson.replace("__ALM_BUILD_SERVER__", settings.getBuildServerName());
+            log.debug("Processed "+jobJsonFileName+ "file: \n"+jobJson);
+
+            data = new String[][]{
+                    {"json", jobJson },
+            };
+            client.doPost(settings.getHudsonUrl() +"job/"+ settings.getJobName() + "/configSubmit", data);
+        } catch (IllegalRestStateException e) {
+            log.error("Create job exception caught; Code: " + e.getResponseCode(), e);
         }
     }
 

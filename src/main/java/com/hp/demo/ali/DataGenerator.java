@@ -21,6 +21,7 @@ import com.hp.demo.ali.rest.DevBridgeDownloader;
 import com.hp.demo.ali.rest.IllegalRestStateException;
 import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.tools.EntityTools;
+import com.hp.demo.ali.tools.ResourceTools;
 import com.hp.demo.ali.tools.XmlFile;
 import com.jayway.jsonpath.JsonPath;
 import net.minidev.json.JSONArray;
@@ -613,14 +614,7 @@ public class DataGenerator {
         try {
             final String fileName = Migrator.WRAPPER_CUSTOM_CONF_FILE;
             File file = new File(Migrator.CONF_DIR, fileName);
-            InputStream in;
-            if (file.exists()) {
-                log.debug("File "+fileName+" found, using this one.");
-                in = new FileInputStream(file);
-            } else {
-                log.debug("No file "+fileName+" found, using the built-in one.");
-                in = DataGenerator.class.getResourceAsStream("/"+fileName);
-            }
+            InputStream in = ResourceTools.getCustomResource(file);
             OutputStream out = new FileOutputStream(settings.getAliDevBridgeFolder()+DEV_BRIDGE_ZIP_ROOT+"wrapper"+File.separator+fileName, true);
             IOUtils.copy(in, out);
             in.close();
