@@ -291,9 +291,19 @@ public class BuildGenerator {
             log.debug("Processed "+jobJsonFileName+" file: \n"+jobJson);
 
             data = new String[][]{
+                    {"scm", "2"},
+                    {"_.remote" , settings.getSvnUrl()+settings.getBranchPath()},
+                    {"-.local", "."},
                     {"json", jobJson },
             };
             client.doPost(settings.getHudsonUrl() +"job/"+ settings.getJobName() + "/configSubmit", data);
+
+            data = new String[][] {
+                    { "nextBuildNumber", ""+currentBuildNumber },
+                    { "json", "{\"nextBuildNumber\": \""+currentBuildNumber+"\"}" },
+
+            };
+            client.doPost(settings.getHudsonUrl() +"job/"+settings.getJobName()+"/nextbuildnumber/submit", data);
         } catch (IllegalRestStateException e) {
             log.error("Create job exception caught; Code: " + e.getResponseCode(), e);
         }
