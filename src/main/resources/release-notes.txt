@@ -1,5 +1,20 @@
 Release Notes:
 ==============
+[4/Nov/2013]
+Version 1.10:
+-------------
+Added features:
+  - When refreshing data, the release is not being deleted but the old one is being kept
+  - Data generator can be now started from Jenkins
+
+Dropped features:
+  - Hudson not supported anymore (there is no template for Hudson jobs)
+
+Technical enhancements:
+  - New folder structure (conf, jobs, logs, tmp) and auto-migration to this
+  - Job at Hudson/Jenkins is being created without reload operation (enables ADG to be started from Jenkins)
+
+Bug fixes
 
 [21/Oct/2013]
 Version 1.09:
