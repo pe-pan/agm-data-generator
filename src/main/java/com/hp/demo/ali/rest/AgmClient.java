@@ -73,7 +73,7 @@ public class AgmClient {
                 response = client.doGet(portalUrl+"/portal2/service/users/session?");
                 String owningAccountId = JsonPath.read(response.getResponse(), "$.owningAccountId").toString();
                 log.debug("Owning Account ID: "+owningAccountId );
-                List accountIds = JsonPath.read(response.getResponse(), "$.accountsAndServices[?(@.accountName == '"+accountName+"')].accountId");
+                List accountIds = JsonPath.read(response.getResponse(), "$.accountsAndServices[?(@.accountDisplayName == '"+accountName+"')].accountId");
                 if (accountIds.size() == 0) {
                     throw new IllegalArgumentException("The provided account name does not exist: "+accountName);
                 }
