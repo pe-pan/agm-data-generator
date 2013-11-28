@@ -75,7 +75,14 @@ public class AgmClient {
                 log.debug("Owning Account ID: "+owningAccountId );
                 List accountIds = JsonPath.read(response.getResponse(), "$.accountsAndServices[?(@.accountDisplayName == '"+accountName+"')].accountId");
                 if (accountIds.size() == 0) {
-                    throw new IllegalArgumentException("The provided account name does not exist: "+accountName);
+                    List<String> accountNames = JsonPath.read(response.getResponse(), "$.accountsAndServices[*].accountDisplayName");
+                    String possibleAccountNames;
+                    if (accountNames == null || accountNames.size() == 0) {
+                        possibleAccountNames = "\nThere is no account at all.";
+                    } else {
+                        possibleAccountNames = "\nThe possible account names are: "+accountNames;
+                    }
+                    throw new IllegalArgumentException("The provided account name does not exist: "+accountName+possibleAccountNames);
                 }
                 String accountId = accountIds.get(0).toString();
                 log.debug("Account ID: "+accountId);
@@ -96,7 +103,14 @@ public class AgmClient {
             if (solutionName != null) {
                 List<String> agmUrls = (List<String>)JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl");
                 if (agmUrls.size() == 0) {
-                    throw new IllegalArgumentException("The provided solution name does not exist: "+solutionName);
+                    List<String> solutionNames = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[*].displayName");
+                    String possibleSolutionNames;
+                    if (solutionNames == null || solutionNames.size() == 0) {
+                        possibleSolutionNames = "\nThere is no solution at all.";
+                    } else {
+                        possibleSolutionNames = "\nThe possible solution names are: "+solutionNames;
+                    }
+                    throw new IllegalArgumentException("The provided solution name does not exist: "+solutionName+possibleSolutionNames);
                 }
                 tenantUrl = agmUrls.get(0);
             } else {
