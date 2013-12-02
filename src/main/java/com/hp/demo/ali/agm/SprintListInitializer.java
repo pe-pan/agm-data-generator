@@ -50,11 +50,15 @@ public class SprintListInitializer extends EntityHandler {
                     fields.put("start-date", sdf.format(new Date(startDate + diff)));
                     fields.put("end-date", sdf.format(new Date(endDate + diff)));
                     Entity updatedSprint = new Entity("release-cycle", fields);
-                    CRUDService.update(updatedSprint);
+                    log.debug("Updating sprint: "+entityToString(updatedSprint));
+                    Entity e = CRUDService.update(updatedSprint);
+                    log.debug("Updated sprint: "+entityToString(e));
 
                     updatedSprint.setFieldValue("start-date", sdf.format(new Date(startDate)));
                     updatedSprint.setFieldValue("end-date", sdf.format(new Date(endDate)));
-                    CRUDService.update(updatedSprint);
+                    log.debug("Updating sprint: "+entityToString(updatedSprint));
+                    e = CRUDService.update(updatedSprint);
+                    log.debug("Updated sprint: "+entityToString(e));
                 }
             }
         } catch (RestClientException | ALMRestException e) {

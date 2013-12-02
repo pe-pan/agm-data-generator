@@ -54,7 +54,7 @@ public class ReleaseHandler extends EntityHandler {
             int i = 1;
             for (Entity sprint : sprintList.getEntityList()) {
                 String id = sprint.getId().toString();
-                log.debug("Learning sprint#"+i+" with id: "+id);
+                log.debug("Learning sprint#"+i+" with id: "+id+": "+entityToString(sprint));
                 AgmEntityIterator.putReference("sprint#"+i++, id);
             }
             return response;
@@ -78,9 +78,9 @@ public class ReleaseHandler extends EntityHandler {
         Integer releaseId = Settings.getSettings().getReleaseId(); //todo it can handle only one release
         if (releaseId != null) {
             entity.setId(releaseId);
-            log.debug("Updating " + entity);
+            log.debug("Updating " + entity+": "+entityToString(entity));
             Entity response = AgmRestService.getCRUDService().update(entity);
-            log.debug("Updated "+response);
+            log.debug("Updated "+response+": "+entityToString(response));
             return response;
         } else {
             return super.createEntity(entity);
