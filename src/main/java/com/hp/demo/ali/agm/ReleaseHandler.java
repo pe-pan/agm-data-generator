@@ -4,6 +4,7 @@ package com.hp.demo.ali.agm;
 import com.hp.demo.ali.Settings;
 import com.hp.demo.ali.excel.AgmEntityIterator;
 import com.hp.demo.ali.rest.AgmRestService;
+import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
@@ -54,7 +55,7 @@ public class ReleaseHandler extends EntityHandler {
             int i = 1;
             for (Entity sprint : sprintList.getEntityList()) {
                 String id = sprint.getId().toString();
-                log.debug("Learning sprint#"+i+" with id: "+id+": "+entityToString(sprint));
+                log.debug("Learning sprint#"+i+" with id: "+id+": "+ EntityTools.entityToString(sprint));
                 AgmEntityIterator.putReference("sprint#"+i++, id);
             }
             return response;
@@ -78,9 +79,9 @@ public class ReleaseHandler extends EntityHandler {
         Integer releaseId = Settings.getSettings().getReleaseId(); //todo it can handle only one release
         if (releaseId != null) {
             entity.setId(releaseId);
-            log.debug("Updating " + entity+": "+entityToString(entity));
+            log.debug("Updating " + entity+": "+ EntityTools.entityToString(entity));
             Entity response = AgmRestService.getCRUDService().update(entity);
-            log.debug("Updated "+response+": "+entityToString(response));
+            log.debug("Updated "+response+": "+ EntityTools.entityToString(response));
             return response;
         } else {
             return super.createEntity(entity);
