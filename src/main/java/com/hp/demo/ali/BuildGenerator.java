@@ -1,13 +1,12 @@
 package com.hp.demo.ali;
 
-import com.hp.demo.ali.entity.Entity;
 import com.hp.demo.ali.entity.User;
 import com.hp.demo.ali.excel.EntityIterator;
+import com.hp.demo.ali.excel.ExcelEntity;
 import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.IllegalRestStateException;
 import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.svn.RepositoryMender;
-import com.hp.demo.ali.tools.EntityTools;
 import com.hp.demo.ali.tools.ResourceTools;
 import com.hp.demo.ali.tools.XmlFile;
 import net.minidev.json.JSONObject;
@@ -71,25 +70,25 @@ public class BuildGenerator {
 
     public void generate() {
         log.info("Generating builds...");
-        EntityIterator<Entity> iterator = new EntityIterator<>(reader.getSheet("Builds"));
+        EntityIterator<ExcelEntity> iterator = new EntityIterator<>(reader.getSheet("Builds"));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-'00'");
         List<Long> skipRevisions = readSkippedRevisions();
         try {
             while (iterator.hasNext()) {
-                Entity entity = iterator.next();
-                int nextBuild = EntityTools.getFieldIntValue(entity, "next build");
-                int totalLines = EntityTools.getFieldIntValue(entity, "totalLines");
-                int coveredLines = EntityTools.getFieldIntValue(entity, "coveredLines");
-                int totalTests = EntityTools.getFieldIntValue(entity, "totalTests");
-                int failedTests = EntityTools.getFieldIntValue(entity, "failedTests");
-                int skippedTests = EntityTools.getFieldIntValue(entity, "skippedTests");
-                String status = EntityTools.getFieldValue(entity, "status");
-                int duration = EntityTools.getFieldIntValue(entity, "duration");
-                long increaseRevision = EntityTools.getFieldLongValue(entity, "revisions");
-                int requirements = EntityTools.getFieldIntValue(entity, "requirements");
-                int defects = EntityTools.getFieldIntValue(entity, "defects");
-                int unassigned = EntityTools.getFieldIntValue(entity, "unassigned");
-                int teamMembers = EntityTools.getFieldIntValue(entity, "team members");
+                ExcelEntity entity = iterator.next();
+                int nextBuild = entity.getFieldIntValue("next build");
+                int totalLines = entity.getFieldIntValue("totalLines");
+                int coveredLines = entity.getFieldIntValue("coveredLines");
+                int totalTests = entity.getFieldIntValue("totalTests");
+                int failedTests = entity.getFieldIntValue("failedTests");
+                int skippedTests = entity.getFieldIntValue("skippedTests");
+                String status = entity.getFieldValue("status");
+                int duration = entity.getFieldIntValue("duration");
+                long increaseRevision = entity.getFieldLongValue("revisions");
+                int requirements = entity.getFieldIntValue("requirements");
+                int defects = entity.getFieldIntValue("defects");
+                int unassigned = entity.getFieldIntValue("unassigned");
+                int teamMembers = entity.getFieldIntValue("team members");
 
                 currentBuildDate = new Date(currentBuildDate.getTime() + nextBuild);     //nextBuild is in milliseconds
                 String outputFolder = settings.getBuildFolder() + File.separator + settings.getJobName() + File.separator + "builds" + File.separator + sdf.format(currentBuildDate);
@@ -158,11 +157,11 @@ public class BuildGenerator {
     }
 
     private List<Long> readSkippedRevisions() {
-        EntityIterator<com.hp.demo.ali.entity.Entity> iterator = new EntityIterator<>(reader.getSheet("Skip-Revisions"));
+        EntityIterator<ExcelEntity> iterator = new EntityIterator<>(reader.getSheet("Skip-Revisions"));
         List<Long> revisions = new LinkedList<>();
         while (iterator.hasNext()) {
-            com.hp.demo.ali.entity.Entity entity =  iterator.next();
-            long revision = EntityTools.getFieldLongValue(entity, "revisions to skip");
+            ExcelEntity entity =  iterator.next();
+            long revision = entity.getFieldLongValue("revisions to skip");
             revisions.add(revision);
         }
         return revisions;

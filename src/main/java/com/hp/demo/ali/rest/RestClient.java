@@ -1,7 +1,6 @@
 package com.hp.demo.ali.rest;
 
-import com.hp.demo.ali.entity.Entity;
-import com.hp.demo.ali.tools.EntityTools;
+import com.hp.demo.ali.excel.ExcelEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -82,8 +81,8 @@ public class RestClient {
         return doRequest(urlAddress, formData, method, contentType, null);
     }
 
-    public synchronized HttpResponse doRequest(String urlAddress, Entity entity, Method method, ContentType contentType) {
-        return doRequest(urlAddress, EntityTools.toUrlParameters(entity), method, contentType, null);
+    public synchronized HttpResponse doRequest(String urlAddress, ExcelEntity entity, Method method, ContentType contentType) {
+        return doRequest(urlAddress, entity.toUrlParameters(), method, contentType, null);
     }
 
     /**

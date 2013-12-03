@@ -11,6 +11,7 @@ import com.hp.demo.ali.agm.SheetHandler;
 import com.hp.demo.ali.agm.SheetHandlerRegistry;
 import com.hp.demo.ali.agm.SprintListInitializer;
 import com.hp.demo.ali.excel.AgmEntityIterator;
+import com.hp.demo.ali.excel.ExcelEntity;
 import com.hp.demo.ali.rest.AgmClient;
 import com.hp.demo.ali.entity.User;
 import com.hp.demo.ali.excel.EntityIterator;
@@ -20,7 +21,6 @@ import com.hp.demo.ali.rest.ContentType;
 import com.hp.demo.ali.rest.DevBridgeDownloader;
 import com.hp.demo.ali.rest.IllegalRestStateException;
 import com.hp.demo.ali.rest.RestClient;
-import com.hp.demo.ali.tools.EntityTools;
 import com.hp.demo.ali.tools.ResourceTools;
 import com.hp.demo.ali.tools.XmlFile;
 import com.jayway.jsonpath.JsonPath;
@@ -304,16 +304,16 @@ public class DataGenerator {
     private static Sheet readUsers(ExcelReader reader) {
         log.info("Reading list of users...");
         Sheet users = reader.getSheet("Users");
-        EntityIterator<com.hp.demo.ali.entity.Entity> iterator = new EntityIterator<>(users);
+        EntityIterator<ExcelEntity> iterator = new EntityIterator<>(users);
         while (iterator.hasNext()) {
-            com.hp.demo.ali.entity.Entity userEntity = iterator.next();
-            String id = EntityTools.getFieldValue(userEntity, "id");
-            String login = EntityTools.getFieldValue(userEntity, "login");
-            String password = EntityTools.getFieldValue(userEntity, "password");
-            String firstName = EntityTools.getFieldValue(userEntity, "first name");
-            String lastName = EntityTools.getFieldValue(userEntity, "last name");
-            String phone = EntityTools.getFieldValue(userEntity, "phone");
-            boolean portalUser = "yes".equals(EntityTools.getFieldValue(userEntity, "portal user"));
+            ExcelEntity entity = iterator.next();
+            String id = entity.getFieldValue("id");
+            String login = entity.getFieldValue("login");
+            String password = entity.getFieldValue("password");
+            String firstName = entity.getFieldValue("first name");
+            String lastName = entity.getFieldValue("last name");
+            String phone = entity.getFieldValue("phone");
+            boolean portalUser = "yes".equals(entity.getFieldValue("portal user"));
             User user = new User(id, login, password, firstName, lastName, phone, portalUser);
             User.addUser(user);
         }

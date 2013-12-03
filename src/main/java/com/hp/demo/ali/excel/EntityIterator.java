@@ -1,10 +1,8 @@
 package com.hp.demo.ali.excel;
 
-import com.hp.demo.ali.entity.*;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by panuska on 10/29/12.
@@ -14,7 +12,6 @@ public class EntityIterator<E> implements Iterable, Iterator {
     protected RowIterator rowIterator;
     protected String[] fieldNames;
 
-    private static ObjectFactory entityFactory = new ObjectFactory();
     public static final String NULL = "null";
 
     public EntityIterator(Sheet sheet) {
@@ -38,22 +35,14 @@ public class EntityIterator<E> implements Iterable, Iterator {
     @Override
     public E next() {
         String[] row = rowIterator.next();
-        Entity entity = entityFactory.createEntity();
-        Fields fields = entityFactory.createFields();
-        entity.setFields(fields);
-        List<Field> fieldList = fields.getField();
+        ExcelEntity entity = new ExcelEntity();
         for (int i = 0; i < fieldNames.length; i++) {
             String stringValue = row[i];
             if (NULL.equals(stringValue)) { // skip if "null" is in Excel
                 continue;
             }
             String fieldName = fieldNames[i];
-            Field field = entityFactory.createField();
-            field.setName(fieldName);
-            Value value = entityFactory.createValue();
-            value.setValue(stringValue);
-            field.setValue(value);
-            fieldList.add(field);
+            entity.setFieldValue(fieldName, stringValue);
         }
         return (E)entity;
     }

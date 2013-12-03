@@ -4,6 +4,7 @@ import com.hp.demo.ali.agm.ProjectTaskHandler;
 import com.hp.demo.ali.agm.ReleaseHandler;
 import com.hp.demo.ali.excel.AgmEntityIterator;
 import com.hp.demo.ali.rest.AgmRestService;
+import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.hp.almjclient.connection.ServiceResourceAdapter;
 import org.hp.almjclient.exceptions.ALMRestException;
@@ -41,18 +42,18 @@ public class HistoryGenerator {
                         String agmId = (String)work.remove(0);
                         int remaining = "In Progress".equals(status) ? (Integer)work.remove(0) : 0; // once completed, remaining is 0
                         String originalTeamId = (String)work.remove(0);
-//                        int invested = 6 - remaining;                // todo estimated work must be always 6
+                        int invested = 6 - remaining;                // todo estimated work must be always 6
 
                         Map<String, Object> fields = new HashMap<>(4);
                         fields.put("id", agmId);
                         fields.put("remaining", remaining);
-//                        fields.put("invested", invested);
+                        fields.put("invested", invested);
                         fields.put("status", status);
 
-//                        log.debug("Updating task "+agmId+": remaining="+remaining+" invested="+invested+" status="+status);
-                        log.debug("Updating task "+agmId+": remaining="+remaining+" status="+status);
                         Entity projectTask = new Entity("project-task", fields);
+                        log.debug("Updating task: "+ EntityTools.entityToString(projectTask));
                         projectTask = service.update(projectTask);
+                        log.debug("Task updated:  "+ EntityTools.entityToString(projectTask));
                         String backlogItemId = projectTask.getFieldValue("release-backlog-item-id").getValue();
 
                         String ksStatus = "New";
