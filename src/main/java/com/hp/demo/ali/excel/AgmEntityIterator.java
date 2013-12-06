@@ -16,9 +16,9 @@ import java.util.Set;
 public class AgmEntityIterator<E> extends EntityIterator implements Iterable, Iterator {
     private static Logger log = Logger.getLogger(AgmEntityIterator.class.getName());
 
-    private Set<String> referenceColumns = new HashSet<String>();
+    private Set<String> referenceColumns = new HashSet<>();
     private String entityType;
-    private static Map<String, String> idTranslationTable = new HashMap<String, String>();
+    private static Map<String, String> idTranslationTable = new HashMap<>();
 
     public AgmEntityIterator(Sheet sheet) {
         super(sheet);
@@ -36,7 +36,7 @@ public class AgmEntityIterator<E> extends EntityIterator implements Iterable, It
     @Override
     public E next() {
         String[] row = rowIterator.next();
-        Map<String, Object> fields = new HashMap<String, Object>(row.length);
+        Map<String, Object> fields = new HashMap<>(row.length);
         for (int i = 0; i < row.length; i++) {  // do not skip the very first column (it contains the original entity ID - written in Excel file)
             String value = row[i];
             if (!NULL.equals(value)) {

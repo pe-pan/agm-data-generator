@@ -40,17 +40,9 @@ public class AgmClient {
     }
 
     /**
-     * Returns an array of strings:
-     * [0] host
-     * [1] domain
-     * [2] project
-     * [3] tenant ID
-     * [4] REST API URL
-     * [5] portal URL
-     *
-     * @param loginUrl
-     * @param admin
-     * @return
+     * @param loginUrl where to login.
+     * @param admin user credentials.
+     * @return an array of strings [0-5]: host, domain, project, tenant ID, REST API URL, portal URL.
      */
     public String[] login(String loginUrl, User admin) {
         final String[][] data = {
@@ -101,7 +93,7 @@ public class AgmClient {
                 throw new IllegalArgumentException("There are no 'Agile Manager' solutions under the given account: "+(accountName == null ? "default " : accountName));
             }
             if (solutionName != null) {
-                List<String> agmUrls = (List<String>)JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl");
+                List<String> agmUrls = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl");
                 if (agmUrls.size() == 0) {
                     List<String> solutionNames = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[*].displayName");
                     String possibleSolutionNames;

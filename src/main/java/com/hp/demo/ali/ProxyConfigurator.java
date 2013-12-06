@@ -126,8 +126,7 @@ public class ProxyConfigurator {
             if (proxyList.size() > 1) {
                 log.warn("There is more " + proxy.type() + " proxies available. Use "+PROXY_PROPERTIES_FILE_NAME+" to set the right one.");
             }
-            InetSocketAddress address = (InetSocketAddress) proxy.address();
-            return address;
+            return (InetSocketAddress) proxy.address();
         }
         return null;
     }
@@ -164,8 +163,8 @@ public class ProxyConfigurator {
 
     /**
      * Returns null when no proxy properties specified (even when an instance is provided)
-     * @param element
-     * @return
+     * @param element HTML element where to add the proxy properties.
+     * @return null when no proxy properties specified; the same element instead.
      */
     public Element getSvnAgentProxyConfiguration(Element element) {
         if (proxyProperties != null && proxyProperties.size() > 0) {

@@ -32,12 +32,12 @@ public class RowIterator<E> implements Iterable, Iterator {
      * Transforms the row content into an array of string values and (unlike poi library):
      * 1. puts in the array also empty (blank/null) cells (does not skip them)
      * 2. removes the empty ending cells (trims the row)
-     * @param row
-     * @return
+     * @param row which row to read.
+     * @return array of strings where each string is the excel cell value.
      */
     private String[] _readLine(Row row) {
         Iterator<Cell> cellIterator = row.cellIterator();
-        List<String> cells = new LinkedList<String>();
+        List<String> cells = new LinkedList<>();
         // transform iterator to list
         while (cellIterator.hasNext()) {
             Cell cell =  cellIterator.next();
@@ -72,7 +72,6 @@ public class RowIterator<E> implements Iterable, Iterator {
         }
 
         // initialize buffer
-        int size = row.getLastCellNum(); // the very first line in the sheet must be full (contains all values)
         if (buffer == null) {
             buffer = _readLine(row);
             return Arrays.copyOf(buffer, buffer.length);  // return copy of buffer as buffer is used as static cache

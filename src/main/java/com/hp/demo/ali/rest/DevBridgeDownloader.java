@@ -35,9 +35,8 @@ public class DevBridgeDownloader implements AsyncHandler {
             file = new File(Migrator.TMP_DIR, header.substring(header.indexOf("; filename=")+"; filename=".length()));
             log.info("Downloading "+ file +"...");
             int size;
-            FileOutputStream outFile = null;
             try {
-                outFile = new FileOutputStream(file);
+                FileOutputStream outFile = new FileOutputStream(file);
                 size = IOUtils.copy(conn.getInputStream(), outFile);
                 outFile.flush();
                 outFile.close();

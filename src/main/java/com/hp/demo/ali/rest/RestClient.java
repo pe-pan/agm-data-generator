@@ -3,6 +3,7 @@ package com.hp.demo.ali.rest;
 import com.hp.demo.ali.excel.ExcelEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.net.*;
@@ -17,7 +18,7 @@ public class RestClient {
 
     private static Logger log = Logger.getLogger(RestClient.class.getName());
 
-    private HashMap<String, String> cookies = new HashMap<String, String>();
+    private HashMap<String, String> cookies = new HashMap<>();
     private String oldLocation = "";
 
     private void addCookieList(List<String> cookieList) {
@@ -92,10 +93,11 @@ public class RestClient {
      * @param urlAddress where the request is being sent
      * @param formData if null, GET method is used; POST otherwise
      * @param method which method will be used
-     * @param handler
+     * @param handler if null, the method is synchronous and waits for response. If not null, the method is asynchronous
+     *                and returns immediatelly. The response should can be processed in this handler.
      * @return response of the request
      */
-    public synchronized HttpResponse doRequest(String urlAddress, String formData, Method method, ContentType contentType, AsyncHandler handler) {
+    public synchronized HttpResponse doRequest(String urlAddress, String formData, Method method, ContentType contentType, @Nullable AsyncHandler handler) {
         HttpURLConnection conn = null;
         try {
             boolean redirect = false;
@@ -257,7 +259,7 @@ public class RestClient {
         return doRequest(url, serializeParameters(data), Method.POST, ContentType.NONE);
     }
 
-    public HttpResponse doPost(String url, String[][] data, AsyncHandler handler) {
+    public HttpResponse doPost(String url, @Nullable String[][] data, AsyncHandler handler) {
         return doRequest(url, serializeParameters(data), Method.POST, ContentType.NONE, handler);
     }
 

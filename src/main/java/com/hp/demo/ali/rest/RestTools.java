@@ -34,7 +34,7 @@ public class RestTools {
         tidy.setQuiet(true);
         Document document = tidy.parseDOM(new StringReader(html), null);
         XPath xpath = XPathFactory.newInstance().newXPath();
-        Node a = null;
+        Node a;
         try {
             a = (Node) xpath.compile(xpathString).evaluate(document, XPathConstants.NODE);
         } catch (XPathExpressionException e) {

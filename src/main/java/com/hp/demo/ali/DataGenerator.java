@@ -60,7 +60,6 @@ public class DataGenerator {
 
     private static SheetHandlerRegistry registry;
     private static ProxyConfigurator proxyConfigurator;
-    private static JobLogger jobLogger;
 
     private static String getBuildTime() {
         String buildTime = null;
@@ -228,7 +227,7 @@ public class DataGenerator {
             if (settings.isGenerateProject() || settings.isGenerateBuilds()) {
                 downloader = agmClient.downloadDevBridge();
             }
-            jobLogger = new JobLogger(reader);
+            JobLogger jobLogger = new JobLogger(reader);
             jobLogger.deleteExistingData();
 
             if (settings.isAddUsers()) {

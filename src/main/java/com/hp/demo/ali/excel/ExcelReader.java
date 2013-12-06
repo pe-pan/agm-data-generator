@@ -20,9 +20,7 @@ public class ExcelReader {
     public ExcelReader(InputStream workbookStream) {
         try {
             workbook = WorkbookFactory.create(workbookStream);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        } catch (InvalidFormatException e) {
+        } catch (IOException | InvalidFormatException e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -33,11 +31,11 @@ public class ExcelReader {
 
     /**
      * Returns list of sheets whose name starts with a lower-cased character (a-z).
-     * @return
+     * @return only entity sheets.
      */
     public List<Sheet> getAllEntitySheets() {
         int size = workbook.getNumberOfSheets();
-        List<Sheet> sheets = new LinkedList<Sheet>();
+        List<Sheet> sheets = new LinkedList<>();
         for (int i = 0; i < size; i++) {
             Sheet sheet = workbook.getSheetAt(i);
             char firstChar = sheet.getSheetName().charAt(0);

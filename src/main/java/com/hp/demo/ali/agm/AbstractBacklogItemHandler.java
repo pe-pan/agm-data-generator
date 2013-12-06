@@ -19,11 +19,11 @@ public abstract class AbstractBacklogItemHandler extends EntityHandler {
     protected Entity _backlogItem;
     protected String _backlogItemId;
 
-    protected static Map<String, String> featureMap = new HashMap<String, String>();
+    protected static Map<String, String> featureMap = new HashMap<>();
 
     /**
      * Sets _backlogItem, _backlogItemId and fields for later use.
-     * @param agmId
+     * @param agmId The entity ID used in AgM
      * @throws ALMRestException
      * @throws RestClientException
      */
