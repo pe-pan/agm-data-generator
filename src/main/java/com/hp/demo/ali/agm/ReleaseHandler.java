@@ -39,11 +39,11 @@ public class ReleaseHandler extends EntityHandler {
     public Entity row(Entity entity) {
         try {
             //calculates the release date using current date (it's relative to the current date)
-            releaseStartDate = new Date(Settings.getSettings().getFirstBuildDate().getTime() + (Long.parseLong(entity.getFieldValue("start-date").getValue()) * 24*60*60*1000));
+            releaseStartDate = new Date(Settings.getSettings().getFirstBuildDate().getTime() + (EntityTools.getLongField(entity, "start-date") * 24*60*60*1000));
             log.debug("Setting start of the release to: "+sdf.format(releaseStartDate));
             entity.setFieldValue("start-date", sdf.format(releaseStartDate));
 
-            Date endDate = new Date(releaseStartDate.getTime() + (Long.parseLong(entity.getFieldValue("end-date").getValue()) * 24*60*60*1000));
+            Date endDate = new Date(releaseStartDate.getTime() + (EntityTools.getLongField(entity, "end-date") * 24*60*60*1000));
             log.debug("Setting end of the release to: "+sdf.format(endDate));
             entity.setFieldValue("end-date", sdf.format(endDate));
 

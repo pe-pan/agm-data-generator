@@ -2,6 +2,7 @@ package com.hp.demo.ali.agm;
 
 import com.hp.demo.ali.Settings;
 import com.hp.demo.ali.excel.AgmEntityIterator;
+import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
@@ -23,10 +24,9 @@ public class DefectHandler extends AbstractBacklogItemHandler {
     @Override
     public Entity row(Entity entity) {
         try {
-            String featureId = entity.getFieldValue("parent-id").getValue();      // set feature/theme the defect belongs to
-            entity.removeField("parent-id");
+            String featureId = EntityTools.removeField(entity, "parent-id");      // set feature/theme the defect belongs to
 
-            String excelId = entity.getFieldValue("id").getValue();
+            String excelId = EntityTools.getField(entity, "id");
             Entity response = super.row(entity);
             String agmId = response.getId().toString();
             _findBacklogItem(agmId);

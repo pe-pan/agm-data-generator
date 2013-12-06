@@ -1,5 +1,6 @@
 package com.hp.demo.ali.agm;
 
+import com.hp.demo.ali.tools.EntityTools;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.FieldNotFoundException;
 import org.hp.almjclient.exceptions.RestClientException;
@@ -16,8 +17,7 @@ public class PlanBacklogItemHandler extends EntityHandler {
             String ksStatusId = null;
             Integer id = null;
             try {
-                ksStatusId = entity.getFieldValue("kanban-status-id").getValue();
-                entity.removeField("kanban-status-id");
+                ksStatusId = EntityTools.removeField(entity, "kanban-status-id");
                 id = entity.getId();
             } catch (FieldNotFoundException e) {
                 // ks status not to be set

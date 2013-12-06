@@ -9,8 +9,6 @@ import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
 
-import java.util.Set;
-
 /**
  * Created by panuska on 3/14/13.
  */
@@ -32,7 +30,7 @@ public class EntityHandler extends AbstractSheetHandler {
     @Override
     public Entity row(Entity entity) {
         try {
-            String excelId = entity.getFieldValue("id").getValue();
+            String excelId = EntityTools.getField(entity, "id");
             Entity response = createEntity(entity);
             String agmId = response.getId().toString();
             AgmEntityIterator.putReference(sheetName + "#" + excelId, agmId);

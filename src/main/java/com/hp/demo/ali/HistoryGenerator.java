@@ -54,7 +54,7 @@ public class HistoryGenerator {
                         log.debug("Updating task: "+ EntityTools.entityToString(projectTask));
                         projectTask = service.update(projectTask);
                         log.debug("Task updated:  "+ EntityTools.entityToString(projectTask));
-                        String backlogItemId = projectTask.getFieldValue("release-backlog-item-id").getValue();
+                        String backlogItemId = EntityTools.getField(projectTask, "release-backlog-item-id");
 
                         String ksStatus = "New";
                         Filter filter = new Filter("project-task");

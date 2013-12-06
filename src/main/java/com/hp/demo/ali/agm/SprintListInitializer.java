@@ -6,7 +6,6 @@ import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,19 +29,13 @@ public class SprintListInitializer extends EntityHandler {
                 String id = sprint.getId().toString();
                 log.debug("Initializing sprint id: " + id);
 
-                String tense = sprint.getFieldValue("tense").getValue();
+                String tense = EntityTools.getField(sprint, "tense");
                 assert tense != null;
                 if ("PAST".equals(tense)) {
                     log.debug("Moving the sprint " + id + " to current and back again (to reset assigned teams)");
                     long now = System.currentTimeMillis();
-                    long startDate;
-                    long endDate;
-                    try {
-                        startDate = sdf.parse(sprint.getFieldValue("start-date").getValue()).getTime();
-                        endDate = sdf.parse(sprint.getFieldValue("end-date").getValue()).getTime();
-                    } catch (ParseException e) {
-                        throw new IllegalStateException(e);
-                    }
+                    long startDate = EntityTools.getDateField(sprint, "start-date", sdf).getTime();
+                    long endDate = EntityTools.getDateField(sprint, "end-date", sdf).getTime();
                     long diff = now - startDate;
 
                     assert diff > 0;

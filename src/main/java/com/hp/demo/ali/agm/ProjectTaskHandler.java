@@ -1,5 +1,6 @@
 package com.hp.demo.ali.agm;
 
+import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.FieldNotFoundException;
 import org.hp.almjclient.model.marshallers.Entity;
@@ -15,7 +16,7 @@ import java.util.Map;
 public class ProjectTaskHandler extends EntityHandler {
     private static Logger log = Logger.getLogger(ProjectTaskHandler.class.getName());
 
-    private static Map<Integer, List<Object>> workCalendar = new HashMap<Integer, List<Object>>(1000);
+    private static Map<Integer, List<Object>> workCalendar = new HashMap<>(1000);
 
     public static List<Object> getWorkOnDay(int day) {
         return workCalendar.get(day);
@@ -26,10 +27,10 @@ public class ProjectTaskHandler extends EntityHandler {
         // when calculating history
         // check completed day is > in progress day
         // check in progress remaining hours < estimated
-        int dayWhenInProgress = getAndRemoveIntFieldValue(entity, "day-when-in-progress");
-        int newRemaining = getAndRemoveIntFieldValue(entity, "new-remaining");
-        int dayWhenCompleted = getAndRemoveIntFieldValue(entity, "day-when-completed");
-        String originalTeamId = getAndRemoveFieldValue(entity, "team-id");
+        int dayWhenInProgress = EntityTools.removeIntField(entity, "day-when-in-progress");
+        int newRemaining = EntityTools.removeIntField(entity, "new-remaining");
+        int dayWhenCompleted = EntityTools.removeIntField(entity, "day-when-completed");
+        String originalTeamId = EntityTools.removeField(entity, "team-id");
         Entity response = super.row(entity);
         String agmId;
         try {
@@ -46,7 +47,7 @@ public class ProjectTaskHandler extends EntityHandler {
         if (dayWhenInProgress > 0) {
             List<Object> work = workCalendar.get(dayWhenInProgress);
             if (work == null) {
-                work = new LinkedList<Object>();
+                work = new LinkedList<>();
                 workCalendar.put(dayWhenInProgress, work);
             }
             work.add("In Progress");
@@ -58,7 +59,7 @@ public class ProjectTaskHandler extends EntityHandler {
         if (dayWhenCompleted > 0) {
             List<Object> work = workCalendar.get(dayWhenCompleted);
             if (work == null) {
-                work = new LinkedList<Object>();
+                work = new LinkedList<>();
                 workCalendar.put(dayWhenCompleted, work);
             }
             work.add("Completed");
@@ -67,20 +68,5 @@ public class ProjectTaskHandler extends EntityHandler {
             log.debug("On day "+dayWhenCompleted+" task "+agmId+" belonging to "+originalTeamId+" switching to Completed; remaining set to "+0);
         }
         return response;
-    }
-
-    private String getAndRemoveFieldValue(Entity entity, String fieldName) {
-        try {
-            String returnValue = entity.getFieldValue(fieldName).getValue();
-            entity.removeField(fieldName);
-            return returnValue;
-        } catch (FieldNotFoundException e) {
-            return null;
-        }
-    }
-
-    private int getAndRemoveIntFieldValue(Entity entity, String fieldName) {
-        String value = getAndRemoveFieldValue(entity, fieldName);
-        return value == null ? -1 : Integer.parseInt(value);
     }
 }
