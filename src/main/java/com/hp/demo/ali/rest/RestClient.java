@@ -3,7 +3,6 @@ package com.hp.demo.ali.rest;
 import com.hp.demo.ali.excel.ExcelEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.net.*;
@@ -97,7 +96,7 @@ public class RestClient {
      *                and returns immediatelly. The response should can be processed in this handler.
      * @return response of the request
      */
-    public synchronized HttpResponse doRequest(String urlAddress, String formData, Method method, ContentType contentType, @Nullable AsyncHandler handler) {
+    public synchronized HttpResponse doRequest(String urlAddress, String formData, Method method, ContentType contentType, AsyncHandler handler) {
         HttpURLConnection conn = null;
         try {
             boolean redirect = false;
@@ -259,7 +258,7 @@ public class RestClient {
         return doRequest(url, serializeParameters(data), Method.POST, ContentType.NONE);
     }
 
-    public HttpResponse doPost(String url, @Nullable String[][] data, AsyncHandler handler) {
+    public HttpResponse doPost(String url, String[][] data, AsyncHandler handler) {
         return doRequest(url, serializeParameters(data), Method.POST, ContentType.NONE, handler);
     }
 
