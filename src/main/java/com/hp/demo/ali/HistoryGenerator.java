@@ -40,12 +40,23 @@ public class HistoryGenerator {
                     while (work.size() > 0) {
                         String status = (String)work.remove(0);
                         String agmId = (String)work.remove(0);
-                        int remaining = "In Progress".equals(status) ? (Integer)work.remove(0) : 0; // once completed, remaining is 0
+                        int remaining;
+                        int estimated;
+                        int newEstimated;
+                        if ("In Progress".equals(status)) {
+                            estimated = (Integer)work.remove(0);
+                            newEstimated = (Integer)work.remove(0);
+                            remaining = (Integer)work.remove(0);
+                        } else {
+                            estimated = newEstimated = (Integer)work.remove(0);    // this is actually newEstimated
+                            remaining = 0;
+                        }
                         String originalTeamId = (String)work.remove(0);
-                        int invested = 6 - remaining;                // todo estimated work must be always 6
+                        int invested = estimated - remaining;                // todo estimated work must be always 6
 
                         Map<String, Object> fields = new HashMap<>(4);
                         fields.put("id", agmId);
+                        fields.put("estimated", newEstimated);
                         fields.put("remaining", remaining);
                         fields.put("invested", invested);
                         fields.put("status", status);

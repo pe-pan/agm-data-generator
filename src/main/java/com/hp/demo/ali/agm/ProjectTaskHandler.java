@@ -27,7 +27,9 @@ public class ProjectTaskHandler extends EntityHandler {
         // when calculating history
         // check completed day is > in progress day
         // check in progress remaining hours < estimated
+        int estimated = EntityTools.getIntField(entity, "estimated");
         int dayWhenInProgress = EntityTools.removeIntField(entity, "day-when-in-progress");
+        int newEstimated = EntityTools.removeIntField(entity, "new-estimated");
         int newRemaining = EntityTools.removeIntField(entity, "new-remaining");
         int dayWhenCompleted = EntityTools.removeIntField(entity, "day-when-completed");
         String originalTeamId = EntityTools.removeField(entity, "team-id");
@@ -52,6 +54,8 @@ public class ProjectTaskHandler extends EntityHandler {
             }
             work.add("In Progress");
             work.add(agmId);
+            work.add(estimated);
+            work.add(newEstimated);
             work.add(newRemaining);
             work.add(originalTeamId);
             log.debug("On day "+dayWhenInProgress+" task "+agmId+" belonging to "+originalTeamId+" switching to In Progress; remaining set to "+newRemaining);
@@ -64,6 +68,7 @@ public class ProjectTaskHandler extends EntityHandler {
             }
             work.add("Completed");
             work.add(agmId);
+            work.add(newEstimated);
             work.add(originalTeamId);
             log.debug("On day "+dayWhenCompleted+" task "+agmId+" belonging to "+originalTeamId+" switching to Completed; remaining set to "+0);
         }

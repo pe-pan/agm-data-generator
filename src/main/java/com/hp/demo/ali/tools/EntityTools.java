@@ -57,7 +57,12 @@ public class EntityTools {
 
     public static String removeField(Entity entity, String fieldName) {
         String returnValue = getField(entity, fieldName);
-        entity.removeField(fieldName);
+        try {
+            entity.removeField(fieldName);
+        } catch (NullPointerException e) {
+            // catching NPE when removing non-existing field
+            // todo bug in AgM REST API
+        }
         return returnValue;
     }
 
