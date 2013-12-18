@@ -151,7 +151,7 @@ public class JobLogger {
         while (iterator.hasPrevious()) {
             Sheet sheet = iterator.previous();
             String entityType = sheet.getSheetName();
-            if (entityType.equals("release-backlog-item")) {
+            if (entityType.equals("release-backlog-item") || entityType.equals("kanban-status")) {
                 log.debug("Skipping "+entityType);
                 continue;   // skip release backlog items (they are not entities in AgM)
             }

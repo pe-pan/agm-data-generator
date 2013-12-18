@@ -21,7 +21,7 @@ public class EntityTools {
         StringBuilder sb = new StringBuilder("{");
         for (String field : fields) {
             String value = getField(entity, field);
-            sb.append("'").append(field).append("': '").append(value).append("', ");
+            sb.append("\"").append(field).append("\": \"").append(value).append("\", ");
         }
         sb.delete(sb.length()-2, sb.length());
         sb.append("}");
