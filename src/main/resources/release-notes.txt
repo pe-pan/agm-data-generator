@@ -1,5 +1,18 @@
 Release Notes:
 ==============
+[30/Dec/2013]
+Version 1.11:
+-------------
+Added features:
+  - Customize KanBan statuses; add Spec, UX Mockup, Coding, Testing sub-statuses to Planning and In Progress statuses
+  - Set application field (product ID) also for defects / user stories (not only for features)
+  - Nicer graphs (estimated/remaining/done) on RBLIs
+
+Technical enhancements
+
+Bug fixes:
+  - When specifying the account option, use Account Display Name instead of Account Name
+
 [4/Nov/2013]
 Version 1.10:
 -------------
