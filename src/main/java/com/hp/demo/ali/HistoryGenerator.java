@@ -52,7 +52,7 @@ public class HistoryGenerator {
                             remaining = 0;
                         }
                         String originalTeamId = (String)work.remove(0);
-                        int invested = estimated - remaining;                // todo estimated work must be always 6
+                        int invested = estimated - remaining;
 
                         Map<String, Object> fields = new HashMap<>(4);
                         fields.put("id", agmId);
