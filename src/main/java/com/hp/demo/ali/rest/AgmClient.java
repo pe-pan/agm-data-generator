@@ -128,7 +128,7 @@ public class AgmClient {
         tenantProperties[2] = m.group(3);   // project
         tenantProperties[3] = m.group(4);   // tenant ID
 
-        tenantProperties[4] = "https://" + tenantProperties[0] + "/qcbin";
+        tenantProperties[4] = "https://" + tenantProperties[0] + "/agm";
         tenantProperties[5] = portalUrl;    // portal URL
         tenantProperties[6] = instanceId;   // todo this is the reason why --tenant-url and --generate-u cannot be combined -> test if it can be combined and if so, remove the warnings
 
@@ -138,7 +138,7 @@ public class AgmClient {
 
     public DevBridgeDownloader downloadDevBridge() {
         DevBridgeDownloader downloader = new DevBridgeDownloader(client);
-        client.doPost(restUrl+"scm/dev-bridge/bundle", null, downloader);  // /scm/dev-bridge - downloads only war file!
+        client.doGet(restUrl+"scm/dev-bridge/bundle", downloader);  // /scm/dev-bridge - downloads only war file!
         return downloader;
     }
 }

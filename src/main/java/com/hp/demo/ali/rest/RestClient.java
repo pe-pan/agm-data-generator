@@ -250,6 +250,10 @@ public class RestClient {
         return doRequest(url, (String) null, Method.GET, ContentType.NONE);
     }
 
+    public HttpResponse doGet(String url, AsyncHandler handler) {
+        return doRequest(url, null, Method.GET, ContentType.NONE, handler);
+    }
+
     public HttpResponse doPost(String url, String data) {
         return doRequest(url, data, Method.POST, ContentType.XML_XML);
     }
