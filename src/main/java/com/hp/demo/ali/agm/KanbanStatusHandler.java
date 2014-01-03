@@ -11,10 +11,11 @@ import org.hp.almjclient.services.KanbanStatusConfigurationService;
 /**
  * Created by panuska on 17.12.13.
  */
-public class KanbanStatusHandler extends EntityHandler {
+public class KanbanStatusHandler extends KanbanStatusInitializer {
     private static Logger log = Logger.getLogger(KanbanStatusHandler.class.getName());
 
     int previousTeamId = 0;
+    String excelTeamId = "NOT_INITIALIZED";
     String kanbanStatuses = "[";                     // contains the set of statuses
 
     @Override
@@ -22,10 +23,12 @@ public class KanbanStatusHandler extends EntityHandler {
         int teamId = EntityTools.getIntField(entity, "KS_TEAM_ID");
         if (previousTeamId == 0) {
             previousTeamId = teamId;
+            excelTeamId = EntityTools.removeField(entity, "team-id");
         }
         if (previousTeamId != teamId) {  // in this row, there are new set of statuses
             terminate();                 // finish the previous set
             previousTeamId = teamId;     // initialize the new set
+            excelTeamId = EntityTools.removeField(entity, "team-id");
             kanbanStatuses = "[";        // also init
         }
         entity.removeField("id");
@@ -39,7 +42,9 @@ public class KanbanStatusHandler extends EntityHandler {
             KanbanStatusConfigurationService service = AgmRestService.getKanbanStatusConfigurationService();
             kanbanStatuses = kanbanStatuses.substring(0, kanbanStatuses.length()-1) + "]";
             log.debug("Setting kanban statuses: "+kanbanStatuses);
-            service.configureKanbanSubStatuses(previousTeamId, kanbanStatuses);
+            String result = service.configureKanbanSubStatuses(previousTeamId, kanbanStatuses);
+            log.debug("Receiving: "+result);
+            parseKanbanStatusEntities(result, excelTeamId);
         } catch (RestClientException | ALMRestException e) {
             throw new IllegalStateException(e);
         }

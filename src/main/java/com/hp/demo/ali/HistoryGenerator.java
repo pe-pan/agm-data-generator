@@ -1,5 +1,6 @@
 package com.hp.demo.ali;
 
+import com.hp.demo.ali.agm.PlanBacklogItemHandler;
 import com.hp.demo.ali.agm.ProjectTaskHandler;
 import com.hp.demo.ali.agm.ReleaseHandler;
 import com.hp.demo.ali.excel.AgmEntityIterator;
@@ -67,7 +68,7 @@ public class HistoryGenerator {
                         log.debug("Task updated:  "+ EntityTools.entityToString(projectTask));
                         String backlogItemId = EntityTools.getField(projectTask, "release-backlog-item-id");
 
-                        String ksStatus = "New";
+                        String ksStatus = AgmEntityIterator.dereference("ks#"+originalTeamId+"#"+"New");
                         Filter filter = new Filter("project-task");
                         filter.addQueryClause("status", "<> COMPLETED");
                         filter.addQueryClause("release-backlog-item-id", backlogItemId);
@@ -75,22 +76,22 @@ public class HistoryGenerator {
                         switch (unfinishedTasks.getEntityList().size()) {
                             case 2:
                                 status = "In Progress";
-                                ksStatus = "Planning";
+                                ksStatus = PlanBacklogItemHandler.getStatusAfterChange(agmId);
                                 break;
                             case 1:
                                 status = "In Testing";
-                                ksStatus = "In Progress";
+                                ksStatus = PlanBacklogItemHandler.getStatusAfterChange(agmId);
                                 break;
                             case 0:
                                 status = "Done";
-                                ksStatus = "Done";
+                                ksStatus = AgmEntityIterator.dereference("ks#"+originalTeamId+"#"+"Done");
                                 break;
                         }
                         log.debug("Setting backlog item "+backlogItemId+" to "+status);
                         fields = new HashMap<>(2);
                         fields.put("id", backlogItemId);
                         fields.put("status", status);
-                        fields.put("kanban-status-id", AgmEntityIterator.dereference("ks#"+originalTeamId+"#"+ksStatus));
+                        fields.put("kanban-status-id", ksStatus);
                         Entity backlogItem = new Entity("release-backlog-item", fields);
                         service.update(backlogItem);
                     }

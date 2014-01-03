@@ -17,25 +17,36 @@ public class KanbanStatusInitializer extends EntityHandler {
     @Override
     public Entity row(Entity entity) {
         try {
-            String originalId = entity.getId().toString();
+            int excelTeamId = entity.getId();
             Entity response = super.row(entity);
-            String agmId = response.getId().toString();
+            int agmId = response.getId();
 
             KanbanStatusConfigurationService service = AgmRestService.getKanbanStatusConfigurationService();
 
-            String result = service.getKanbanStatuses(new Integer(agmId));
-            JSONObject kanbanStatuses = (JSONObject) JSONValue.parse(result);
-            JSONArray statuses = (JSONArray) kanbanStatuses.get("entities");
-
-            for (Object kanbanStatus : statuses) {
-                JSONObject status = (JSONObject) kanbanStatus;
-                String statusId = status.get("KS_ID").toString();
-                String name = (String)status.get("KS_NAME");
-                AgmEntityIterator.putReference("ks#"+sheetName+"#"+originalId+"#"+name, statusId);
-            }
+            String result = service.getKanbanStatuses(agmId);
+            parseKanbanStatusEntities(result, sheetName+"#"+excelTeamId);
             return response;
         } catch (ALMRestException | RestClientException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    protected void parseKanbanStatusEntities(String result, String excelTeamId) {
+        JSONObject kanbanStatuses = (JSONObject) JSONValue.parse(result);
+        JSONArray statuses = (JSONArray) kanbanStatuses.get("entities");
+
+        _parseSubStatuses(statuses, excelTeamId);
+    }
+    private void _parseSubStatuses(JSONArray statuses, String excelTeamId) {
+        for (Object kanbanStatus : statuses) {
+            JSONObject status = (JSONObject) kanbanStatus;
+            String statusId = status.get("KS_ID").toString();
+            String name = (String)status.get("KS_NAME");
+            AgmEntityIterator.putReference("ks#"+excelTeamId+"#"+name, statusId);
+            JSONArray subStatuses = (JSONArray) status.get("SUBSTATUSES");
+            if (subStatuses != null) {
+                _parseSubStatuses(subStatuses, excelTeamId);
+            }
         }
     }
 }
