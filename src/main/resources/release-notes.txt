@@ -1,5 +1,14 @@
 Release Notes:
 ==============
+[12/Feb/2014]
+Version 1.12:
+-------------
+Added features:
+  - Planning RBLIs into different KanBan statuses
+
+Bug fixes:
+  - When specifying the account option, use Account Display Name instead of Account Name (now even when adding users)
+
 [30/Dec/2013]
 Version 1.11:
 -------------
