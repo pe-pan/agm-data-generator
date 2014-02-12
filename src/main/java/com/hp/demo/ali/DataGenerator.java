@@ -424,10 +424,17 @@ public class DataGenerator {
         String owningAccountSaasId = JsonPath.read(response.getResponse(), "$.owningAccountSaasId").toString();
 
         String accountName = settings.getAccountName();
-        if (accountName != null) {
-            List<net.minidev.json.JSONObject> accounts = JsonPath.read(response.getResponse(), "$.accountsAndServices[?(@.accountName == '"+accountName+"')]");
+        if (accountName != null) {           //todo refactor => merge with AgmClient.login method (where account is also being set)
+            List<net.minidev.json.JSONObject> accounts = JsonPath.read(response.getResponse(), "$.accountsAndServices[?(@.accountDisplayName == '"+accountName+"')]");
             if (accounts.size() == 0) {
-                throw new IllegalArgumentException("The provided account name does not exist: "+accountName);
+                List<String> accountNames = JsonPath.read(response.getResponse(), "$.accountsAndServices[*].accountDisplayName");
+                String possibleAccountNames;
+                if (accountNames == null || accountNames.size() == 0) {
+                    possibleAccountNames = "\nThere is no account at all.";
+                } else {
+                    possibleAccountNames = "\nThe possible account names are: "+accountNames;
+                }
+                throw new IllegalArgumentException("The provided account name does not exist: "+accountName+possibleAccountNames);
             }
 
             String nextAccountId = accounts.get(0).get("accountId").toString();
