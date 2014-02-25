@@ -21,6 +21,7 @@ Technical enhancements
 
 Bug fixes:
   - When specifying the account option, use Account Display Name instead of Account Name
+  - To download ALI Dev Bridge, perform HTTP GET (used to be HTTP POST)
 
 [4/Nov/2013]
 Version 1.10:
