@@ -76,11 +76,11 @@ public class HistoryGenerator {
                         switch (unfinishedTasks.getEntityList().size()) {
                             case 2:
                                 status = "In Progress";
-                                ksStatus = PlanBacklogItemHandler.getStatusAfterChange(agmId);
+                                ksStatus = PlanBacklogItemHandler.getStatusAfterChange(backlogItemId);
                                 break;
                             case 1:
                                 status = "In Testing";
-                                ksStatus = PlanBacklogItemHandler.getStatusAfterChange(agmId);
+                                ksStatus = PlanBacklogItemHandler.getStatusAfterChange(backlogItemId);
                                 break;
                             case 0:
                                 status = "Done";
