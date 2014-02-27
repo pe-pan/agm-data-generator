@@ -57,9 +57,9 @@ public class HistoryGenerator {
 
                         Map<String, Object> fields = new HashMap<>(4);
                         fields.put("id", agmId);
-                        fields.put("estimated", newEstimated);
-                        fields.put("remaining", remaining);
-                        fields.put("invested", invested);
+                        if (newEstimated >= 0) fields.put("estimated", newEstimated);  //if newEstimated, remaining, invested
+                        if (remaining >= 0) fields.put("remaining", remaining);        //not provided in Excel data,
+                        if (invested >= 0) fields.put("invested", invested);           //-1 is stored in the getWorkOnDay list
                         fields.put("status", status);
 
                         Entity projectTask = new Entity("project-task", fields);
