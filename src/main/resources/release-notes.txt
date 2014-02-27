@@ -1,5 +1,12 @@
 Release Notes:
 ==============
+[27/Feb/2014]
+Version 1.13:
+-------------
+Bug fixes:
+  - Using task ID instead of RBLI ID when setting RBLI KanBan status is causing exceptions when populating very new tenants
+  - Do no update estimated, remaining, invested fields on a task when these values not provided in Excel data
+
 [12/Feb/2014]
 Version 1.12:
 -------------
