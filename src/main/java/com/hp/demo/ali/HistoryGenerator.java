@@ -87,7 +87,7 @@ public class HistoryGenerator {
                                 ksStatus = AgmEntityIterator.dereference("ks#"+originalTeamId+"#"+"Done");
                                 break;
                         }
-                        log.debug("Setting backlog item "+backlogItemId+" to "+status);
+                        log.debug("Setting backlog item "+backlogItemId+" to "+status+" and KanBan "+ksStatus);
                         fields = new HashMap<>(2);
                         fields.put("id", backlogItemId);
                         fields.put("status", status);
