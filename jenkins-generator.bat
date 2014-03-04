@@ -12,8 +12,10 @@ if "%what-to-generate%"=="Skip users" set what-to-generate=--generate-phb
 if "%delete-all%"=="true" set delete-all=--delete-all
 if "%delete-all%"=="false" set delete-all=
 
-if exist "%workspace%\excel-data" set custom-data="%workspace%\custom-data.xlsx"
-if exist "%workspace%\excel-data" move "%workspace%\excel-data" "%workspace%\custom-data.xlsx" > nul
+if exist "%workspace%\excel-data" (
+  set custom-data="%workspace%\custom-data.xlsx"
+  move "%workspace%\excel-data" "%workspace%\custom-data.xlsx" > nul
+)
 
 if "%wait-time%"=="" set wait_time=0
 if not "%wait-time%"=="" set /A wait_time=%wait-time%*60
