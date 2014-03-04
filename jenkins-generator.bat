@@ -25,10 +25,8 @@ if exist "%workspace%\excel-data" (
 if "%wait-time%"=="" set wait_time=0
 if not "%wait-time%"=="" set /A wait_time=%wait-time%*60
 
-
-echo Starting following command: java -jar agm-data-generator.jar %custom-data% %what-to-generate% %account-name% %solution-name% %tenant-url% %delete-all% --force-delete %user-name% %password%
-
-java -jar agm-data-generator.jar %custom-data% %what-to-generate% %account-name% %solution-name% %tenant-url% %delete-all% --force-delete %user-name% %password%
+echo Starting following command: generate.bat %custom-data% %what-to-generate% %account-name% %solution-name% %tenant-url% %delete-all% --force-delete %user-name% %password%
+generate.bat %custom-data% %what-to-generate% %account-name% %solution-name% %tenant-url% %delete-all% --force-delete %user-name% %password%
 
 if %errorlevel% == 0 (
   echo Waiting %wait-time% mins to let ALI DevBrige to synchronize data from SVN and Jenkins into the populated tenant.
