@@ -1,5 +1,10 @@
 @echo off
-cd C:\AgM\data-generator
+if exist C:\ALI (
+  cd C:\ALI\data-generator
+)
+if exist C:\AgM (
+  cd C:\AgM\data-generator
+)
 
 setlocal enableextensions enabledelayedexpansion
 if not "%account-name%"=="" set account-name="--account-name=%account-name%"
