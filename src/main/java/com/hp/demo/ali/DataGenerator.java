@@ -19,7 +19,7 @@ import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.AgmRestService;
 import com.hp.demo.ali.rest.ContentType;
-import com.hp.demo.ali.rest.DevBridgeDownloader;
+import com.hp.demo.ali.rest.FileDownloader;
 import com.hp.demo.ali.rest.IllegalRestStateException;
 import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.tools.ResourceTools;
@@ -224,9 +224,9 @@ public class DataGenerator {
             resolveTenantUrl();
             AgmRestService.initRestService();
 
-            DevBridgeDownloader downloader = null;
+            FileDownloader aliDevBridgeDownloader = null;
             if (settings.isGenerateProject() || settings.isGenerateBuilds()) {
-                downloader = agmClient.downloadDevBridge();
+                aliDevBridgeDownloader = agmClient.downloadDevBridge();
             }
             JobLogger jobLogger = new JobLogger(reader);
             jobLogger.deleteExistingData();
@@ -257,8 +257,8 @@ public class DataGenerator {
                 buildGenerator.createJob();
             }
             if (settings.isGenerateProject() || settings.isGenerateBuilds()) {
-                downloader.waitTillDownloaded();
-                replaceDevBridgeBits(downloader);
+                aliDevBridgeDownloader.waitTillDownloaded();
+                replaceDevBridgeBits(aliDevBridgeDownloader);
                 configureDevBridgeBits();
                 startDevBridge();
 
@@ -558,7 +558,7 @@ public class DataGenerator {
 
     }
 
-    public static void replaceDevBridgeBits(DevBridgeDownloader downloader) {
+    public static void replaceDevBridgeBits(FileDownloader downloader) {
         log.debug("Deleting old ALI Dev Bridge folder: "+settings.getAliDevBridgeFolder());
         try {
             FileUtils.deleteDirectory(new File(settings.getAliDevBridgeFolder()));

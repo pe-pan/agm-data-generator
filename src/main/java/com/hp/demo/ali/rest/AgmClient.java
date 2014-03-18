@@ -136,8 +136,8 @@ public class AgmClient {
         return tenantProperties;
     }
 
-    public DevBridgeDownloader downloadDevBridge() {
-        DevBridgeDownloader downloader = new DevBridgeDownloader(client);
+    public FileDownloader downloadDevBridge() {
+        FileDownloader downloader = new FileDownloader(client);
         client.doGet(restUrl+"scm/dev-bridge/bundle", downloader);  // /scm/dev-bridge - downloads only war file!
         return downloader;
     }
