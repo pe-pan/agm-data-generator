@@ -47,6 +47,10 @@ public class RestClient {
         return cookieList.substring(0, cookieList.length() - 1); // remove the last ';'
     }
 
+    public String getCookie(String cookieName) {
+        return cookies.get(cookieName);
+    }
+
     public static class HttpResponse {
         private final String response;
         private final int responseCode;

@@ -18,19 +18,13 @@ import com.hp.demo.ali.entity.User;
 import com.hp.demo.ali.excel.EntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.AgmRestService;
-import com.hp.demo.ali.rest.ContentType;
 import com.hp.demo.ali.rest.FileDownloader;
-import com.hp.demo.ali.rest.IllegalRestStateException;
 import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.tools.ResourceTools;
 import com.hp.demo.ali.tools.XmlFile;
-import com.jayway.jsonpath.JsonPath;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.hp.almjclient.connection.ServiceResourceAdapter;
@@ -41,8 +35,6 @@ import org.w3c.dom.Element;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.jar.Attributes;
@@ -338,20 +330,8 @@ public class DataGenerator {
         log.info("Resolving Tenant ID, domain and project name...");
         User admin = User.getUser(settings.getAdmin());
 
-        String loginUrl;
         try {
-            loginUrl = agmClient.resolveLoginUrl(settings.getLoginUrl());
-        } catch (IllegalStateException e) {
-            log.debug(e);
-            log.error("Incorrect credentials or URL: " + admin.getLogin() + " / " + admin.getPassword());
-            log.error("At: " + settings.getLoginUrl());
-            System.exit(-1);
-            throw e;         //will never be executed
-        }
-        settings.setLoginUrl(loginUrl);
-        String[] tenantProperties;
-        try {
-            tenantProperties = agmClient.login(loginUrl, admin);
+            agmClient.login(settings.getLoginUrl(), admin);
         } catch (IllegalStateException e) {
             log.debug(e);
             log.error("Incorrect credentials or URL: " + admin.getLogin() + " / " + admin.getPassword());
@@ -364,12 +344,6 @@ public class DataGenerator {
             System.exit(-1);
             throw e;        //will never be executed
         }
-        settings.setDomain(tenantProperties[1]);
-        settings.setProject(tenantProperties[2]);
-        settings.setTenantId(tenantProperties[3]);
-        settings.setRestUrl(tenantProperties[4]);
-        settings.setPortalUrl(tenantProperties[5]);
-        settings.setInstanceId(tenantProperties[6]);
     }
 
     public static void synchronizeAliDevBridge() {
@@ -407,124 +381,12 @@ public class DataGenerator {
     }
 
     public static void addUsers() {
-        RestClient portalClient = new RestClient();
-        User admin = User.getUser(settings.getAdmin());
+        agmClient.prepareAddingUsers();
 
-        String[][] data = {
-                { "username", admin.getLogin() },
-                { "password", admin.getPassword() }
-        };
-        portalClient.doPost(settings.getLoginUrl(), data);
-        RestClient.HttpResponse response = portalClient.doGet(settings.getPortalUrl()+"/portal2/service/settings/general?");
-        String token = JsonPath.read(response.getResponse(), "$.cSRFTokenVal");
-        response = portalClient.doGet(settings.getPortalUrl()+"/portal2/service/users/session?");
-        String timezone = JsonPath.read(response.getResponse(), "$.timezone");
-        String owningAccountId = JsonPath.read(response.getResponse(), "$.owningAccountId").toString();
-        String owningAccountName = JsonPath.read(response.getResponse(), "$.owningAccountName");
-        String owningAccountSaasId = JsonPath.read(response.getResponse(), "$.owningAccountSaasId").toString();
-
-        String accountName = settings.getAccountName();
-        if (accountName != null) {           //todo refactor => merge with AgmClient.login method (where account is also being set)
-            List<net.minidev.json.JSONObject> accounts = JsonPath.read(response.getResponse(), "$.accountsAndServices[?(@.accountDisplayName == '"+accountName+"')]");
-            if (accounts.size() == 0) {
-                List<String> accountNames = JsonPath.read(response.getResponse(), "$.accountsAndServices[*].accountDisplayName");
-                String possibleAccountNames;
-                if (accountNames == null || accountNames.size() == 0) {
-                    possibleAccountNames = "\nThere is no account at all.";
-                } else {
-                    possibleAccountNames = "\nThe possible account names are: "+accountNames;
-                }
-                throw new IllegalArgumentException("The provided account name does not exist: "+accountName+possibleAccountNames);
-            }
-
-            String nextAccountId = accounts.get(0).get("accountId").toString();
-            portalClient.setCustomHeader("csrf.token", token);
-            JSONObject accountId = new JSONObject();
-            accountId.put("id", owningAccountId);
-            accountId.put("nextAccountId", nextAccountId);
-            portalClient.doPut(settings.getPortalUrl()+"/portal2/service/accounts/updateCurrentAccount/"+owningAccountId, accountId.toString(), ContentType.JSON_JSON);
-        }
         for (User user : User.getUsers()) {
             if (user.isPortalUser()) {
-                JSONObject userJson = new JSONObject();
-                userJson.put("firstName", StringEscapeUtils.escapeHtml(user.getFirstName()));
-                userJson.put("lastName", StringEscapeUtils.escapeHtml(user.getLastName()));
-                userJson.put("email", StringEscapeUtils.escapeHtml(user.getLogin()));
-                userJson.put("loginName", StringEscapeUtils.escapeHtml(user.getLogin()));
-                userJson.put("phone", StringEscapeUtils.escapeHtml(user.getPhone()));
-                userJson.put("timezone", timezone);
-                JSONArray roles = new JSONArray();
-                roles.add("CUSTOMER_PORTAL_BASIC");
-                userJson.put("roles", roles);
-                userJson.put("acceptNotification", false);
-                userJson.put("status", true);
-                userJson.put("id", null);
-                JSONArray instanceIds = new JSONArray();
-                instanceIds.add(settings.getInstanceId()+"#true");
-                userJson.put("allowedServices", instanceIds);
-                userJson.put("userImpersonation", 0);
-                userJson.put("owningAccountId", owningAccountId);
-                userJson.put("owningAccountName", owningAccountName);
-                userJson.put("owningAccountSaasId", owningAccountSaasId);
-                log.info("Adding user: " + user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
-                try {
-                    portalClient.setCustomHeader("csrf.token", token);
-                    response = portalClient.doPost(settings.getPortalUrl()+"/portal2/service/users", userJson.toString(), ContentType.JSON_JSON);
-                    log.info("New user added");
-                    token = JsonPath.read(response.getResponse(), "$.csrftoken");
-                } catch (IllegalRestStateException e) {
-                    int responseCode = e.getResponseCode();
-                    String errorMessage = JsonPath.read(e.getErrorStream(), "$.errorMessage");
-                    if (responseCode == HttpURLConnection.HTTP_CONFLICT) {
-                        // perhaps, it was not added as it already exists -> trying to attach it as an existing user account
-                        log.info(errorMessage);
-                        token = JsonPath.read(e.getErrorStream(), "$.csrftoken");
-                        try {
-                            log.debug("Trying to attach an existing user account: "+ user.getFirstName() + " " + user.getLastName() + ", " + user.getLogin());
-                            userJson = new JSONObject();
-                            userJson.put("loginName", StringEscapeUtils.escapeHtml(user.getLogin()));
-                            userJson.put("allowedServices", instanceIds);
-                            userJson.put("roles", "CUSTOMER_PORTAL_BASIC");
-
-                            portalClient.setCustomHeader("csrf.token", token);
-                            response = portalClient.doPut(settings.getPortalUrl()+"/portal2/service/users/attach/"+ URLEncoder.encode(user.getLogin()), userJson.toString(), ContentType.JSON_JSON);
-                            log.info("Existing user attached");
-                            token = JsonPath.read(response.getResponse(), "$.csrftoken");
-                        } catch (IllegalRestStateException e2) {
-                            log.error("Cannot add user to portal: "+user.getFirstName()+" "+user.getLastName());
-                            log.error(e2.getErrorStream());
-                            token = JsonPath.read(e.getErrorStream(), "$.csrftoken");
-                        }
-                    } else {
-                        log.error(errorMessage);
-                    }
-                }
-                try {
-                    userJson = new JSONObject();
-                    userJson.put("firstName", StringEscapeUtils.escapeHtml(user.getFirstName()));
-                    userJson.put("lastName", StringEscapeUtils.escapeHtml(user.getLastName()));
-                    userJson.put("email", StringEscapeUtils.escapeHtml(user.getLogin()));
-                    userJson.put("loginName", StringEscapeUtils.escapeHtml(user.getLogin()));
-                    userJson.put("phone", StringEscapeUtils.escapeHtml(user.getPhone()));
-                    userJson.put("timezone", timezone);
-                    JSONArray users = new JSONArray();
-                    users.add(userJson);
-                    JSONObject usersJson = new JSONObject();
-                    usersJson.put("users", users);
-                    ServiceResourceAdapter adapter = AgmRestService.getAdapter();
-                    Map<String, String> headers = new HashMap<>(1);
-                    headers.put("INTERNAL_DATA", "20120922");
-                    adapter.addSessionCookie("AGM_STATE="+"20120922");
-                    adapter.putWithHeaders(String.class, settings.getRestUrl()+"/rest/api/portal/users", usersJson.toString(), headers, ServiceResourceAdapter.ContentType.JSON);
-                    log.info("User added to the tenant");
-                } catch (ALMRestException e) {
-                    log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
-                    String responseHtml = e.getResponse().getEntity(String.class);
-                    String reason = responseHtml.substring(responseHtml.indexOf("<h1>")+"<h1>".length(), responseHtml.indexOf("</h1>")); //todo parse the HTML better way
-                    log.error(reason);
-                } catch (RestClientException e) {
-                    log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
-                }
+                agmClient.addPortalUser(user);
+                agmClient.addTenantUser(user);
             }
         }
     }

@@ -2,13 +2,16 @@ package com.hp.demo.ali.rest;
 
 import com.hp.demo.ali.Settings;
 import com.hp.demo.ali.entity.User;
-import com.jayway.jsonpath.JsonPath;
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.hp.almjclient.connection.ServiceResourceAdapter;
+import org.hp.almjclient.exceptions.ALMRestException;
+import org.hp.almjclient.exceptions.RestClientException;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by panuska on 2/6/13.
@@ -24,121 +27,72 @@ public class AgmClient {
         return agmClient;
     }
 
-    private RestClient client;
-    private String restUrl;
+    private PortalClient client;
 
     private AgmClient() {
-        client = new RestClient();
-    }
-
-    public String resolveLoginUrl(String agmUrl) {
-        String loginUrl = agmUrl.replace("https://", "http://");
-        RestClient.HttpResponse  response = client.doGet(loginUrl);
-        loginUrl = response.getLocation().length() > 0 ? response.getLocation() : agmUrl;
-        String loginContext = RestTools.extractString(response.getResponse(), "//form[@id='loginForm']/@action");
-        return RestTools.getProtocolHost(loginUrl)+loginContext;
+        client = new PortalClient();
     }
 
     /**
      * @param loginUrl where to login.
      * @param admin user credentials.
-     * @return an array of strings [0-5]: host, domain, project, tenant ID, REST API URL, portal URL.
      */
-    public String[] login(String loginUrl, User admin) {
-        final String[][] data = {
-                { "username", admin.getLogin() },
-                { "password", admin.getPassword() }
-        };
-        RestClient.HttpResponse response;
-        response = client.doPost(loginUrl, data);
-        String portalUrl = RestTools.getProtocolHost(response.getLocation());
-        log.debug("Logged in to: " + loginUrl);
-        log.debug("Portal URL: "+portalUrl);
-        String instanceId = "";
+    public void login(String loginUrl, User admin) {
+        client.login(loginUrl, admin);
         String tenantUrl = Settings.getSettings().getTenantUrl();
         if (tenantUrl == null) {
             String accountName = Settings.getSettings().getAccountName();
             if (accountName != null) {
-                response = client.doGet(portalUrl+"/portal2/service/settings/general?");
-                String token = JsonPath.read(response.getResponse(), "$.cSRFTokenVal");
-
-                response = client.doGet(portalUrl+"/portal2/service/users/session?");
-                String owningAccountId = JsonPath.read(response.getResponse(), "$.owningAccountId").toString();
-                log.debug("Owning Account ID: "+owningAccountId );
-                List accountIds = JsonPath.read(response.getResponse(), "$.accountsAndServices[?(@.accountDisplayName == '"+accountName+"')].accountId");
-                if (accountIds.size() == 0) {
-                    List<String> accountNames = JsonPath.read(response.getResponse(), "$.accountsAndServices[*].accountDisplayName");
-                    String possibleAccountNames;
-                    if (accountNames == null || accountNames.size() == 0) {
-                        possibleAccountNames = "\nThere is no account at all.";
-                    } else {
-                        possibleAccountNames = "\nThe possible account names are: "+accountNames;
-                    }
-                    throw new IllegalArgumentException("The provided account name does not exist: "+accountName+possibleAccountNames);
-                }
-                String accountId = accountIds.get(0).toString();
-                log.debug("Account ID: "+accountId);
-                client.setCustomHeader("csrf.token", token);
-                JSONObject accountData = new JSONObject();
-                accountData.put("id", owningAccountId);
-                accountData.put("nextAccountId", accountId);
-
-                client.doPut(portalUrl+"/portal2/service/accounts/updateCurrentAccount/"+owningAccountId, accountData.toString(), ContentType.JSON_JSON);
-                log.info("Populate data for this account: "+accountName);
+                client.switchAccount(accountName);
             }
             String solutionName = Settings.getSettings().getSolutionName();
-            response = client.doGet(RestTools.getProtocolHost(response.getLocation())+"/portal2/service/services/requestsAndServices");
-            List solutions = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances");
-            if (solutions.size() == 0) {
-                throw new IllegalArgumentException("There are no 'Agile Manager' solutions under the given account: "+(accountName == null ? "default " : accountName));
-            }
-            if (solutionName != null) {
-                List<String> agmUrls = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].loginUrl");
-                if (agmUrls.size() == 0) {
-                    List<String> solutionNames = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[*].displayName");
-                    String possibleSolutionNames;
-                    if (solutionNames == null || solutionNames.size() == 0) {
-                        possibleSolutionNames = "\nThere is no solution at all.";
-                    } else {
-                        possibleSolutionNames = "\nThe possible solution names are: "+solutionNames;
-                    }
-                    throw new IllegalArgumentException("The provided solution name does not exist: "+solutionName+possibleSolutionNames);
-                }
-                tenantUrl = agmUrls.get(0);
-            } else {
-                tenantUrl = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].loginUrl");
-                log.info("Solution being populated: "+JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].displayName"));
-            }
-            if (solutionName != null) {
-                List<Integer> instanceIds = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[?(@.displayName == '"+solutionName+"')].instanceId");
-                instanceId = instanceIds.get(0).toString();
-            } else {
-                Integer instanceIdInteger = JsonPath.read(response.getResponse(), "$.data[?(@.solutionName == 'Agile Manager')].solutionInstances[0].instanceId");
-                instanceId = instanceIdInteger.toString();
-            }
-
+            tenantUrl = client.getTenantUrl(solutionName);
         }
-        response = client.doGet(tenantUrl);
-        Pattern p = Pattern.compile("^https?://([^/]+)/agm/webui/alm/([^/]+)/([^/]+)/apm/[^/]+/\\?TENANTID=(.+)$");
-        Matcher m = p.matcher(response.getLocation());
-        m.matches();
-        String[] tenantProperties = new String[7];
-        tenantProperties[0] = m.group(1);   // host
-        tenantProperties[1] = m.group(2);   // domain
-        tenantProperties[2] = m.group(3);   // project
-        tenantProperties[3] = m.group(4);   // tenant ID
+        client.parseTenantProperties(tenantUrl);
+  }
 
-        tenantProperties[4] = "https://" + tenantProperties[0] + "/agm";
-        tenantProperties[5] = portalUrl;    // portal URL
-        tenantProperties[6] = instanceId;   // todo this is the reason why --tenant-url and --generate-u cannot be combined -> test if it can be combined and if so, remove the warnings
+    public void prepareAddingUsers() {
+        client.prepareAddingUsers();
+    }
 
-        restUrl = tenantProperties[4] + "/rest/domains/" + tenantProperties[1] + "/projects/" + tenantProperties[2] + "/";
-        return tenantProperties;
+    public void addPortalUser(User user) {
+        client.addUser(user);
+    }
+
+    public void addTenantUser(User user) {
+        try {
+             JSONObject userJson = new JSONObject();
+             userJson.put("firstName", StringEscapeUtils.escapeHtml(user.getFirstName()));
+             userJson.put("lastName", StringEscapeUtils.escapeHtml(user.getLastName()));
+             userJson.put("email", StringEscapeUtils.escapeHtml(user.getLogin()));
+             userJson.put("loginName", StringEscapeUtils.escapeHtml(user.getLogin()));
+             userJson.put("phone", StringEscapeUtils.escapeHtml(user.getPhone()));
+             userJson.put("timezone", client.getTimezone());
+             JSONArray users = new JSONArray();
+             users.add(userJson);
+             JSONObject usersJson = new JSONObject();
+             usersJson.put("users", users);
+             ServiceResourceAdapter adapter = AgmRestService.getAdapter();
+             Map<String, String> headers = new HashMap<>(1);
+             headers.put("INTERNAL_DATA", "20120922");
+             adapter.addSessionCookie("AGM_STATE="+"20120922");
+             adapter.putWithHeaders(String.class, Settings.getSettings().getRestUrl()+"/rest/api/portal/users", usersJson.toString(), headers, ServiceResourceAdapter.ContentType.JSON);
+             log.info("User added to the tenant");
+         } catch (ALMRestException e) {
+             log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
+             String responseHtml = e.getResponse().getEntity(String.class);
+             String reason = responseHtml.substring(responseHtml.indexOf("<h1>")+"<h1>".length(), responseHtml.indexOf("</h1>")); //todo parse the HTML better way
+             log.error(reason);
+         } catch (RestClientException e) {
+             log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
+         }
     }
 
     public FileDownloader downloadDevBridge() {
-        FileDownloader downloader = new FileDownloader(client);
-        client.doGet(restUrl+"scm/dev-bridge/bundle", downloader);  // /scm/dev-bridge - downloads only war file!
+        RestClient devBridgeDownloaderClient = new RestClient();
+        FileDownloader downloader = new FileDownloader(devBridgeDownloaderClient );
+        Settings settings = Settings.getSettings();
+        devBridgeDownloaderClient.doGet(settings.getRestUrl()+"/rest/domains/" + settings.getDomain() + "/projects/" + settings.getProject() + "/scm/dev-bridge/bundle", downloader);  // /scm/dev-bridge - downloads only war file!
         return downloader;
     }
 }
