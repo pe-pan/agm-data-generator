@@ -105,6 +105,10 @@ public class RestClient {
         try {
             boolean redirect = false;
             do {
+                if (method == Method.GET && formData != null) {
+                    urlAddress = urlAddress + "?"+formData;
+                    formData = null;
+                }
                 log.debug("At: "+urlAddress);
                 URL url = new URL(urlAddress);
                 conn = (HttpURLConnection) url.openConnection();
@@ -256,6 +260,10 @@ public class RestClient {
 
     public HttpResponse doGet(String url, AsyncHandler handler) {
         return doRequest(url, null, Method.GET, ContentType.NONE, handler);
+    }
+
+    public HttpResponse doGet(String url, String[][] data, AsyncHandler handler) {
+        return doRequest(url, serializeParameters(data), Method.GET, ContentType.NONE, handler);
     }
 
     public HttpResponse doPost(String url, String data) {
