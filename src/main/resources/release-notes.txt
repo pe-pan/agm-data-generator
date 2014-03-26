@@ -1,5 +1,14 @@
 Release Notes:
 ==============
+[26/Mar/2014]
+Version 1.14:
+-------------
+Added features:
+  - Moving to Pronq (old SaaS portal not supported anymore)
+
+Bug fixes:
+  - Authentication is required to download ALI DevBridge
+
 [27/Feb/2014]
 Version 1.13:
 -------------
