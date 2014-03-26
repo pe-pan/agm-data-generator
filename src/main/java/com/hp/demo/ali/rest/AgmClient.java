@@ -92,6 +92,12 @@ public class AgmClient {
         RestClient devBridgeDownloaderClient = new RestClient();
         FileDownloader downloader = new FileDownloader(devBridgeDownloaderClient );
         Settings settings = Settings.getSettings();
+        User admin = User.getUser(settings.getAdmin());          //todo this is a code copy of PortalClient.login -> refactor
+        String[][] data = {
+                { "username", admin.getLogin() },
+                { "password", admin.getPassword() }
+        };
+        devBridgeDownloaderClient.doPost(settings.getLoginUrl(), data);
         devBridgeDownloaderClient.doGet(settings.getRestUrl()+"/rest/domains/" + settings.getDomain() + "/projects/" + settings.getProject() + "/scm/dev-bridge/bundle", downloader);  // /scm/dev-bridge - downloads only war file!
         return downloader;
     }
