@@ -98,7 +98,8 @@ public class AgmClient {
                 { "password", admin.getPassword() }
         };
         devBridgeDownloaderClient.doPost(settings.getLoginUrl(), data);
-        devBridgeDownloaderClient.doGet(settings.getRestUrl()+"/rest/domains/" + settings.getDomain() + "/projects/" + settings.getProject() + "/scm/dev-bridge/bundle", downloader);  // /scm/dev-bridge - downloads only war file!
+        data = new String[][] { {"server-url", settings.getRestUrl() } };
+        devBridgeDownloaderClient.doGet(settings.getRestUrl()+"/rest/domains/" + settings.getDomain() + "/projects/" + settings.getProject() + "/scm/dev-bridge/bundle", data, downloader);  // /scm/dev-bridge - downloads only war file!
         return downloader;
     }
 }
