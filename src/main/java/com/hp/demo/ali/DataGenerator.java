@@ -22,6 +22,7 @@ import com.hp.demo.ali.rest.FileDownloader;
 import com.hp.demo.ali.rest.RestClient;
 import com.hp.demo.ali.tools.ResourceTools;
 import com.hp.demo.ali.tools.XmlFile;
+import com.hp.demo.ali.upgrade.Upgrader;
 import org.apache.ant.compress.taskdefs.Unzip;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -37,9 +38,6 @@ import javax.xml.bind.JAXBException;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 /**
  * Created by panuska on 10/12/12.
@@ -54,28 +52,16 @@ public class DataGenerator {
     private static SheetHandlerRegistry registry;
     private static ProxyConfigurator proxyConfigurator;
 
-    private static String getBuildTime() {
-        String buildTime = null;
-        try {
-            JarFile jarFile = new JarFile(DataGenerator.class.getProtectionDomain().getCodeSource().getLocation().getFile());
-            Manifest manifest = jarFile.getManifest();
-            Attributes attr = manifest.getMainAttributes();
-            buildTime = attr.getValue("Build-Time");
-        } catch (IOException e) {
-            log.debug("Exception when reading build time from manifest file!", e);
-        }
-        return buildTime;
-    }
     private static void printUsage() {
         System.out.println(
                 " /============================================================================\\"+System.lineSeparator()+
-                " | AgM data generator "+DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+getBuildTime()+")                     |"+System.lineSeparator()+
+                " | AgM data generator "+DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+Upgrader.getBuildTime()+")                     |"+System.lineSeparator()+
                 " |============================================================================|"+System.lineSeparator()+
                 " | For more information and release notes, go to                              |"+System.lineSeparator()+
                 " |   https://connections.houston.hp.com/docs/DOC-58222                        |"+System.lineSeparator()+
                 " |============================================================================|"+System.lineSeparator()+
                 " | Usage:                                                                     |"+System.lineSeparator()+
-                " |   java -jar agm-data-generator.jar [excel-configuration-file.xlsx]         |"+System.lineSeparator()+
+                " |   java -jar "+ Upgrader.AGM_JAR_FILE+" [excel-configuration-file.xlsx]         |"+System.lineSeparator()+
                 " |   [--generate-[u][p][h][b]] [URL] [--solution-name=solution_name]          |"+System.lineSeparator()+
                 " |   [--account-name=account_name] [--tenant-url=tenant_url] [--delete-all]   |"+System.lineSeparator()+
                 " |   [--force-delete] admin_name admin_password                               |"+System.lineSeparator()+
@@ -128,7 +114,7 @@ public class DataGenerator {
         log.debug("Options: "+Arrays.toString(args));
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         long startTime = System.currentTimeMillis();
-        log.info("AgM data generator " + DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+getBuildTime()+")");
+        log.info("AgM data generator " + DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+Upgrader.getBuildTime()+")");
         log.info("Starting at: "+sdf.format(new Date(startTime)));
         Migrator.migrate();
         try {
@@ -208,6 +194,10 @@ public class DataGenerator {
 
             proxyConfigurator = new ProxyConfigurator();
             proxyConfigurator.init();
+
+            if (Upgrader.upgrade()) { // upgrade succeeded
+                System.exit(101);     // this status code gives the order -> restart me using the newly downloaded version
+            }
 
             User admin = User.getUser(settings.getAdmin());
             admin.setLogin(args[argIndex++]);
