@@ -213,7 +213,7 @@ public class DataGenerator {
             admin.setLogin(args[argIndex++]);
             admin.setPassword(args[argIndex]);
 
-            resolveTenantUrl();
+            login();
             AgmRestService.initRestService();
 
             FileDownloader aliDevBridgeDownloader = null;
@@ -326,7 +326,7 @@ public class DataGenerator {
         handler.terminate();
     }
 
-    public static void resolveTenantUrl() {
+    public static void login() {
         log.info("Resolving Tenant ID, domain and project name...");
         User admin = User.getUser(settings.getAdmin());
 
