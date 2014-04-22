@@ -6,9 +6,7 @@ import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
-import org.hp.almjclient.model.marshallers.Entities;
 import org.hp.almjclient.model.marshallers.Entity;
-import org.hp.almjclient.model.marshallers.favorite.Filter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,18 +30,6 @@ public class DefectHandler extends AbstractBacklogItemHandler {
             _findBacklogItem(agmId);
             _updateBacklogItem(featureId);
             AgmEntityIterator.putReference("apmuiservice#" + sheetName + "#" + excelId, _backlogItemId);
-
-            Filter filter = new Filter("project-task");                                 // delete the automatically created task
-            filter.addQueryClause("release-backlog-item-id", _backlogItemId);
-            Entities tasks = CRUDService.readCollection(filter);
-            List<Integer> taskIds = new ArrayList<>(tasks.getEntityList().size());
-            for (Entity entityTask : tasks.getEntityList()) {
-                taskIds.add(entityTask.getId());
-            }
-            log.debug("Deleting all the by default created tasks. In total: "+taskIds.size());
-            if (taskIds.size() > 0) {
-                CRUDService.delete("project-task", taskIds, true);
-            }
 
             if (firstDefId == 0) {
                 // remember def IDs
