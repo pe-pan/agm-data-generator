@@ -510,10 +510,11 @@ public class DataGenerator {
     public static void configureProject() {
         log.info("Configuring project...");
         String [][] params = new String[][] {
-                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_ASSIGNMENT_CHANGE" },
-                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_STATUS_CHANGE" },
-                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_EXCEED_CYCLE_TIME" },
-                { "APM_EXTENSION", "project", "projectlevelkey", "PLANNING", "AUTO_CREATE_TASK_FOR_DEFECT" }
+                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_ASSIGNMENT_CHANGE",  "false" },
+                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_STATUS_CHANGE",      "false" },
+                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_EXCEED_CYCLE_TIME",  "false" },
+                { "APM_EXTENSION", "project", "projectlevelkey", "PLANNING", "AUTO_CREATE_TASK_FOR_DEFECT",     "false" },
+                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "WSJF_FEATURE_ENABLED",            "true"  },
         };
 
         StringBuilder builder = new StringBuilder();
@@ -526,10 +527,11 @@ public class DataGenerator {
                     append("<propertyKey>").append(paramSet[4]).append("</propertyKey>").
                     append("</configurationKey>" +
                             "<configurationValue>" +
-                            "<value>false</value>" +
+                            "<value>").append(paramSet[5]).append("</value>" +
                             "<className>java.lang.Boolean</className>" +
                             "</configurationValue>" +
                             "</ConfigurationResourceParameter>");
+            log.debug(paramSet[4]+"="+paramSet[5]);
         }
         builder.append("</ConfigurationResourceParameters>");
         try {
