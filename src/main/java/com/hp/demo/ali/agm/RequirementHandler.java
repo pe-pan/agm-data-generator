@@ -32,6 +32,18 @@ public class RequirementHandler extends AbstractBacklogItemHandler {
                 }
                 _backlogItem.setFieldValue("theme-id", themeId);
                 CRUDService.update(_backlogItem);                                           // update backlog item
+
+                String featureStatus = EntityTools.getField(entity, "feature-status");
+                if (featureStatus != null) {                                                //todo bug of AgM REST? feature status was not set when creating the entity!
+                    int agmIdI = response.getId();
+                    entity.removeAllFields();
+                    entity.setId(agmIdI);
+                    entity.setFieldValue("feature-status", featureStatus);
+                    log.debug("Updating feature's status: "+EntityTools.entityToString(entity));
+                    response = CRUDService.update(entity);
+                    log.debug("Feature's status updated: "+EntityTools.entityToString(response));
+                }
+
             } else if ("70".equals(typeId)) { // user story
                 String featureId = EntityTools.getField(entity, "parent-id");
                 _updateBacklogItem(featureId);
