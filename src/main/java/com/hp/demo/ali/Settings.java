@@ -63,6 +63,7 @@ public class Settings {
     private boolean keepRelease;
     private String releaseName;
     private Integer releaseId;
+    private String updateUrl;
 
     private static DataFormatter formatter = new DataFormatter(true);
 
@@ -482,6 +483,14 @@ public class Settings {
             log.error("Cannot parse this string into a long: "+firstSvnRevision, e);
             this.firstSvnRevision = 0;
         }
+    }
+
+    public String getUpdateUrl() {
+        return updateUrl;
+    }
+
+    public void setUpdateUrl(String updateUrl) {
+        this.updateUrl = updateUrl;
     }
 
     private static Settings settings = null;
