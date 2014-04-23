@@ -1,5 +1,16 @@
 Release Notes:
 ==============
+[23/Apr/2014]
+Version 1.15:
+-------------
+Added features:
+  - Automatic upgrade
+  - Fields related to 'Feature planning' feature are being filled-in with values
+  - Support for 'Weighted Shortest Job First' (WSJF)
+
+ Bug fixes:
+  - Theme/feature/user story hierarchy is defined using 'feature-id' field; not 'parent-id' field
+
 [26/Mar/2014]
 Version 1.14:
 -------------
