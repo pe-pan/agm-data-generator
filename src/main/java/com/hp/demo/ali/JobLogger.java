@@ -1,5 +1,6 @@
 package com.hp.demo.ali;
 
+import com.hp.demo.ali.excel.AgmEntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.AgmRestService;
 import com.hp.demo.ali.tools.EntityTools;
@@ -10,6 +11,7 @@ import org.hp.almjclient.exceptions.FieldNotFoundException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
 import org.hp.almjclient.model.marshallers.favorite.Filter;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,7 +21,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -39,43 +40,14 @@ public class JobLogger {
         this.jobLog = new File(Migrator.JOBS_DIR, Migrator.JOB_PREFIX+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+Migrator.JOB_SUFFIX);  //todo hack; make it non-static
     }
 
-    public static void writeLogLine(String entityName, String entityId) {   //todo hack; make it non-static (e.g. use context to register/retrieve common objects like JobLogger is)
+    public static void writeLogLine(String entityName, String entityId, String excelId) {   //todo hack; make it non-static (e.g. use context to register/retrieve common objects like JobLogger is)
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(jobLog, true));
-            writer.write(entityName+": "+entityId+System.lineSeparator());
+            writer.write(entityName+"#"+excelId+"="+entityId+System.lineSeparator());
             writer.flush();
             writer.close();
         } catch (IOException e) {
             throw new IllegalStateException(e);
-        }
-    }
-
-    private List<String> logItems = new LinkedList<>();
-    private void openLog() {
-        log.debug("Reading all the job log...");
-        try {
-            BufferedReader logReader = new BufferedReader(new FileReader(jobLog));
-            for (String line = logReader.readLine(); line != null; line = logReader.readLine()) {
-                logItems.add(line);
-            }
-            logReader.close();
-            log.debug("Renaming job log file...");
-            String bakFileName = jobLog.getName()+Migrator.JOB_BACKUP_SUFIX;
-            File bakFile = new File(Migrator.JOBS_DIR, bakFileName);
-            bakFile.delete();
-            jobLog.renameTo(bakFile);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private String readLogLine() {
-        if (logItems.size() > 0) {
-            log.debug("Processing job log line #"+logItems.size());
-            return logItems.remove(logItems.size()-1);
-        } else {
-            log.debug("Job log processed.");
-            return null;
         }
     }
 
@@ -97,45 +69,25 @@ public class JobLogger {
         }
     }
 
-    void deleteExistingData() {
+    void loadJobLog() {
         if (settings.isDeleteAll()) {
             deleteAllData();
         } else {
-            if (settings.isGenerateProject()) {
-                deleteJobLogData();
-            }
-        }
-    }
-
-    void deleteJobLogData() {
-        if (jobLog.exists()) {
-            log.info("Log from previous run found ("+jobLog.getName()+"), previously created data are going to be deleted...");
-            askForDeletePermission();
-            openLog();
-            String previousEntity = "";
-            for (String line = readLogLine(); line != null; line = readLogLine()) {
-                int columnIndex = line.indexOf(':');
-                String entityName = line.substring(0, columnIndex);
-                String agmId = line.substring(columnIndex+2);
-                log.debug("Deleting "+entityName+" with ID: "+agmId);
-                if (!entityName.equals(previousEntity)) {
-                    log.info("Deleting entity: "+entityName);
-                    previousEntity = entityName;
-                }
-                if ("release".equals(entityName) && settings.isKeepRelease()) {
-                    log.info("Keeping release with ID: "+agmId);
-                    settings.setReleaseId(agmId);
-                } else {
-                    AgmRestService service = AgmRestService.getCRUDService();
-                    try {
-                        service.delete(entityName, Integer.parseInt(agmId));
-                    } catch (RestClientException | ALMRestException e) {
-                        log.error("Cannot delete "+entityName+" with ID: "+agmId);
+            if (jobLog.exists()) {
+                log.info("Log from previous run found (" + jobLog.getName() + "), previously created data are going to be reused...");
+                try {
+                    BufferedReader logReader = new BufferedReader(new FileReader(jobLog));
+                    for (String line = logReader.readLine(); line != null; line = logReader.readLine()) {
+                        String[] items = StringUtils.split(line, "=");
+                        AgmEntityIterator.putReference(items[0], items[1]);
                     }
+                    logReader.close();
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
                 }
+            } else {
+                log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
             }
-        } else {
-            log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
         }
     }
 

@@ -211,7 +211,7 @@ public class DataGenerator {
                 aliDevBridgeDownloader = agmClient.downloadDevBridge();
             }
             JobLogger jobLogger = new JobLogger(reader);
-            jobLogger.deleteExistingData();
+            jobLogger.loadJobLog();
 
             if (settings.isAddUsers()) {
                 addUsers();
@@ -282,6 +282,7 @@ public class DataGenerator {
             generateEntity(reader, entityName);
         }
         AgmEntityIterator.logReferences();
+        EntityHandler.printStatistics();
     }
 
     private static Sheet readUsers(ExcelReader reader) {
