@@ -161,7 +161,7 @@ public class DataGenerator {
                         }
                         log.info(settings.isAddUsers() ? "Users will be added to the project..." : "No users will be added to the project...");
                         log.info(settings.isGenerateProject() ? "Entities will be generated..." : "No entities will be generated...");
-                        log.info(settings.isGenerateHistory() ? "History will be generated..." : "No history wil be generated...");
+                        log.info(settings.isGenerateHistory() ? "History will be generated..." : "No history will be generated...");
                         log.info(settings.isGenerateBuilds() ? "Builds and commits will be generated..." : "No builds/commits will be generated...");
                     } else if (args[argIndex].startsWith("http")) {
                         settings.setLoginUrl(args[argIndex]);
