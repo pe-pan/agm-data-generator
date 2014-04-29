@@ -23,14 +23,15 @@ public class KanbanStatusHandler extends KanbanStatusInitializer {
         int teamId = EntityTools.getIntField(entity, "KS_TEAM_ID");
         if (previousTeamId == 0) {
             previousTeamId = teamId;
-            excelTeamId = EntityTools.removeField(entity, "team-id");
+            excelTeamId = EntityTools.getField(entity, "team-id");
         }
         if (previousTeamId != teamId) {  // in this row, there are new set of statuses
             terminate();                 // finish the previous set
             previousTeamId = teamId;     // initialize the new set
-            excelTeamId = EntityTools.removeField(entity, "team-id");
+            excelTeamId = EntityTools.getField(entity, "team-id");
             kanbanStatuses = "[";        // also init
         }
+        entity.removeField("team-id");
         entity.removeField("id");
         kanbanStatuses = kanbanStatuses+EntityTools.entityToString(entity)+",";
         return null;
