@@ -36,32 +36,28 @@ public class EntityHandler extends AbstractSheetHandler {
     @Override
     public Entity row(Entity entity) {
         try {
-            return createEntity(entity);
+            String excelId = EntityTools.getField(entity, "id");
+            entity.removeField("id");      // remove the original Entity ID (the one written in Excel); if not removed here, it'll lead to NumberFormatException on the row below
+            log.debug("Creating/updating " + entity + ": " + EntityTools.entityToString(entity));
+            String agmId = AgmEntityIterator.dereference(sheetName+"#"+excelId);
+            Entity response;
+            if (agmId == null) {
+                response = createEntity(entity, excelId);
+            } else {
+                entity.setId(Integer.parseInt(agmId));
+                try {
+                    response = AgmRestService.getCRUDService().update(entity);
+                    updatedEntities++;
+                    log.debug("Updated("+updatedEntities+") "+response+": "+ EntityTools.entityToString(response));
+                } catch (ALMRestException | RestClientException e) {
+                    log.debug("Update failed! Trying to create!", e);
+                    response = createEntity(entity, excelId);
+                }
+            }
+            return response;
         } catch (RestClientException | ALMRestException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    protected Entity createEntity(Entity entity) throws ALMRestException, RestClientException {
-        String excelId = EntityTools.getField(entity, "id");
-        entity.removeField("id");      // remove the original Entity ID (the one written in Excel); if not removed here, it'll lead to NumberFormatException on the row below
-        log.debug("Creating/updating " + entity + ": " + EntityTools.entityToString(entity));
-        String agmId = AgmEntityIterator.dereference(sheetName+"#"+excelId);
-        Entity response;
-        if (agmId == null) {
-            response = _reallyCreateEntity(entity, excelId);
-        } else {
-            entity.setId(Integer.parseInt(agmId));
-            try {
-                response = AgmRestService.getCRUDService().update(entity);
-                updatedEntities++;
-                log.debug("Updated("+updatedEntities+") "+response+": "+ EntityTools.entityToString(response));
-            } catch (ALMRestException | RestClientException e) {
-                log.debug("Update failed! Trying to create!", e);
-                response = _reallyCreateEntity(entity, excelId);
-            }
-        }
-        return response;
     }
 
     private Filter entityToFilter(Entity entity) {
@@ -78,7 +74,7 @@ public class EntityHandler extends AbstractSheetHandler {
         return filter;
     }
 
-    private Entity _reallyCreateEntity(Entity entity, String excelId) throws ALMRestException, RestClientException {
+    private Entity createEntity(Entity entity, String excelId) throws ALMRestException, RestClientException {
         Entity response;
         try {
             response = AgmRestService.getCRUDService().create(entity);
