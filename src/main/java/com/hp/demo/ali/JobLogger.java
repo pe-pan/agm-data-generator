@@ -3,7 +3,6 @@ package com.hp.demo.ali;
 import com.hp.demo.ali.excel.AgmEntityIterator;
 import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.AgmRestService;
-import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.hp.almjclient.exceptions.ALMRestException;
@@ -135,12 +134,7 @@ public class JobLogger {
                     if (id == 0) {
                         log.debug("Skipping the entity with ID 0");  //todo hack!!!!
                     } else {
-                        if ("release".equals(entityType) && settings.isKeepRelease() && settings.getReleaseName().equals(EntityTools.getField(entity, "name"))) {
-                            log.info("Keeping release with ID: "+id);
-                            settings.setReleaseId(id);
-                        } else {
-                            ids.add(id);
-                        }
+                        ids.add(id);
                     }
                 } catch (FieldNotFoundException e) {
                     log.error("Cannot get id of entity "+entityType+" with index="+ids.size());

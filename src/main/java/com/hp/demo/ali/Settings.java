@@ -60,9 +60,6 @@ public class Settings {
     private String hudsonServiceName;
     private String buildServerName;
     private String branchPath;
-    private boolean keepRelease;
-    private String releaseName;
-    private Integer releaseId;
     private String updateUrl;
 
     private static DataFormatter formatter = new DataFormatter(true);
@@ -363,43 +360,6 @@ public class Settings {
         this.branchPath = branchPath;
     }
 
-    public boolean isKeepRelease() {
-        return keepRelease;
-    }
-
-    public void setKeepRelease(boolean keepRelease) {
-        this.keepRelease = keepRelease;
-    }
-
-    public void setKeepRelease(String keepRelease) {
-        this.keepRelease = "yes".equals(keepRelease);
-    }
-
-    public String getReleaseName() {
-        return releaseName;
-    }
-
-    public void setReleaseName(String releaseName) {
-        this.releaseName = releaseName;
-    }
-
-    public Integer getReleaseId() {
-        return releaseId;
-    }
-
-    public void setReleaseId(String releaseId) {
-        try {
-            this.releaseId = Integer.parseInt(releaseId);
-        } catch (NumberFormatException e) {
-            log.error("Cannot parse this string into an int: "+releaseId, e);
-            this.releaseId = null;
-        }
-    }
-
-    public void setReleaseId(Integer releaseId) {
-        this.releaseId = releaseId;
-    }
-
     public void setAdmin(String admin) {
         this.admin = admin;
     }
@@ -451,7 +411,9 @@ public class Settings {
     public void setFirstBuildDate(String firstBuildDate) {
         try {
             long days = Long.parseLong(firstBuildDate);
-            this.firstBuildDate = new Date(System.currentTimeMillis() + days*24*60*60*1000);
+            long currentTimeMillis = settings.isDeleteAll() ? System.currentTimeMillis() - 14 * 24*60*60*1000 : System.currentTimeMillis();
+ //           long currentTimeMillis = System.currentTimeMillis() - 17 * 24*60*60*1000;
+            this.firstBuildDate = new Date(currentTimeMillis + days*24*60*60*1000);
             log.debug("Setting first build date to: "+this.firstBuildDate.toString());
         } catch (NumberFormatException e) {
             log.debug("First build date is not a relative number to todays'; trying if it's an absolute date");
