@@ -1,6 +1,7 @@
 package com.hp.demo.ali.agm;
 
 import com.hp.demo.ali.JobLogger;
+import com.hp.demo.ali.Settings;
 import com.hp.demo.ali.excel.AgmEntityIterator;
 import com.hp.demo.ali.rest.AgmRestService;
 import com.hp.demo.ali.tools.EntityTools;
@@ -30,7 +31,7 @@ public class EntityHandler extends AbstractSheetHandler {
     @Override
     public void init(String sheetName) {
         super.init(sheetName);
-        log.info("Generating entity: "+sheetName);
+        log.info(Settings.getSettings().isDeleteAll() ? "Generating" : "Refreshing"+" entity: "+sheetName);
     }
 
     @Override

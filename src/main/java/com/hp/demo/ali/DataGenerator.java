@@ -259,7 +259,7 @@ public class DataGenerator {
     }
 
     private static void generateProject(ExcelReader reader) {
-        log.info("Generating project data...");
+        log.info(settings.isDeleteAll() ? "Generating" : "Refreshing "+" project data...");
         registry = new SheetHandlerRegistry();
         SheetHandler generalHandler = new EntityHandler();
         List<Sheet> entitySheets = reader.getAllEntitySheets();
