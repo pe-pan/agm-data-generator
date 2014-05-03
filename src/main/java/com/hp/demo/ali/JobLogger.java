@@ -1,6 +1,8 @@
 package com.hp.demo.ali;
 
 import com.hp.demo.ali.excel.AgmEntityIterator;
+import com.hp.demo.ali.excel.EntityIterator;
+import com.hp.demo.ali.excel.ExcelEntity;
 import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.AgmRestService;
 import org.apache.log4j.Logger;
@@ -20,8 +22,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 /**
  * Created by panuska on 14.10.13.
@@ -37,6 +41,16 @@ public class JobLogger {
         this.reader = reader;
         this.settings = Settings.getSettings();
         this.jobLog = new File(Migrator.JOBS_DIR, Migrator.JOB_PREFIX+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+Migrator.JOB_SUFFIX);  //todo hack; make it non-static
+        File migratedJobLog = new File(jobLog.getParentFile(), jobLog.getName()+".tmp");
+        if (migrateJobLog(reader, jobLog, migratedJobLog)) {
+            // job log migrated
+            if (!jobLog.delete()) {
+                throw new IllegalStateException("Cannot delete the original job log file when migrating it: "+jobLog.getName());
+            }
+            if (!migratedJobLog.renameTo(jobLog)) {
+                throw new IllegalStateException("Cannot move the migrated job log file ("+migratedJobLog.getName()+") to the original name: "+jobLog.getName());
+            }
+        }
     }
 
     public static void writeLogLine(String entityName, String entityId, String excelId) {   //todo hack; make it non-static (e.g. use context to register/retrieve common objects like JobLogger is)
@@ -153,6 +167,61 @@ public class JobLogger {
             } catch (RestClientException | ALMRestException e) {
                 log.error("Cannot query for entities: "+entityType, e);
             }
+        }
+    }
+
+    private static Map<Sheet, EntityIterator<ExcelEntity>> iterators = new HashMap<>();
+    private static String migrateJobLogLine(String original, ExcelReader reader) {
+        String[] items = StringUtils.split(original, ": ");
+        if (items.length != 2) {
+            log.debug("No colon to split a job log line into 2 items: "+original+". Cannot continue in migration!");
+            return null;
+        }
+        String sheetName= items[0].trim();
+        String agmId = items[1].trim();
+        Sheet sheet = reader.getSheet(sheetName);
+        EntityIterator<ExcelEntity> it = iterators.get(sheet);
+        if (it == null) {
+            it = new EntityIterator<>(sheet);
+            iterators.put(sheet, it);
+        }
+        if (it.hasNext()) {
+            ExcelEntity entity = it.next();
+            String excelId = entity.getFieldValue("id");
+            String output = sheetName+"#"+excelId+"="+agmId;
+            log.debug("Migrating '"+original+"' into '"+output+"'");
+            return output;
+        } else {
+            log.debug("No more lines in sheet "+sheetName+". Cannot continue in migration!");
+            return null;
+        }
+    }
+
+    private static boolean migrateJobLog(ExcelReader reader, File jobLog, File migratedJobLog) {
+        try {
+            BufferedReader r = new BufferedReader(new FileReader(jobLog));
+            String line = r.readLine();
+            if (line.contains("#")) {
+                log.debug("Job log "+jobLog.getName()+" seems to be already migrated");
+                r.close();
+                return false;
+            }
+            log.info("Job log seems to be in the old format. Migrating it to the new format: "+jobLog.getName());
+            BufferedWriter w = new BufferedWriter(new FileWriter(migratedJobLog));
+            for(;line != null; line = r.readLine()) {
+                String migrated = migrateJobLogLine(line, reader);
+                if (migrated == null) {
+                    r.close();
+                    w.close();
+                    throw new IllegalStateException("Job log "+jobLog.getName()+" cannot be migrated. Check logs for errors.");
+                }
+                w.write(migrated+System.lineSeparator());
+            }
+            r.close();
+            w.close();
+            return true;
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
     }
 }
