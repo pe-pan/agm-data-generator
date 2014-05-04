@@ -1,5 +1,14 @@
 Release Notes:
 ==============
+[4/May/2014]
+Version 1.16:
+-------------
+Added features:
+  - Data re-initialization (previously generated data are not deleted but re-used on data refresh)
+
+Dropped features:
+  - Keep Release settings has no effect
+
 [23/Apr/2014]
 Version 1.15:
 -------------
@@ -8,7 +17,7 @@ Added features:
   - Fields related to 'Feature planning' feature are being filled-in with values
   - Support for 'Weighted Shortest Job First' (WSJF)
 
- Bug fixes:
+Bug fixes:
   - Theme/feature/user story hierarchy is defined using 'feature-id' field; not 'parent-id' field
 
 [26/Mar/2014]
