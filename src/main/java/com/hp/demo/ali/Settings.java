@@ -61,7 +61,6 @@ public class Settings {
     private String buildServerName;
     private String branchPath;
     private String updateUrl;
-    private String updateUrl;
 
     private static DataFormatter formatter = new DataFormatter(true);
 
