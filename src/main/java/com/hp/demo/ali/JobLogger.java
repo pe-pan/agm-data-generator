@@ -1,8 +1,10 @@
 package com.hp.demo.ali;
 
+import com.hp.demo.ali.excel.AgmEntityIterator;
+import com.hp.demo.ali.excel.EntityIterator;
+import com.hp.demo.ali.excel.ExcelEntity;
 import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.AgmRestService;
-import com.hp.demo.ali.tools.EntityTools;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.hp.almjclient.exceptions.ALMRestException;
@@ -10,6 +12,7 @@ import org.hp.almjclient.exceptions.FieldNotFoundException;
 import org.hp.almjclient.exceptions.RestClientException;
 import org.hp.almjclient.model.marshallers.Entity;
 import org.hp.almjclient.model.marshallers.favorite.Filter;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -19,9 +22,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 /**
  * Created by panuska on 14.10.13.
@@ -37,45 +41,26 @@ public class JobLogger {
         this.reader = reader;
         this.settings = Settings.getSettings();
         this.jobLog = new File(Migrator.JOBS_DIR, Migrator.JOB_PREFIX+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+Migrator.JOB_SUFFIX);  //todo hack; make it non-static
+        File migratedJobLog = new File(jobLog.getParentFile(), jobLog.getName()+".tmp");
+        if (migrateJobLog(reader, jobLog, migratedJobLog)) {
+            // job log migrated
+            if (!jobLog.delete()) {
+                throw new IllegalStateException("Cannot delete the original job log file when migrating it: "+jobLog.getName());
+            }
+            if (!migratedJobLog.renameTo(jobLog)) {
+                throw new IllegalStateException("Cannot move the migrated job log file ("+migratedJobLog.getName()+") to the original name: "+jobLog.getName());
+            }
+        }
     }
 
-    public static void writeLogLine(String entityName, String entityId) {   //todo hack; make it non-static (e.g. use context to register/retrieve common objects like JobLogger is)
+    public static void writeLogLine(String entityName, String entityId, String excelId) {   //todo hack; make it non-static (e.g. use context to register/retrieve common objects like JobLogger is)
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(jobLog, true));
-            writer.write(entityName+": "+entityId+System.lineSeparator());
+            writer.write(entityName+"#"+excelId+"="+entityId+System.lineSeparator());
             writer.flush();
             writer.close();
         } catch (IOException e) {
             throw new IllegalStateException(e);
-        }
-    }
-
-    private List<String> logItems = new LinkedList<>();
-    private void openLog() {
-        log.debug("Reading all the job log...");
-        try {
-            BufferedReader logReader = new BufferedReader(new FileReader(jobLog));
-            for (String line = logReader.readLine(); line != null; line = logReader.readLine()) {
-                logItems.add(line);
-            }
-            logReader.close();
-            log.debug("Renaming job log file...");
-            String bakFileName = jobLog.getName()+Migrator.JOB_BACKUP_SUFIX;
-            File bakFile = new File(Migrator.JOBS_DIR, bakFileName);
-            bakFile.delete();
-            jobLog.renameTo(bakFile);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    private String readLogLine() {
-        if (logItems.size() > 0) {
-            log.debug("Processing job log line #"+logItems.size());
-            return logItems.remove(logItems.size()-1);
-        } else {
-            log.debug("Job log processed.");
-            return null;
         }
     }
 
@@ -97,45 +82,25 @@ public class JobLogger {
         }
     }
 
-    void deleteExistingData() {
+    void loadJobLog() {
         if (settings.isDeleteAll()) {
             deleteAllData();
         } else {
-            if (settings.isGenerateProject()) {
-                deleteJobLogData();
-            }
-        }
-    }
-
-    void deleteJobLogData() {
-        if (jobLog.exists()) {
-            log.info("Log from previous run found ("+jobLog.getName()+"), previously created data are going to be deleted...");
-            askForDeletePermission();
-            openLog();
-            String previousEntity = "";
-            for (String line = readLogLine(); line != null; line = readLogLine()) {
-                int columnIndex = line.indexOf(':');
-                String entityName = line.substring(0, columnIndex);
-                String agmId = line.substring(columnIndex+2);
-                log.debug("Deleting "+entityName+" with ID: "+agmId);
-                if (!entityName.equals(previousEntity)) {
-                    log.info("Deleting entity: "+entityName);
-                    previousEntity = entityName;
-                }
-                if ("release".equals(entityName) && settings.isKeepRelease()) {
-                    log.info("Keeping release with ID: "+agmId);
-                    settings.setReleaseId(agmId);
-                } else {
-                    AgmRestService service = AgmRestService.getCRUDService();
-                    try {
-                        service.delete(entityName, Integer.parseInt(agmId));
-                    } catch (RestClientException | ALMRestException e) {
-                        log.error("Cannot delete "+entityName+" with ID: "+agmId);
+            if (jobLog.exists()) {
+                log.info("Log from previous run found (" + jobLog.getName() + "), previously created data are going to be reused...");
+                try {
+                    BufferedReader logReader = new BufferedReader(new FileReader(jobLog));
+                    for (String line = logReader.readLine(); line != null; line = logReader.readLine()) {
+                        String[] items = StringUtils.split(line, "=");
+                        AgmEntityIterator.putReference(items[0], items[1]);
                     }
+                    logReader.close();
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
                 }
+            } else {
+                log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
             }
-        } else {
-            log.info("No log ("+jobLog.getName()+") from previous run found; first run against this tenant?");
         }
     }
 
@@ -183,12 +148,7 @@ public class JobLogger {
                     if (id == 0) {
                         log.debug("Skipping the entity with ID 0");  //todo hack!!!!
                     } else {
-                        if ("release".equals(entityType) && settings.isKeepRelease() && settings.getReleaseName().equals(EntityTools.getField(entity, "name"))) {
-                            log.info("Keeping release with ID: "+id);
-                            settings.setReleaseId(id);
-                        } else {
-                            ids.add(id);
-                        }
+                        ids.add(id);
                     }
                 } catch (FieldNotFoundException e) {
                     log.error("Cannot get id of entity "+entityType+" with index="+ids.size());
@@ -207,6 +167,61 @@ public class JobLogger {
             } catch (RestClientException | ALMRestException e) {
                 log.error("Cannot query for entities: "+entityType, e);
             }
+        }
+    }
+
+    private static Map<Sheet, EntityIterator<ExcelEntity>> iterators = new HashMap<>();
+    private static String migrateJobLogLine(String original, ExcelReader reader) {
+        String[] items = StringUtils.split(original, ": ");
+        if (items.length != 2) {
+            log.debug("No colon to split a job log line into 2 items: "+original+". Cannot continue in migration!");
+            return null;
+        }
+        String sheetName= items[0].trim();
+        String agmId = items[1].trim();
+        Sheet sheet = reader.getSheet(sheetName);
+        EntityIterator<ExcelEntity> it = iterators.get(sheet);
+        if (it == null) {
+            it = new EntityIterator<>(sheet);
+            iterators.put(sheet, it);
+        }
+        if (it.hasNext()) {
+            ExcelEntity entity = it.next();
+            String excelId = entity.getFieldValue("id");
+            String output = sheetName+"#"+excelId+"="+agmId;
+            log.debug("Migrating '"+original+"' into '"+output+"'");
+            return output;
+        } else {
+            log.debug("No more lines in sheet "+sheetName+". Cannot continue in migration!");
+            return null;
+        }
+    }
+
+    private static boolean migrateJobLog(ExcelReader reader, File jobLog, File migratedJobLog) {
+        try {
+            BufferedReader r = new BufferedReader(new FileReader(jobLog));
+            String line = r.readLine();
+            if (line.contains("#")) {
+                log.debug("Job log "+jobLog.getName()+" seems to be already migrated");
+                r.close();
+                return false;
+            }
+            log.info("Job log seems to be in the old format. Migrating it to the new format: "+jobLog.getName());
+            BufferedWriter w = new BufferedWriter(new FileWriter(migratedJobLog));
+            for(;line != null; line = r.readLine()) {
+                String migrated = migrateJobLogLine(line, reader);
+                if (migrated == null) {
+                    r.close();
+                    w.close();
+                    throw new IllegalStateException("Job log "+jobLog.getName()+" cannot be migrated. Check logs for errors.");
+                }
+                w.write(migrated+System.lineSeparator());
+            }
+            r.close();
+            w.close();
+            return true;
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
         }
     }
 }

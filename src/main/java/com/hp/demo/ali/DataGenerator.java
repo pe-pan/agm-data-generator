@@ -211,7 +211,7 @@ public class DataGenerator {
                 aliDevBridgeDownloader = agmClient.downloadDevBridge();
             }
             JobLogger jobLogger = new JobLogger(reader);
-            jobLogger.deleteExistingData();
+            jobLogger.loadJobLog();
 
             if (settings.isAddUsers()) {
                 addUsers();
@@ -259,7 +259,7 @@ public class DataGenerator {
     }
 
     private static void generateProject(ExcelReader reader) {
-        log.info("Generating project data...");
+        log.info(settings.isDeleteAll() ? "Generating" : "Refreshing "+" project data...");
         registry = new SheetHandlerRegistry();
         SheetHandler generalHandler = new EntityHandler();
         List<Sheet> entitySheets = reader.getAllEntitySheets();
@@ -282,6 +282,7 @@ public class DataGenerator {
             generateEntity(reader, entityName);
         }
         AgmEntityIterator.logReferences();
+        EntityHandler.printStatistics();
     }
 
     private static Sheet readUsers(ExcelReader reader) {

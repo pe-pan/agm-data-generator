@@ -2,6 +2,7 @@ package com.hp.demo.ali.agm;
 
 import com.hp.demo.ali.rest.AgmRestService;
 import com.hp.demo.ali.tools.EntityTools;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.RestClientException;
@@ -33,6 +34,11 @@ public class KanbanStatusHandler extends KanbanStatusInitializer {
         }
         entity.removeField("team-id");
         entity.removeField("id");
+        if (!NumberUtils.isNumber(EntityTools.getField(entity, "KS_ID"))) {  //in case the value is NaN, the filed dereference did not work
+            log.debug("KS_ID not dereferenced; new data generation? :"       //and we are generating new data (not refreshing existing ones)
+                    +EntityTools.getField(entity, "KS_ID"));
+            entity.removeField("KS_ID");
+        }
         kanbanStatuses = kanbanStatuses+EntityTools.entityToString(entity)+",";
         return null;
     }
