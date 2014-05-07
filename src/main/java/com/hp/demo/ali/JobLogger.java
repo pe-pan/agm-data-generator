@@ -198,6 +198,10 @@ public class JobLogger {
     }
 
     private static boolean migrateJobLog(ExcelReader reader, File jobLog, File migratedJobLog) {
+        if (!jobLog.exists()) {
+            log.debug("Job log "+jobLog.getName()+" does not exist; nothing to migrate");
+            return false;
+        }
         try {
             BufferedReader r = new BufferedReader(new FileReader(jobLog));
             String line = r.readLine();
