@@ -5,6 +5,7 @@ Version 1.17:
 -------------
 Bug fixes:
   - Job log migration fails when no log exists
+  - Wrong info message when generating data
 
 [4/May/2014]
 Version 1.16:

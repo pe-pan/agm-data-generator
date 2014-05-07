@@ -31,7 +31,7 @@ public class EntityHandler extends AbstractSheetHandler {
     @Override
     public void init(String sheetName) {
         super.init(sheetName);
-        log.info(Settings.getSettings().isDeleteAll() ? "Generating" : "Refreshing"+" entity: "+sheetName);
+        log.info((Settings.getSettings().isDeleteAll() ? "Generating" : "Refreshing")+" entity: "+sheetName);
     }
 
     @Override
