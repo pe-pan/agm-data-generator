@@ -1,5 +1,11 @@
 Release Notes:
 ==============
+[20/May/2014]
+Version 1.18:
+-------------
+Added features:
+  - Multi-product support (older versions of ADG not compatible with AgM having this feature)
+
 [7/May/2014]
 Version 1.17:
 -------------
