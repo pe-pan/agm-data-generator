@@ -77,11 +77,14 @@ public class EntityHandler extends AbstractSheetHandler {
 
     private Entity createEntity(Entity entity, String excelId) throws ALMRestException, RestClientException {
         Entity response;
-        try {
+//        try {
             response = AgmRestService.getCRUDService().create(entity);
             createdEntities++;
             log.debug("Created("+createdEntities+") "+response+": "+ EntityTools.entityToString(response));
             //todo this is not transactional (create and writeLogLine should be a single transaction)
+/*
+        // todo do not try to reconstruct the entity; it does not work anyway
+        // todo to make it work, one would have to create the filter other way (e.g. remove the Description field from the filter)
         } catch (ALMRestException | RestClientException e) {
             Filter filter = entityToFilter(entity);
             Entities entities = AgmRestService.getCRUDService().readCollection(filter);
@@ -92,6 +95,7 @@ public class EntityHandler extends AbstractSheetHandler {
             reconstructedEntities++;
             log.debug("Reconstructed("+reconstructedEntities+") "+response+": "+ EntityTools.entityToString(response));
         }
+*/
         String agmId = response.getId().toString();
         JobLogger.writeLogLine(sheetName, agmId, excelId);
         AgmEntityIterator.putReference(sheetName + "#" + excelId, agmId);
