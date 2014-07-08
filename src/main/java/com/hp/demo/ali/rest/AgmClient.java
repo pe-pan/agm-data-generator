@@ -76,7 +76,7 @@ public class AgmClient {
              Map<String, String> headers = new HashMap<>(1);
              headers.put("INTERNAL_DATA", "20120922");
              adapter.addSessionCookie("AGM_STATE="+"20120922");
-             adapter.putWithHeaders(String.class, Settings.getSettings().getRestUrl()+"/rest/api/portal/users", usersJson.toString(), headers, ServiceResourceAdapter.ContentType.JSON);
+             adapter.putWithHeaders(String.class, Settings.getSettings().getRestUrl()+"/rest/api/portal/users?productGroupId=1000", usersJson.toString(), headers, ServiceResourceAdapter.ContentType.JSON);
              log.info("User added to the tenant");
          } catch (ALMRestException e) {
              log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());

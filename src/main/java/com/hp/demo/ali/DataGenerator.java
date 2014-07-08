@@ -547,11 +547,11 @@ public class DataGenerator {
     public static void configureProject() {
         log.info("Configuring project...");
         String [][] params = new String[][] {
-                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_ASSIGNMENT_CHANGE",  "false" },
-                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_STATUS_CHANGE",      "false" },
-                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "SEND_MAIL_ON_EXCEED_CYCLE_TIME",  "false" },
-                { "APM_EXTENSION", "project", "projectlevelkey", "PLANNING", "AUTO_CREATE_TASK_FOR_DEFECT",     "false" },
-                { "APM_EXTENSION", "project", "projectlevelkey", "SETTINGS", "WSJF_FEATURE_ENABLED",            "true"  },
+                { "APM_EXTENSION", "product", "1000", "SETTINGS", "SEND_MAIL_ON_ASSIGNMENT_CHANGE",  "false" },
+                { "APM_EXTENSION", "product", "1000", "SETTINGS", "SEND_MAIL_ON_STATUS_CHANGE",      "false" },
+                { "APM_EXTENSION", "product", "1000", "SETTINGS", "SEND_MAIL_ON_EXCEED_CYCLE_TIME",  "false" },
+                { "APM_EXTENSION", "product", "1000", "PLANNING", "AUTO_CREATE_TASK_FOR_DEFECT",     "false" },
+                { "APM_EXTENSION", "product", "1000", "SETTINGS", "WSJF_FEATURE_ENABLED",            "true"  },
         };
 
         StringBuilder builder = new StringBuilder();
