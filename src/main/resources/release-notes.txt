@@ -1,5 +1,18 @@
 Release Notes:
 ==============
+[08/Jul/2014]
+Version 1.19:
+-------------
+Added features:
+  - Support for AgM/PPM demos (user peter_agm@hp.com replaced by ppm_agm@hp.com)
+
+Bug fixes:
+  - Multi-product support for users (add productGroupId parameter when adding a user to a tenant)
+  - Multi-product support in configuration
+  - ALI Dev Bridge must connect before creating build system / SCM entities (and disconnect immediately)
+  - Do not try to reconstruct an entity if the entity cannot be created
+  - Do not keep build-type and scm-branch entities (keeping them prevents ALI data from being refreshed)
+
 [20/May/2014]
 Version 1.18:
 -------------
