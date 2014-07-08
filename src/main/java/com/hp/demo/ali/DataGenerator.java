@@ -223,6 +223,14 @@ public class DataGenerator {
                 configureSvnAgent();
                 configureAliDevBridge();
                 stopDevBridge();
+
+                aliDevBridgeDownloader.waitTillDownloaded();
+                replaceDevBridgeBits(aliDevBridgeDownloader);
+                configureDevBridgeBits();
+                startDevBridge();
+
+                connectAliDevBridge();      // if Dev Bridge not connected, build system, SCM types are not known and will not be created!
+                disconnectAliDevBridge();   // if Dev Bridge is connected, it may start synchronize current (obsolete) SVN content
             }
             if (settings.isGenerateProject()) {
                 generateProject(reader);
@@ -239,11 +247,6 @@ public class DataGenerator {
                 buildGenerator.createJob();
             }
             if (settings.isGenerateProject() || settings.isGenerateBuilds()) {
-                aliDevBridgeDownloader.waitTillDownloaded();
-                replaceDevBridgeBits(aliDevBridgeDownloader);
-                configureDevBridgeBits();
-                startDevBridge();
-
                 synchronizeAliDevBridge();
             }
         } catch (RuntimeException e) {
@@ -337,8 +340,11 @@ public class DataGenerator {
         }
     }
 
-    public static void synchronizeAliDevBridge() {
-        log.debug("Synchronizing builds and source code changes");
+    private static RestClient devBridgeClient;
+    private static String xFid;
+    private static boolean devBridgeConnected = false;
+    public static void connectAliDevBridge() {
+        log.debug("Connecting ALI Dev Bridge");
 
         User admin = User.getUser(settings.getAdmin());
         String [][] data = {
@@ -346,14 +352,44 @@ public class DataGenerator {
                 { "j_password", admin.getPassword() },
                 { "a", "" }
         };
-        RestClient devBridgeClient = new RestClient();
-        RestClient.HttpResponse response = devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/j_spring_security_check", data);
+        devBridgeClient = new RestClient();
+        try {
+            RestClient.HttpResponse response = devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/j_spring_security_check", data);
+            xFid = response.getXFid();
+            devBridgeConnected = true;
+            log.info("ALI Dev Bridge connected!");
+        } catch (IllegalStateException e) {
+            log.info("Exception when connecting ALI Dev Bridge!", e);
+        }
+    }
 
-        data = new String[][] { { "fid", response.getXFid() } };
-        devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/rest/task/start/BuildSyncTask", data);
-        log.info("Build synchronization started!");
-        devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/rest/task/start/SourceSyncTask", data);
-        log.info("Source code synchronization started!");
+    public static void synchronizeAliDevBridge() {
+        if (!devBridgeConnected) connectAliDevBridge();
+
+        String [][] data = { { "fid", xFid } };
+        try {
+            devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/rest/task/start/BuildSyncTask", data);
+            log.info("Build synchronization started!");
+            devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/rest/task/start/SourceSyncTask", data);
+            log.info("Source code synchronization started!");
+        } catch (IllegalStateException e) {
+            log.info("Exception when starting ALI Dev Bridge synchronization!", e);
+        }
+    }
+
+    public static void disconnectAliDevBridge() {
+        log.debug("Disconnecting ALI Dev Bridge");
+
+        String [][] data = {
+                { "op", "disconnect" },
+                { "fid", xFid } };
+        try {
+            devBridgeClient.doPost(settings.getAliDevBridgeUrl() + "/j_spring_security_logout", data);
+            log.info("ALI Dev Bridge disconnected!");
+        } catch (IllegalStateException e) {
+            log.info("Exception when disconnecting ALI Dev Bridge!", e);
+        }
+        devBridgeConnected = false;
     }
 
     public static void configureAliDevBridge() {
