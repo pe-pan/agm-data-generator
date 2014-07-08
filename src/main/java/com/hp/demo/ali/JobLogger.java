@@ -89,12 +89,41 @@ public class JobLogger {
             if (jobLog.exists()) {
                 log.info("Log from previous run found (" + jobLog.getName() + "), previously created data are going to be reused...");
                 try {
+                    boolean logHasChanged = false;
                     BufferedReader logReader = new BufferedReader(new FileReader(jobLog));
+                    File tempJobLog = new File(jobLog.getParent(), jobLog.getName()+".tmp");
+                    BufferedWriter logWriter = new BufferedWriter(new FileWriter(tempJobLog));
                     for (String line = logReader.readLine(); line != null; line = logReader.readLine()) {
-                        String[] items = StringUtils.split(line, "=");
-                        AgmEntityIterator.putReference(items[0], items[1]);
+                        String[] items = StringUtils.split(line, "=#");
+                        if (items.length != 3) {
+                            throw new IllegalStateException("Job log "+jobLog.getName()+" does not follow the expected format!");
+                        }
+                        if (settings.isGenerateBuilds() && (items[0].equals("build-type") || items[0].equals("scm-branch"))) {
+                            // todo scm-branch-release should be also skipped
+                            // do not load build jobs and SCM branches; these have to be always created new ones
+                            // otherwise, ALI data synchronization over Dev Bridge would not work
+                            try {
+                                log.info("Dropping entity "+items[0]+":"+items[2]+" to allow ALI data refresh");
+                                AgmRestService.getCRUDService().delete(items[0], Integer.parseInt(items[2]));
+                                logHasChanged = true;
+                            } catch (RestClientException | ALMRestException e) {
+                                log.error("Cannot delete entity "+items[0]+":"+items[2], e);
+                            }
+                        } else {
+                            AgmEntityIterator.putReference(items[0]+"#"+items[1], items[2]);
+                            logWriter.write(line+System.lineSeparator());
+                        }
                     }
                     logReader.close();
+                    logWriter.close();
+                    if (logHasChanged) {
+                        if (!jobLog.delete()) {
+                            log.error("Cannot delete the original job log file when loading it: "+jobLog.getName());
+                        }
+                        if (!tempJobLog.renameTo(jobLog)) {
+                            log.error("Cannot move the temporal job log file ("+tempJobLog.getName()+") to the original name: "+jobLog.getName());
+                        }
+                    }
                 } catch (IOException e) {
                     throw new IllegalStateException(e);
                 }
