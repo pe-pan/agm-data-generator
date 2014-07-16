@@ -81,15 +81,15 @@ public class PortalClient  {
     public String getTenantUrl(String solutionName) {
         client.setCustomHeader("X-XSRF-TOKEN", lwssoCookieKey);
         RestClient.HttpResponse response = client.doGet(portalUrl+"/myaccount/service/customer/CustomerProductsAndSignupRequests");
-        List solutions = JsonPath.read(response.getResponse(), "$.data[*].data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')]");
+        List solutions = JsonPath.read(response.getResponse(), "$.data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')]");
         if (solutions.size() == 0) {
             throw new IllegalArgumentException("There are no '"+PRODUCT_NAME+"' solutions under the given account: "+(accountName == null ? "default " : accountName));
         }
         String tenantUrl;
         if (solutionName != null) {
-            List<String> agmUrls = JsonPath.read(response.getResponse(), "$.data[*].data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')][?(@.displayLabel == '"+solutionName+"')].launch.url");
+            List<String> agmUrls = JsonPath.read(response.getResponse(), "$.data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')][?(@.displayLabel == '"+solutionName+"')].launch.url");
             if (agmUrls.size() == 0) {
-                List<String> solutionNames = JsonPath.read(response.getResponse(), "$.data[*].data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')].displayLabel");
+                List<String> solutionNames = JsonPath.read(response.getResponse(), "$.data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')].displayLabel");
                 String possibleSolutionNames;
                 if (solutionNames == null || solutionNames.size() == 0) {
                     possibleSolutionNames = "\nThere is no solution at all.";
@@ -100,15 +100,15 @@ public class PortalClient  {
             }
             tenantUrl = agmUrls.get(0); //todo if there is more solutions having the same display label, it will take the very first one
         } else {
-            tenantUrl = JsonPath.read(response.getResponse(), "$.data[*].data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')][0].launch.url");
-            log.info("Solution being populated: "+JsonPath.read(response.getResponse(), "$.data[*].data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')][0].displayLabel"));
+            tenantUrl = JsonPath.read(response.getResponse(), "$.data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')][0].launch.url");
+            log.info("Solution being populated: "+JsonPath.read(response.getResponse(), "$.data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')][0].displayLabel"));
         }
         String instanceId;
         if (solutionName != null) {
-            List<Integer> instanceIds = JsonPath.read(response.getResponse(), "$.data[*].data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')][?(@.displayLabel == '"+solutionName+"')].instanceId");
+            List<Integer> instanceIds = JsonPath.read(response.getResponse(), "$.data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')][?(@.displayLabel == '"+solutionName+"')].instanceId");
             instanceId = instanceIds.get(0).toString();
         } else {
-            Integer instanceIdInteger = JsonPath.read(response.getResponse(), "$.data[*].data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')][0].instanceId");
+            Integer instanceIdInteger = JsonPath.read(response.getResponse(), "$.data[?(@.productDisplayLabel == '"+PRODUCT_NAME+"')][0].instanceId");
             instanceId = instanceIdInteger.toString();
         }
         Settings.getSettings().setInstanceId(instanceId); // todo this is the reason why --tenant-url and --generate-u cannot be combined -> test if it can be combined and if so, remove the warnings
