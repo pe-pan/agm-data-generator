@@ -1,5 +1,11 @@
 Release Notes:
 ==============
+[15/Jul/2014]
+Version 1.20:
+-------------
+Bug fixes:
+  - Reflecting changes in portal API (to select correct solution)
+
 [08/Jul/2014]
 Version 1.19:
 -------------
