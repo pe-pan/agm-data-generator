@@ -37,15 +37,15 @@ public class ProxyConfigurator {
         if (proxyProperties == null) {
             System.setProperty("java.net.useSystemProxies", "true");
             Settings settings = Settings.getSettings();
-            String loginUrl = settings.getLoginUrl();
+            String portalUrl = settings.getPortalUrl();
             String httpUrl;
             String httpsUrl;
-            if (loginUrl.toLowerCase().startsWith("https")) {
-                httpUrl ="http"+loginUrl.substring("https".length());
-                httpsUrl = loginUrl;
+            if (portalUrl.toLowerCase().startsWith("https")) {
+                httpUrl ="http"+portalUrl.substring("https".length());
+                httpsUrl = portalUrl;
             } else {
-                httpUrl = loginUrl;
-                httpsUrl = "https"+loginUrl.substring("http".length());
+                httpUrl = portalUrl;
+                httpsUrl = "https"+portalUrl.substring("http".length());
             }
             String urls[] = new String[] { httpUrl, httpsUrl, settings.getSvnUrl(), settings.getHudsonUrl(), settings.getAliDevBridgeUrl() };
             proxyProperties = getSystemProxyConfiguration(urls);

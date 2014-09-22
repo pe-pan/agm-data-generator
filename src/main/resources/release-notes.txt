@@ -1,5 +1,11 @@
 Release Notes:
 ==============
+[22/Sep/2014]
+Version 1.21:
+-------------
+Technical enhancements:
+  - Standard SaaS portal API used for authentication and user management
+
 [15/Jul/2014]
 Version 1.20:
 -------------

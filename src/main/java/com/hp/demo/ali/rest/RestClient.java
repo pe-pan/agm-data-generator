@@ -34,6 +34,10 @@ public class RestClient {
         log.debug("New cookies: "+cookies.toString());
     }
 
+    public void addCookieValue(String cookie, String value) {
+        cookies.put(cookie, value);
+    }
+
     private String getCookieList() {
         if (cookies.size() == 0) {
             return "";

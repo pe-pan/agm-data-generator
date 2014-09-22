@@ -34,25 +34,16 @@ public class AgmClient {
     }
 
     /**
-     * @param loginUrl where to login.
+     * @param portalUrl where to login.
      * @param admin user credentials.
      */
-    public void login(String loginUrl, User admin) {
-        client.login(loginUrl, admin);
+    public void login(String portalUrl, User admin) {
+        client.authenticate(portalUrl, admin);
         String tenantUrl = Settings.getSettings().getTenantUrl();
         if (tenantUrl == null) {
-            String accountName = Settings.getSettings().getAccountName();
-            if (accountName != null) {
-                client.switchAccount(accountName);
-            }
-            String solutionName = Settings.getSettings().getSolutionName();
-            tenantUrl = client.getTenantUrl(solutionName);
+            tenantUrl = client.getTenantUrl(portalUrl, admin);
         }
         client.parseTenantProperties(tenantUrl);
-  }
-
-    public void prepareAddingUsers() {
-        client.prepareAddingUsers();
     }
 
     public void addPortalUser(User user) {
@@ -92,14 +83,14 @@ public class AgmClient {
         RestClient devBridgeDownloaderClient = new RestClient();
         FileDownloader downloader = new FileDownloader(devBridgeDownloaderClient );
         Settings settings = Settings.getSettings();
-        User admin = User.getUser(settings.getAdmin());          //todo this is a code copy of PortalClient.login -> refactor
-        String[][] data = {
-                { "username", admin.getLogin() },
-                { "password", admin.getPassword() }
-        };
-        devBridgeDownloaderClient.doPost(settings.getLoginUrl(), data);
-        data = new String[][] { {"server-url", settings.getRestUrl() } };
-        devBridgeDownloaderClient.doGet(settings.getRestUrl()+"/rest/domains/" + settings.getDomain() + "/projects/" + settings.getProject() + "/scm/dev-bridge/bundle", data, downloader);  // /scm/dev-bridge - downloads only war file!
+        User admin = User.getUser(settings.getAdmin());          //todo this is a code copy of PortalClient.authenticate -> refactor
+        final String data = "{\"loginName\":\""+admin.getLogin()+"\",\"password\":\""+admin.getPassword()+"\"}";
+        RestClient.HttpResponse response = devBridgeDownloaderClient.doPost(settings.getPortalUrl()+"/openservice/v1/lwsso/getToken", data, ContentType.JSON_JSON);
+        String ssoToken = response.getResponse();
+        devBridgeDownloaderClient.addCookieValue("LWSSO_COOKIE_KEY", ssoToken);
+
+        final String[][] data2 = new String[][] { {"server-url", settings.getRestUrl() } };
+        devBridgeDownloaderClient.doGet(settings.getRestUrl()+"/rest/domains/" + settings.getDomain() + "/projects/" + settings.getProject() + "/scm/dev-bridge/bundle", data2, downloader);  // /scm/dev-bridge - downloads only war file!
         return downloader;
     }
 }

@@ -325,11 +325,11 @@ public class DataGenerator {
         User admin = User.getUser(settings.getAdmin());
 
         try {
-            agmClient.login(settings.getLoginUrl(), admin);
+            agmClient.login(settings.getPortalUrl(), admin);
         } catch (IllegalStateException e) {
             log.debug(e);
             log.error("Incorrect credentials or URL: " + admin.getLogin() + " / " + admin.getPassword());
-            log.error("At: " + settings.getLoginUrl());
+            log.error("At: " + settings.getPortalUrl());
             System.exit(-1);
             throw e;        //will never be executed
         } catch (IllegalArgumentException e) {
@@ -408,8 +408,6 @@ public class DataGenerator {
     }
 
     public static void addUsers() {
-        agmClient.prepareAddingUsers();
-
         for (User user : User.getUsers()) {
             if (user.isPortalUser()) {
                 agmClient.addPortalUser(user);

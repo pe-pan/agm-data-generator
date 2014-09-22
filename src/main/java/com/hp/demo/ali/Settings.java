@@ -25,7 +25,7 @@ public class Settings {
 
     private static Logger log = Logger.getLogger(Settings.class.getName());
     private boolean generateProject;
-    private String loginUrl;
+    private String loginUrl;             //todo kept for backward compatibility (not used anymore)
     private String restUrl;
     private String tenantId;
     private String admin;
