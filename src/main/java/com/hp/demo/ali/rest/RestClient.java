@@ -97,7 +97,7 @@ public class RestClient {
      * @param formData if null, GET method is used; POST otherwise
      * @param method which method will be used
      * @param handler if null, the method is synchronous and waits for response. If not null, the method is asynchronous
-     *                and returns immediatelly. The response should can be processed in this handler.
+     *                and returns immediately. The response should can be processed in this handler.
      * @return response of the request
      */
     public synchronized HttpResponse doRequest(String urlAddress, String formData, Method method, ContentType contentType, AsyncHandler handler) {
