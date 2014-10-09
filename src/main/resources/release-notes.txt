@@ -8,6 +8,7 @@ Technical enhancements:
 
 Bug fixes:
   - Repository-type field of scm-repository entity renamed to 'type'
+  - Release has been extended for 13 days -> sprint #11 is not a single day long anymore (not valid for already created releases)
 
 [15/Jul/2014]
 Version 1.20:
