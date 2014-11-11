@@ -1,5 +1,11 @@
 Release Notes:
 ==============
+[11/Nov/2014]
+Version 1.22:
+-------------
+Bug fixes:
+  - Field product-group on build-type and scm-branch entities got renamed into product-group-id
+
 [09/Oct/2014]
 Version 1.21:
 -------------
