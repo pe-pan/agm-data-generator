@@ -1,5 +1,11 @@
 Release Notes:
 ==============
+[09/Dec/2014]
+Version 1.23:
+-------------
+Bug fixes:
+  - Entities build-server and scm-repository now also requires the product-group-id field
+
 [11/Nov/2014]
 Version 1.22:
 -------------
