@@ -8,6 +8,7 @@ import com.hp.demo.ali.agm.EntityHandler;
 import com.hp.demo.ali.agm.ProjectTaskHandler;
 import com.hp.demo.ali.agm.ReleaseHandler;
 import com.hp.demo.ali.agm.RequirementHandler;
+import com.hp.demo.ali.agm.ScmRepositoryHandler;
 import com.hp.demo.ali.agm.SheetHandler;
 import com.hp.demo.ali.agm.SheetHandlerRegistry;
 import com.hp.demo.ali.agm.SprintListInitializer;
@@ -272,6 +273,7 @@ public class DataGenerator {
         }
         // these specialized handlers will overwrite the handlers above for these specific entities
         registry.registerHandler("release", new ReleaseHandler());
+        registry.registerHandler("scm-repository", new ScmRepositoryHandler());
         registry.registerHandler("requirement", new RequirementHandler());
         registry.registerHandler("defect", new DefectHandler());
         registry.registerHandler("release-backlog-item", new PlanBacklogItemHandler());
