@@ -485,7 +485,7 @@ public class DataGenerator {
                 throw new IllegalStateException("Cannot start ALI Dev Bridge service; code "+devBridge.exitValue());
             }
             RestClient devBridgeClient = new RestClient();
-            int attempts = 15;
+            int attempts = settings.getAliDevBridgeAttempts();
             while (attempts > 0) {
                 try {
                     Thread.sleep(2000);

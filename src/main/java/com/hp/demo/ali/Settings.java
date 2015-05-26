@@ -61,6 +61,7 @@ public class Settings {
     private String buildServerName;
     private String branchPath;
     private String updateUrl;
+    private int aliDevBridgeAttempts = 15;
 
     private static DataFormatter formatter = new DataFormatter(true);
 
@@ -453,6 +454,18 @@ public class Settings {
 
     public void setUpdateUrl(String updateUrl) {
         this.updateUrl = updateUrl;
+    }
+
+    public int getAliDevBridgeAttempts() {
+        return aliDevBridgeAttempts;
+    }
+
+    public void setAliDevBridgeAttempts(String attempts) {
+        try {
+            this.aliDevBridgeAttempts = Integer.parseInt(attempts);
+        } catch (NumberFormatException e) {
+            log.error("Cannot parse this string into an int: "+attempts, e);
+        }
     }
 
     private static Settings settings = null;
