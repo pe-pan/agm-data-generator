@@ -56,7 +56,11 @@ public class EntityHandler extends AbstractSheetHandler {
                 }
             }
             return response;
-        } catch (RestClientException | ALMRestException e) {
+        } catch (RestClientException e) {
+            throw new IllegalStateException(e);
+        } catch (ALMRestException e) {
+            log.error(e.getExceptionProperties());
+            log.error(e.getId());
             throw new IllegalStateException(e);
         }
     }
