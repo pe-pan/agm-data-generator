@@ -62,6 +62,7 @@ public class Settings {
     private String branchPath;
     private String updateUrl;
     private int aliDevBridgeAttempts = 15;
+    private String workspaceId = Migrator.DEFAULT_WORKSPACE_ID;
 
     private static DataFormatter formatter = new DataFormatter(true);
 
@@ -466,6 +467,15 @@ public class Settings {
         } catch (NumberFormatException e) {
             log.error("Cannot parse this string into an int: "+attempts, e);
         }
+    }
+
+    public String getWorkspaceId() {
+        return workspaceId;
+    }
+
+    public void setWorkspaceId(String workspaceId) {
+        log.debug("Settings workspace ID: "+workspaceId);
+        this.workspaceId = workspaceId;
     }
 
     private static Settings settings = null;

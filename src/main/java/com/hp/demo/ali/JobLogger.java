@@ -40,7 +40,7 @@ public class JobLogger {
     public JobLogger(ExcelReader reader) {
         this.reader = reader;
         this.settings = Settings.getSettings();
-        this.jobLog = new File(Migrator.JOBS_DIR, Migrator.JOB_PREFIX+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+Migrator.JOB_SUFFIX);  //todo hack; make it non-static
+        jobLog = new File(Migrator.JOBS_DIR, Migrator.JOB_PREFIX+settings.getWorkspaceId()+"-"+settings.getTenantId()+"-"+settings.getDomain()+"-"+settings.getProject()+Migrator.JOB_SUFFIX);  //todo hack; make it non-static
         File migratedJobLog = new File(jobLog.getParentFile(), jobLog.getName()+".tmp");
         if (migrateJobLog(reader, jobLog, migratedJobLog)) {
             // job log migrated
@@ -134,20 +134,21 @@ public class JobLogger {
     }
 
     void deleteAllData() {
-        log.info("###############################################################");
-        log.info("###############################################################");
-        log.info("# You asked to delete ALL data from the tenant! Are you sure? #");
-        log.info("###############################################################");
-        log.info("###############################################################");
+        log.info("##################################################################");
+        log.info("##################################################################");
+        log.info("# You asked to delete ALL data from the workspace! Are you sure? #");
+        log.info("##################################################################");
+        log.info("##################################################################");
         askForDeletePermission();
         List<Sheet> sheets = reader.getAllEntitySheets();
         ListIterator<Sheet> iterator = sheets.listIterator(sheets.size());
         while (iterator.hasPrevious()) {
             Sheet sheet = iterator.previous();
             String entityType = sheet.getSheetName();
-            if (entityType.equals("release-backlog-item") || entityType.equals("kanban-status")) {
-                log.debug("Skipping "+entityType);
-                continue;   // skip release backlog items (they are not entities in AgM)
+            if (entityType.equals("release-backlog-item") || entityType.equals("kanban-status") || // skip release backlog and kanban items (they are not entities in AgM)
+                    entityType.equals("branch-policy-link") || entityType.equals("scm-branch-release") || entityType.equals("policy-item")) {  //those entities will be deleted when deleting scm-branch entity
+                log.info("Skipping entity: "+entityType);
+                continue;
             }
             deleteEntities(entityType);
         }
@@ -158,6 +159,7 @@ public class JobLogger {
         log.info("Deleting entity: " + entityType);
         Filter filter = new Filter(entityType);
         org.hp.almjclient.model.marshallers.Entities entities;
+        filter.addQueryClause("product-group-id", settings.getWorkspaceId());
         AgmRestService service = AgmRestService.getCRUDService();
         try {
             entities = service.readCollection(filter);

@@ -1,5 +1,6 @@
 package com.hp.demo.ali;
 
+import com.hp.demo.ali.agm.UnifyOtherEntityHandler;
 import com.hp.demo.ali.agm.KanbanStatusHandler;
 import com.hp.demo.ali.agm.KanbanStatusInitializer;
 import com.hp.demo.ali.agm.PlanBacklogItemHandler;
@@ -90,7 +91,7 @@ public class DataGenerator {
                 " |       - suppresses solution-name and account-name options (if provided)    |"+System.lineSeparator()+
                 " |       - users cannot be added when providing this option                   |"+System.lineSeparator()+
                 " |     --delete-all                                                           |"+System.lineSeparator()+
-                " |       - deletes all data from the tenant regardless previous runs          |"+System.lineSeparator()+
+                " |       - deletes all data from the workspace regardless previous runs       |"+System.lineSeparator()+
                 " |       - does not pay attention to the job log content                      |"+System.lineSeparator()+
                 " |     --force-delete                                                         |"+System.lineSeparator()+
                 " |       - do not ask for permission to delete previous data                  |"+System.lineSeparator()+
@@ -187,6 +188,7 @@ public class DataGenerator {
                     argIndex++;
                 }
             }
+            log.info("Workspace being populated: "+settings.getWorkspaceId());
             if (settings.isAddUsers() && settings.getTenantUrl() != null) {
                 log.error("Invalid combination: Adding users while providing Tenant URL is not supported.");
                 log.error("Use --generate-phb option when providing --tenant-url option.");
@@ -273,7 +275,7 @@ public class DataGenerator {
         }
         // these specialized handlers will overwrite the handlers above for these specific entities
         registry.registerHandler("release", new ReleaseHandler());
-        registry.registerHandler("scm-repository", new ScmRepositoryHandler());
+        registry.registerHandler("scm-repository", new ScmRepositoryHandler("location"));
         registry.registerHandler("requirement", new RequirementHandler());
         registry.registerHandler("defect", new DefectHandler());
         registry.registerHandler("release-backlog-item", new PlanBacklogItemHandler());
@@ -281,6 +283,7 @@ public class DataGenerator {
         registry.registerHandler("project-task", new ProjectTaskHandler());
         registry.registerHandler("team", new KanbanStatusInitializer());      // once teams are known, the kanban statuses should be also known
         registry.registerHandler("kanban-status", new KanbanStatusHandler());
+        registry.registerHandler("build-server", new UnifyOtherEntityHandler("location"));   // make location unique if there is one (in another workspace)
 
         for (Sheet sheet : entitySheets) {
             String entityName = sheet.getSheetName();
@@ -547,11 +550,11 @@ public class DataGenerator {
     public static void configureProject() {
         log.info("Configuring project...");
         String [][] params = new String[][] {
-                { "APM_EXTENSION", "product", "1000", "SETTINGS", "SEND_MAIL_ON_ASSIGNMENT_CHANGE",  "false" },
-                { "APM_EXTENSION", "product", "1000", "SETTINGS", "SEND_MAIL_ON_STATUS_CHANGE",      "false" },
-                { "APM_EXTENSION", "product", "1000", "SETTINGS", "SEND_MAIL_ON_EXCEED_CYCLE_TIME",  "false" },
-                { "APM_EXTENSION", "product", "1000", "PLANNING", "AUTO_CREATE_TASK_FOR_DEFECT",     "false" },
-                { "APM_EXTENSION", "product", "1000", "SETTINGS", "WSJF_FEATURE_ENABLED",            "true"  },
+                { "APM_EXTENSION", "product", settings.getWorkspaceId(), "SETTINGS", "SEND_MAIL_ON_ASSIGNMENT_CHANGE",  "false" },
+                { "APM_EXTENSION", "product", settings.getWorkspaceId(), "SETTINGS", "SEND_MAIL_ON_STATUS_CHANGE",      "false" },
+                { "APM_EXTENSION", "product", settings.getWorkspaceId(), "SETTINGS", "SEND_MAIL_ON_EXCEED_CYCLE_TIME",  "false" },
+                { "APM_EXTENSION", "product", settings.getWorkspaceId(), "PLANNING", "AUTO_CREATE_TASK_FOR_DEFECT",     "false" },
+                { "APM_EXTENSION", "product", settings.getWorkspaceId(), "SETTINGS", "WSJF_FEATURE_ENABLED",            "true"  },
         };
 
         StringBuilder builder = new StringBuilder();

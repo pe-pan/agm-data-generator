@@ -22,6 +22,7 @@ public class Migrator {
     public static final String TMP_DIR = "tmp";
     public static final String DEV_BRIDGE_ZIP_FILE = "DevBridge.zip";
 
+    public static final String DEFAULT_WORKSPACE_ID = "1000";  // if none specified before, default is used
     static void migrate() {
 
         // at this moment of run, do not migrate log folder + log file -> log4j has already created this new folder and the new log file
@@ -57,7 +58,7 @@ public class Migrator {
         File workingFolder = new File(".");
         File[] jobFiles = workingFolder.listFiles(new FilenameFilter() {
             public boolean accept(File dir, String name) {
-            return name.startsWith(JOB_PREFIX) && (name.endsWith(JOB_SUFFIX) || name.endsWith(JOB_SUFFIX+JOB_BACKUP_SUFIX));
+                return name.startsWith(JOB_PREFIX) && (name.endsWith(JOB_SUFFIX) || name.endsWith(JOB_SUFFIX+JOB_BACKUP_SUFIX));
             }
         });
 
@@ -70,5 +71,23 @@ public class Migrator {
         if (migrated) {
             log.info("Logs, job logs and settings migrated to new folder structure");
         }
+
+        //second migration -> migrate job files to use #workspaceID convention naming
+        File jobFilesFolder = new File(".", JOBS_DIR);
+        jobFiles = jobFilesFolder.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.matches(JOB_PREFIX+"\\d+-[^-]+-[^-]+\\.log(.tmp)?");
+//                return name.matches(JOB_PREFIX+"\\d+-[^-]+-[^-]+\\.log(.tmp)?") && !name.startsWith(JOB_PREFIX+WORKSPACE_ID_PREFIX);
+            }
+        });
+        for (File jobFile : jobFiles) {
+            String oldName = jobFile.getName();
+            String newName = JOB_PREFIX+DEFAULT_WORKSPACE_ID+"-"+oldName.substring(JOB_PREFIX.length());
+            log.info("Renaming "+oldName+" into "+newName);
+            if (!jobFile.renameTo(new File(jobFilesFolder, newName))) {
+                log.error("Cannot rename the job; data refresh will not work properly!");
+            }
+        }
+
     }
 }

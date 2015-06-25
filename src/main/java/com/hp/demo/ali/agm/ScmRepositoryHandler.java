@@ -14,8 +14,13 @@ import java.util.Map;
 /**
  * Created by panuska on 19.1.15.
  */
-public class ScmRepositoryHandler extends EntityHandler {
+public class ScmRepositoryHandler extends UnifyOtherEntityHandler {
     private static Logger log = Logger.getLogger(ScmRepositoryHandler.class.getName());
+
+    public ScmRepositoryHandler(String sharedParameter) {
+        super(sharedParameter);
+    }
+
     @Override
     public Entity row(Entity entity) {
         Entity result = super.row(entity);
