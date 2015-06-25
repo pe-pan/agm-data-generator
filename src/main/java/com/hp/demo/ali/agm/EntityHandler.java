@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.hp.almjclient.exceptions.ALMRestException;
 import org.hp.almjclient.exceptions.FieldNotFoundException;
 import org.hp.almjclient.exceptions.RestClientException;
-import org.hp.almjclient.model.marshallers.Entities;
 import org.hp.almjclient.model.marshallers.Entity;
 import org.hp.almjclient.model.marshallers.favorite.Filter;
 
@@ -45,15 +44,7 @@ public class EntityHandler extends AbstractSheetHandler {
             if (agmId == null) {
                 response = createEntity(entity, excelId);
             } else {
-                entity.setId(Integer.parseInt(agmId));
-                try {
-                    response = AgmRestService.getCRUDService().update(entity);
-                    updatedEntities++;
-                    log.debug("Updated("+updatedEntities+") "+response+": "+ EntityTools.entityToString(response));
-                } catch (ALMRestException | RestClientException e) {
-                    log.debug("Update failed! Trying to create!", e);
-                    response = createEntity(entity, excelId);
-                }
+                response = updateEntity(entity, excelId, Integer.parseInt(agmId));
             }
             return response;
         } catch (RestClientException e) {
@@ -79,7 +70,7 @@ public class EntityHandler extends AbstractSheetHandler {
         return filter;
     }
 
-    private Entity createEntity(Entity entity, String excelId) throws ALMRestException, RestClientException {
+    protected Entity createEntity(Entity entity, String excelId) throws ALMRestException, RestClientException {
         Entity response;
 //        try {
             response = AgmRestService.getCRUDService().create(entity);
@@ -103,6 +94,20 @@ public class EntityHandler extends AbstractSheetHandler {
         String agmId = response.getId().toString();
         JobLogger.writeLogLine(sheetName, agmId, excelId);
         AgmEntityIterator.putReference(sheetName + "#" + excelId, agmId);
+        return response;
+    }
+
+    protected Entity updateEntity(Entity entity, String excelId, int agmId) throws ALMRestException, RestClientException {
+        Entity response;
+        entity.setId(agmId);
+        try {
+            response = AgmRestService.getCRUDService().update(entity);
+            updatedEntities++;
+            log.debug("Updated("+updatedEntities+") "+response+": "+ EntityTools.entityToString(response));
+        } catch (ALMRestException | RestClientException e) {
+            log.debug("Update failed! Trying to create!", e);
+            response = createEntity(entity, excelId);
+        }
         return response;
     }
 
