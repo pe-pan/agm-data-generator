@@ -59,7 +59,7 @@ public class DataGenerator {
                 " | AgM data generator "+DataGenerator.class.getPackage().getImplementationVersion()+" (build time: "+Upgrader.getBuildTime()+")                     |"+System.lineSeparator()+
                 " |============================================================================|"+System.lineSeparator()+
                 " | For more information and release notes, go to                              |"+System.lineSeparator()+
-                " |   https://connections.houston.hp.com/docs/DOC-58222                        |"+System.lineSeparator()+
+                " |   https://irock.jiveon.com/docs/DOC-122103                                 |"+System.lineSeparator()+
                 " |============================================================================|"+System.lineSeparator()+
                 " | Usage:                                                                     |"+System.lineSeparator()+
                 " |   java -jar "+ Upgrader.AGM_JAR_FILE+" [excel-configuration-file.xlsx]         |"+System.lineSeparator()+
