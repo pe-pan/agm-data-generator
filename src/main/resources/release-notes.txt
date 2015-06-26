@@ -1,5 +1,16 @@
 Release Notes:
 ==============
+[26/Jun/2015]
+Version 1.25:
+-------------
+Added features:
+  - Support for multiple workspaces; the workspace must be created before-hand
+  - Generating AOB (Advantage Online Banking) related data; no Media Store anymore
+
+Bug fixes:
+  - ALI Dev Bridge connection timeout increased (15->50 attempts) and made configurable
+  - Configure user rights on workspace correctly (including administrator)
+
 [19/Jan/2015]
 Version 1.24:
 -------------
