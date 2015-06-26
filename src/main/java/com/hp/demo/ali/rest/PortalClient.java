@@ -119,7 +119,7 @@ public class PortalClient  {
                     JSONObject userJson = new JSONObject();
                     userJson.put("tenantToAdd", Settings.getSettings().getTenantId());
                     client.doPut(portalUrl+"/service/v1/Users/patch/"+userId, userJson.toJSONString(), ContentType.JSON_JSON);
-                    log.info("User added to the solution");
+                    log.info("User "+user.getLogin()+" added to the solution");
                 } else {
                     log.info("User "+user.getLogin()+" already a member of the solution");
                 }
