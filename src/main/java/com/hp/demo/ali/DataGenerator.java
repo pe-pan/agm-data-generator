@@ -416,8 +416,8 @@ public class DataGenerator {
         for (User user : User.getUsers()) {
             if (user.isPortalUser()) {
                 agmClient.addPortalUser(user);
-                agmClient.addTenantUser(user);
             }
+            agmClient.addTenantUser(user);
         }
     }
 
@@ -576,7 +576,12 @@ public class DataGenerator {
         builder.append("</ConfigurationResourceParameters>");
         try {
             AgmRestService.getAdapter().post(String.class, AgmRestService.getCollectionBaseUrl()+"/customization/configurationservice/setvalues", builder.toString(), ServiceResourceAdapter.ContentType.XML);
-        } catch (RestClientException | ALMRestException e) {
+        } catch (ALMRestException e) {
+            if (e.getId().equals("qccore.user-not-assigned-to-product-group-exception")) {
+                log.error("User "+User.getUser(settings.getAdmin()).getLogin()+" not an admin of the populated workspace "+settings.getWorkspaceId()+"; Didn't you forget to add users to the workspace?");
+            }
+            throw new IllegalStateException(e);
+        } catch (RestClientException e) {
             throw new IllegalStateException(e);
         }
     }

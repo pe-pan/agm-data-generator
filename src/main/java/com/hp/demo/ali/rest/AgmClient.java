@@ -67,8 +67,9 @@ public class AgmClient {
              Map<String, String> headers = new HashMap<>(1);
              headers.put("INTERNAL_DATA", "20120922");
              adapter.addSessionCookie("AGM_STATE="+"20120922");
-             adapter.putWithHeaders(String.class, Settings.getSettings().getRestUrl()+"/rest/api/portal/users?productGroupId=1000", usersJson.toString(), headers, ServiceResourceAdapter.ContentType.JSON);
-             log.info("User added to the tenant");
+             String role = user == User.getUser(Settings.getSettings().getAdmin()) ? "Administrator" : "Team%20Member";
+             adapter.putWithHeaders(String.class, Settings.getSettings().getRestUrl()+"/rest/api/portal/users?product-group-id="+Settings.getSettings().getWorkspaceId()+"&role-name="+role+"&is-term-license=false", usersJson.toString(), headers, ServiceResourceAdapter.ContentType.JSON);
+             log.info("User "+user.getLogin()+" added to the tenant and workspace "+Settings.getSettings().getWorkspaceId()+" as "+role);
          } catch (ALMRestException e) {
              log.error("Cannot add user to project: "+user.getFirstName()+" "+user.getLastName());
              String responseHtml = e.getResponse().getEntity(String.class);
