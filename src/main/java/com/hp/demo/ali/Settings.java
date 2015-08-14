@@ -63,6 +63,8 @@ public class Settings {
     private String updateUrl;
     private int aliDevBridgeAttempts = 15;
     private String workspaceId = Migrator.DEFAULT_WORKSPACE_ID;
+    private String secondJobName = null;
+    private String secondSvnUrl = null;
 
     private static DataFormatter formatter = new DataFormatter(true);
 
@@ -476,6 +478,24 @@ public class Settings {
     public void setWorkspaceId(String workspaceId) {
         log.debug("Settings workspace ID: "+workspaceId);
         this.workspaceId = workspaceId;
+    }
+
+    public String getSecondJobName() {
+        return secondJobName;
+    }
+
+    public void setSecondJobName(String secondJobName) {
+        log.debug("Setting secondJobName: "+secondJobName);
+        this.secondJobName = secondJobName;
+    }
+
+    public String getSecondSvnUrl() {
+        return secondSvnUrl;
+    }
+
+    public void setSecondSvnUrl(String secondSvnUrl) {
+        log.debug("Setting secondSvnUrl: "+secondSvnUrl);
+        this.secondSvnUrl = secondSvnUrl;
     }
 
     private static Settings settings = null;

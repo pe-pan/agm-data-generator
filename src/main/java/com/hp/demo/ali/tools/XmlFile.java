@@ -1,5 +1,6 @@
 package com.hp.demo.ali.tools;
 
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -19,6 +20,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 
 /**
  * Created by panuska on 5/14/13.
@@ -34,6 +36,14 @@ public class XmlFile {
     public XmlFile(File file) {
         try {
             document = dbf.newDocumentBuilder().parse(file);
+        } catch (SAXException | IOException | ParserConfigurationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public XmlFile(String string) {
+        try {
+            document = dbf.newDocumentBuilder().parse(IOUtils.toInputStream(string));
         } catch (SAXException | IOException | ParserConfigurationException e) {
             throw new IllegalStateException(e);
         }
@@ -88,6 +98,17 @@ public class XmlFile {
         try {
             Transformer t = tf.newTransformer();
             t.transform(new DOMSource(document), new StreamResult(file));
+        } catch (TransformerException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public String saveToString() {
+        try {
+            Transformer t = tf.newTransformer();
+            StringWriter sw = new StringWriter();
+            t.transform(new DOMSource(document), new StreamResult(sw));
+            return sw.toString();
         } catch (TransformerException e) {
             throw new IllegalStateException(e);
         }

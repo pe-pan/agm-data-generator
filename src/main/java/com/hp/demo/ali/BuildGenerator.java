@@ -6,16 +6,16 @@ import com.hp.demo.ali.excel.ExcelEntity;
 import com.hp.demo.ali.excel.ExcelReader;
 import com.hp.demo.ali.rest.IllegalRestStateException;
 import com.hp.demo.ali.rest.RestClient;
+import com.hp.demo.ali.rest.RestTools;
 import com.hp.demo.ali.svn.RepositoryMender;
-import com.hp.demo.ali.tools.ResourceTools;
 import com.hp.demo.ali.tools.XmlFile;
-import net.minidev.json.JSONObject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.xpath.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,7 +57,7 @@ public class BuildGenerator {
         log.debug("Trying to delete job "+settings.getJobName()+" at Hudson...");
         RestClient hudsonClient = new RestClient();
         try {
-            hudsonClient.doPost(settings.getHudsonUrl()+"job/"+settings.getJobName()+"/doDelete", (String) null);
+            hudsonClient.doPost(settings.getHudsonUrl()+"job/"+ RestTools.encodeUrl(settings.getJobName())+"/doDelete", (String) null);
         } catch (IllegalStateException e) {
             log.debug("Cannot delete the job, probably it does not exist");
         }
@@ -258,53 +258,54 @@ public class BuildGenerator {
     }
 
     public void createJob() {
-        log.info("Creating job " + settings.getJobName() + " at Hudson...");
+        log.info("Creating job " + settings.getJobName() + " at "+settings.getBuildServerName()+"...");
         RestClient client = new RestClient();
         try {
-            JSONObject job = new JSONObject();
-            job.put("name", settings.getJobName());
-            job.put("mode", "copy");
-            job.put("from", settings.getTemplateJobName());
-            job.put("Submit", "OK");
-
-            String [] [] data = new String[][] {
-                    {"json", job.toJSONString() },
-                    {"name", settings.getJobName()},
-                    {"mode", "copy"},
-                    {"from", settings.getTemplateJobName() }
-            };
-            client.doPost(settings.getHudsonUrl() + "view/All/createItem", data);
-
-            String jobJsonFileName = settings.getBuildServerName()+"-job.json";
-            String jobJson = ResourceTools.getCustomResourceContent(new File(Migrator.CONF_DIR, jobJsonFileName));
-
-            log.debug("Loaded "+jobJsonFileName+" file: \n"+jobJson);
-            jobJson = jobJson.replace("__JOB_NAME__", settings.getJobName());
-            jobJson = jobJson.replace("__SVN_URL__", settings.getSvnUrl()+settings.getBranchPath());
-            jobJson = jobJson.replace("__ALM_LOCATION__", settings.getRestUrl());
-            jobJson = jobJson.replace("__ALM_DOMAIN__", settings.getDomain());
-            jobJson = jobJson.replace("__ALM_PROJECT__", settings.getProject());
-            jobJson = jobJson.replace("__ALM_USERNAME__", User.getUser(settings.getAdmin()).getLogin());
-            jobJson = jobJson.replace("__ALM_PASSWORD__", User.getUser(settings.getAdmin()).getPassword());
-            jobJson = jobJson.replace("__ALM_BUILD_SERVER__", settings.getBuildServerName());
-            log.debug("Processed "+jobJsonFileName+" file: \n"+jobJson);
-
-            data = new String[][]{
-                    {"scm", "2"},
-                    {"_.remote" , settings.getSvnUrl()+settings.getBranchPath()},
-                    {"-.local", "."},
-                    {"json", jobJson },
-            };
-            client.doPost(settings.getHudsonUrl() +"job/"+ settings.getJobName() + "/configSubmit", data);
-
-            data = new String[][] {
+            configureJob(settings.getJobName(), settings.getTemplateJobName(), settings.getSvnUrl());
+            String[][] data = new String[][] {
                     { "nextBuildNumber", ""+currentBuildNumber },
                     { "json", "{\"nextBuildNumber\": \""+currentBuildNumber+"\"}" },
 
             };
-            client.doPost(settings.getHudsonUrl() +"job/"+settings.getJobName()+"/nextbuildnumber/submit", data);
+            client.doPost(settings.getHudsonUrl() + "job/" + settings.getJobName() + "/nextbuildnumber/submit", data);
         } catch (IllegalRestStateException e) {
             log.error("Create job exception caught; Code: " + e.getResponseCode(), e);
+        }
+    }
+
+    public void configureSecondJob() {
+        try {
+            if (settings.getSecondJobName() == null || settings.getSecondSvnUrl() == null) return;
+            log.info("Configuring job " + settings.getSecondJobName() + " at "+settings.getBuildServerName()+"...");
+            configureJob(settings.getSecondJobName(), settings.getSecondJobName(), settings.getSecondSvnUrl());
+        } catch (IllegalRestStateException e) {
+            log.error("Exception when configuring job "+settings.getSecondJobName()+"; Code: " + e.getResponseCode(), e);
+        }
+    }
+
+    /**
+     * Gets the config from template; changes values of SVN URL and ALI connections settings and either creates a new job or changes the existing
+     * @param jobName if equals to templateJobName, just reconfigures this job; creates a new job otherwise
+     * @param templateJobName where to take the original config.xml
+     * @param svnUrl
+     */
+    private void configureJob(String jobName, String templateJobName, String svnUrl) {
+        final String configUrl = settings.getHudsonUrl()+"job/"+RestTools.encodeUrl(templateJobName)+"/config.xml";
+        RestClient client = new RestClient();
+        String templateConfig = client.doGet(configUrl).getResponse();
+
+        XmlFile xmlFile = new XmlFile(templateConfig);
+        xmlFile.setNodeValue("//scm/locations/hudson.scm.SubversionSCM_-ModuleLocation/remote", svnUrl+settings.getBranchPath());
+        xmlFile.setNodeValue("//publishers/com.hp.alm.ali.hudson.BuildRecorder/almLocation", settings.getRestUrl());
+        xmlFile.setNodeValue("//publishers/com.hp.alm.ali.hudson.BuildRecorder/almDomain", settings.getDomain());
+        xmlFile.setNodeValue("//publishers/com.hp.alm.ali.hudson.BuildRecorder/almProject", settings.getProject());
+        xmlFile.setNodeValue("//publishers/com.hp.alm.ali.hudson.BuildRecorder/almUsername", User.getUser(settings.getAdmin()).getLogin());
+        xmlFile.setNodeValue("//publishers/com.hp.alm.ali.hudson.BuildRecorder/almPassword", DatatypeConverter.printBase64Binary(User.getUser(settings.getAdmin()).getPassword().getBytes()));
+        xmlFile.setNodeValue("//publishers/com.hp.alm.ali.hudson.BuildRecorder/almBuildServer", settings.getBuildServerName());
+        if (jobName.equals(templateJobName)) {                 // only update existing
+            client.doPost(configUrl, xmlFile.saveToString());
+        } else {                                               // create a new one
+            client.doPost(settings.getHudsonUrl()+"/createItem?name="+RestTools.encodeUrl(jobName), xmlFile.saveToString());
         }
     }
 

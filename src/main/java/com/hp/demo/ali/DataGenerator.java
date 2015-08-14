@@ -248,6 +248,8 @@ public class DataGenerator {
                 buildGenerator.configureHudson(proxyConfigurator);
                 buildGenerator.generate();
                 buildGenerator.createJob();
+
+                buildGenerator.configureSecondJob();
             }
             if (settings.isGenerateProject() || settings.isGenerateBuilds()) {
                 synchronizeAliDevBridge();
