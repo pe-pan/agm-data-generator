@@ -65,6 +65,7 @@ public class Settings {
     private String workspaceId = Migrator.DEFAULT_WORKSPACE_ID;
     private String secondJobName = null;
     private String secondSvnUrl = null;
+    private int connectionTimeout = 60*1000;
 
     private static DataFormatter formatter = new DataFormatter(true);
 
@@ -496,6 +497,18 @@ public class Settings {
     public void setSecondSvnUrl(String secondSvnUrl) {
         log.debug("Setting secondSvnUrl: "+secondSvnUrl);
         this.secondSvnUrl = secondSvnUrl;
+    }
+
+    public int getConnectionTimeout() {
+        return connectionTimeout;
+    }
+
+    public void setConnectionTimeout(String timeout) {
+        try {
+            this.connectionTimeout = Integer.parseInt(timeout);
+        } catch (NumberFormatException e) {
+            log.error("Cannot parse this string into an int: "+timeout, e);
+        }
     }
 
     private static Settings settings = null;

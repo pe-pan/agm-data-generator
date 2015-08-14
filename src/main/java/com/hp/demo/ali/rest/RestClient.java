@@ -1,5 +1,6 @@
 package com.hp.demo.ali.rest;
 
+import com.hp.demo.ali.Settings;
 import com.hp.demo.ali.excel.ExcelEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -120,8 +121,9 @@ public class RestClient {
                 conn.setDoInput(true);
                 conn.setAllowUserInteraction(false);
                 conn.setInstanceFollowRedirects(false);
-                conn.setReadTimeout(60*1000);
-                conn.setConnectTimeout(60*1000);
+                int connectionTimeout = Settings.getSettings().getConnectionTimeout();
+                conn.setReadTimeout(connectionTimeout);
+                conn.setConnectTimeout(connectionTimeout);
                 String methodName = redirect ? "GET" : method.toString();
                 log.debug("Doing "+methodName);
                 conn.setRequestMethod(methodName);
