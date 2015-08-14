@@ -22,17 +22,20 @@ public class FileDownloader implements AsyncHandler {
     private boolean downloaded = false;
     private File file = null;
     private final Date timeLimit;
+    private final String assumedFileName;
 
     public static final SimpleDateFormat buildTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
-    public FileDownloader(RestClient client) {
+    public FileDownloader(RestClient client, String assumedFileName) {
         this.client = client;
         this.timeLimit = null;
+        this.assumedFileName = assumedFileName;
     }
 
-    public FileDownloader(RestClient client, Date timeLimit) {
+    public FileDownloader(RestClient client, Date timeLimit, String assumedFileName) {
         this.client = client;
         this.timeLimit = timeLimit;
+        this.assumedFileName = assumedFileName;
     }
 
     @Override
@@ -73,7 +76,7 @@ public class FileDownloader implements AsyncHandler {
                     }
                 }
             } catch (IOException e) {
-                log.error("File cannot be downloaded", e);
+                log.error("File "+assumedFileName+" cannot be downloaded", e);
                 return;
             } finally {
                 synchronized (client) {
@@ -93,10 +96,10 @@ public class FileDownloader implements AsyncHandler {
         synchronized (this) {
             while (!downloaded) {
                 try {
-                    log.info("Waiting to finish downloading...");
+                    log.info("Waiting to finish downloading "+assumedFileName+"...");
                     wait();
                 } catch (InterruptedException e) {
-                    log.debug("Interrupted when waiting for download", e);
+                    log.debug("Interrupted when waiting for download "+assumedFileName, e);
                     return downloaded;
                 }
             }

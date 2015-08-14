@@ -82,7 +82,7 @@ public class AgmClient {
 
     public FileDownloader downloadDevBridge() {
         RestClient devBridgeDownloaderClient = new RestClient();
-        FileDownloader downloader = new FileDownloader(devBridgeDownloaderClient );
+        FileDownloader downloader = new FileDownloader(devBridgeDownloaderClient, "DevBridge.zip" );
         Settings settings = Settings.getSettings();
         User admin = User.getUser(settings.getAdmin());          //todo this is a code copy of PortalClient.authenticate -> refactor
         final String data = "{\"loginName\":\""+admin.getLogin()+"\",\"password\":\""+admin.getPassword()+"\"}";

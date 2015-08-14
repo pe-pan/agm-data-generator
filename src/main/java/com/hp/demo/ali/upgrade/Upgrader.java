@@ -52,7 +52,7 @@ public class Upgrader {
             RestClient client = new RestClient();
 
             Date timeLimit = getLastModified();
-            FileDownloader agmJarFileDownloader = new FileDownloader(client, timeLimit);
+            FileDownloader agmJarFileDownloader = new FileDownloader(client, timeLimit, Upgrader.AGM_JAR_FILE);
             client.doGet(url + AGM_JAR_FILE, agmJarFileDownloader);
             if (!agmJarFileDownloader.waitTillDownloaded()) {
                 log.error("Upgrade cannot be downloaded. Check logs for more information.");
