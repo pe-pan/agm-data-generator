@@ -1,7 +1,7 @@
 package com.hp.demo.ali.tools;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.apache.tika.io.IOUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
