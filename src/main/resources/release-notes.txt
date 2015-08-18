@@ -1,5 +1,16 @@
 Release Notes:
 ==============
+[18/Aug/2015]
+Version 1.26:
+-------------
+Added features:
+  - CODAR support (configures additional Jenkins CODAR job)
+  - Option to configure HTTP connection timeout
+
+Technical enhancements
+  - Standard Jenkins REST API when creating jobs
+  - Libraries cleaned
+
 [26/Jun/2015]
 Version 1.25:
 -------------
