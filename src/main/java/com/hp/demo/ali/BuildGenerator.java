@@ -274,8 +274,8 @@ public class BuildGenerator {
     }
 
     public void configureSecondJob() {
+        if (!settings.configureSecondJob()) return;
         try {
-            if (settings.getSecondJobName() == null || settings.getSecondSvnUrl() == null) return;
             log.info("Configuring job " + settings.getSecondJobName() + " at "+settings.getBuildServerName()+"...");
             configureJob(settings.getSecondJobName(), settings.getSecondJobName(), settings.getSecondSvnUrl());
         } catch (IllegalRestStateException e) {
