@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 public class RestTools {
 
     public static String encodeUrl(String url) {
+        if (url == null) return null;
         try {
             return URLEncoder.encode(url, "UTF-8").replace("+", "%20");
         } catch (UnsupportedEncodingException e) {
