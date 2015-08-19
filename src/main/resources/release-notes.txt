@@ -1,6 +1,6 @@
 Release Notes:
 ==============
-[18/Aug/2015]
+[19/Aug/2015]
 Version 1.26:
 -------------
 Added features:
