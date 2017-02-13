@@ -419,6 +419,7 @@ public class DataGenerator {
             if (user.isPortalUser()) {
                 agmClient.addPortalUser(user);
             }
+            if (user.getId().equals(settings.getAdmin())) continue; // do not add admin as it will change admin's name to Petr Panuska
             agmClient.addTenantUser(user);
         }
     }

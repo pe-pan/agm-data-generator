@@ -1,5 +1,11 @@
 Release Notes:
 ==============
+[15/Sep/2015]
+Version 1.27:
+-------------
+Bug fixes:
+  - Do not rename admin to Petr Panuska
+
 [19/Aug/2015]
 Version 1.26:
 -------------
