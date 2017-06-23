@@ -17,7 +17,7 @@
         <repository>
             <id>nexus</id>
             <name>internal mirror for all stable repositories</name>
-            <url>http://mpavmnexus02.hpswlabs.adapps.hp.com:8081/nexus/content/groups/HORIZON-ALL</url>
+            <url>http://mydtbld0051.hpeswlab.net:8081/nexus/content/repositories/agm-snapshots</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
