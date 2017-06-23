@@ -1,5 +1,11 @@
 Release Notes:
 ==============
+[23/Jun/2017]
+Version 1.28:
+-------------
+Bug fixes:
+  - Fixing Hostname Verifier  
+
 [15/Sep/2015]
 Version 1.27:
 -------------
