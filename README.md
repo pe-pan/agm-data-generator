@@ -15,4 +15,6 @@ It generates following entities:
 
 It configures Application Lifecycle Intelligence and Kanban.
 
-FMI, see the generator in <a href="https://hpswdemoportal.com/csp">Stratus</a>.
+For additional information, go to [Release Notes](src/main/resources/release-notes.txt),
+<a href="https://irock.jiveon.com/docs/DOC-122103">IRock (HPE employees only)</a> or
+<a href="https://mpp.hpswdemoportal.com/service?search=codar">Stratus</a> (where ADG is installed).
