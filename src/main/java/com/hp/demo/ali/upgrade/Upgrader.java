@@ -137,18 +137,12 @@ public class Upgrader {
             throw new IllegalStateException(e);
         }
 
-        try {
-            final URL upgradeUrl = new URL(url);
-            HostnameVerifier allHostsValid = new HostnameVerifier() {
-                public boolean verify(String hostname, SSLSession session) {
-                    return url != null && upgradeUrl.getHost().equals(hostname);
-                }
-            };
-            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-        } catch (MalformedURLException e) {
-            log.error("Not an URL "+url, e);
-            return false;
-        }
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
+        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
         return true;
     }
 }
